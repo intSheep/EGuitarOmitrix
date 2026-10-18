@@ -32,3 +32,12 @@ The restricted command sandbox did not expose the same live filesystem/socket be
 - The source snapshot was observed on 2026-10-18; page ordering can change. Revalidate an updated manifest rather than assuming a stored page remains current forever.
 - No task extraction/review, practice timer/history, offline app cache, full backup, score conversion, score playback, GP8 launch, or public deployment is implemented.
 - Visual comfort and workflow suitability still need owner feedback. Automated checks do not prove that the design is the owner's preferred final direction.
+
+
+## Brilliant visual revision — 2026-10-18
+
+- Owner-provided Brilliant screenshot inspected directly; latest Stitch desktop `28e363c036c0459088b87a3e4336f2fe` generated and inspected.
+- Local Chromium 156.0.8078.4: 1440 px desktop, 820 px tablet and 390 px phone checked; no horizontal overflow; tablet retains both panes.
+- Selection, exact Bilibili page/CID popup targets, six related P007 media entries, catalog search and legacy filters, missing subtitles, phone dialog and Escape focus restoration passed.
+- Reduced-motion and unavailable-storage fallback passed; no browser console or page errors. Six existing Node tests and static build passed.
+- Outbound requests were intercepted for destination assertions; actual Bilibili playback was not tested. No fabricated practice completion or teacher prescription was added.

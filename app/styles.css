@@ -1,15 +1,15 @@
 :root {
   color-scheme: light;
-  --canvas: #f7f8fa;
+  --canvas: #fff;
   --surface: #fff;
-  --ink: #20262e;
-  --muted: #65717d;
-  --line: #e0e5e9;
+  --ink: #171717;
+  --muted: #626570;
+  --line: #e5e5e5;
   --line-strong: #c8d0d7;
-  --accent: #087f8c;
-  --accent-hover: #076a76;
-  --accent-soft: #edf7f7;
-  --accent-border: #a5cfd2;
+  --accent: #3f5cf0;
+  --accent-hover: #304bd9;
+  --accent-soft: #f1f4ff;
+  --accent-border: #b6c2ff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
   font-size: 14px;
   color: var(--ink);
@@ -230,4 +230,92 @@ html:has(dialog[open]) { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Brilliant-inspired visual language; exercise selection remains non-linear. */
+.app-header { height: 82px; gap: 54px; }
+.brand { font-size: 20px; font-weight: 800; letter-spacing: -.8px; }
+.navigation a { font-size: 15px; font-weight: 650; }
+.navigation a[aria-current="page"] { color: var(--ink); }
+.navigation a[aria-current="page"]::after { background: var(--ink); height: 3px; }
+.source-link { border: 2px solid var(--line); border-radius: 24px; padding: 8px 16px; }
+.page-heading { padding: 46px 0 30px; }
+h1 { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+.eyebrow { font-weight: 650; letter-spacing: .08em; }
+.page-subtitle { margin-top: 10px; }
+.stage-bar { border: 0; padding-bottom: 0; margin-bottom: 32px; gap: 26px; }
+.stage-pills { gap: 8px; }
+.stage-pills button { border: 2px solid var(--line); border-radius: 12px; min-width: 48px; height: 42px; font-weight: 700; }
+.stage-pills button[aria-pressed="true"] { color: white; border-color: var(--accent); background: var(--accent); box-shadow: 0 3px 0 #243db1; }
+.stage-pills button:hover { background: var(--accent-soft); color: var(--accent); }
+.stage-pills button[aria-pressed="true"]:hover { background: var(--accent-hover); color: white; }
+.stage-context strong { font-size: 15px; }
+.practice-layout { grid-template-columns: minmax(0, 1.05fr) minmax(340px, 1fr); gap: 40px; }
+.exercise-list, .lesson-detail { border: 2px solid var(--line); border-radius: 22px; }
+.list-heading { padding: 20px 24px; }
+.list-heading h2 { font-size: 16px; font-weight: 750; }
+.exercise-list ul { padding: 10px; }
+.exercise-row { border-radius: 14px; min-height: 82px; }
+.exercise-row.is-selected { border-color: var(--accent-border); background: var(--accent-soft); }
+.exercise-row.is-selected::before { display: none; }
+.exercise-select { padding: 17px 8px 17px 12px; gap: 16px; }
+.exercise-number { display: grid; place-items: center; flex: 0 0 38px; height: 38px; border: 2px solid #dedfe5; border-radius: 50%; align-self: center; margin: 0; color: #626570; background: white; font-size: 13px; font-weight: 750; box-shadow: 0 3px 0 #e5e5eb; }
+.is-selected .exercise-number { color: white; background: var(--accent); border-color: var(--accent); box-shadow: 0 3px 0 #253eb4; }
+.exercise-label strong { font-weight: 650; }
+.exercise-label > span { margin-top: 2px; }
+.list-footer { padding: 16px 24px; }
+.lesson-detail { padding: 30px; top: 106px; max-height: calc(100dvh - 130px); }
+.detail-art { width: 102px; height: 90px; display: block; margin: 0 0 20px; }
+.detail-meta { margin-bottom: 12px; font-weight: 650; }
+.lesson-detail h2, #dialog-content > h2 { font-size: 27px; font-weight: 800; line-height: 1.4; margin-bottom: 14px; }
+.button { border-radius: 14px; font-weight: 700; min-height: 46px; }
+.primary { border: 1px solid #3653d7; background: var(--accent); box-shadow: 0 5px 0 #263db0; }
+.primary:hover { box-shadow: 0 5px 0 #263db0; }
+.primary:active { transform: translateY(4px); box-shadow: 0 1px 0 #263db0; }
+.primary.wide { min-height: 54px; font-size: 15px; box-shadow: 0 5px 0 #263db0, 0 16px 28px -16px #4b66ff99; }
+.primary.wide:active { box-shadow: 0 1px 0 #263db0; }
+.outbound-hint { margin-top: 15px; }
+.secondary { border-width: 2px; color: var(--ink); }
+.compact { min-height: 36px; border-radius: 10px; }
+.detail-section { margin-top: 28px; padding-top: 22px; }
+.detail-section h3 { font-size: 14px; font-weight: 750; }
+.kind-tag { border-radius: 6px; background: #fafafa; }
+.catalog-controls, .catalog-card, .roadmap-card { border-width: 2px; border-radius: 20px; }
+.catalog-card { padding: 24px; }
+.catalog-card h2 { font-size: 16px; font-weight: 700; }
+.catalog-grid { gap: 20px; }
+.roadmap-card h2 { font-weight: 750; }
+.roadmap-number { font-weight: 800; }
+dialog { border-width: 2px; border-radius: 24px; }
+:focus-visible { outline-color: #304bd9; }
+@media (max-width: 1000px) {
+  .app-header { gap: 28px; }
+  .practice-layout { grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr); gap: 22px; }
+  .lesson-detail { padding: 24px; }
+  .stage-bar { gap: 18px; }
+  .stage-pills { gap: 5px; }
+  .stage-pills button { min-width: 42px; }
+}
+@media (max-width: 760px) {
+  .app-header { height: 68px; gap: 12px; }
+  .brand { font-size: 17px; }
+  .source-link { padding: 6px 10px; font-size: 11px; }
+  .navigation a { font-size: 11px; }
+  .navigation a[aria-current="page"] { color: var(--accent); }
+  .page-heading { padding: 30px 0 24px; }
+  h1 { font-size: 30px; }
+  .stage-bar { gap: 18px; margin-bottom: 24px; }
+  .stage-pills { gap: 6px; }
+  .stage-pills button { min-width: 38px; height: 40px; padding: 0 6px; }
+  .exercise-list { border-radius: 20px; }
+  .list-heading { padding: 18px; }
+  .exercise-select { gap: 12px; padding-left: 8px; }
+  .exercise-number { flex-basis: 32px; height: 32px; font-size: 11px; }
+  .exercise-list ul { padding: 7px; }
+  .exercise-label strong { font-size: 13px; }
+  .list-footer { padding: 14px 18px; }
+  .lesson-detail h2, #dialog-content > h2 { font-size: 24px; }
+  .detail-art { width: 80px; height: 70px; margin-bottom: 16px; }
+  .catalog-card { padding: 20px; }
+  .filter-row .stage-pills { gap: 4px; }
 }

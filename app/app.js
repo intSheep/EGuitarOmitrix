@@ -49,6 +49,7 @@ function selectedEntry(route) {
 function lessonDetail(entry, { modal = false } = {}) {
   const related = relatedEntries(course, entry);
   return `${modal ? `<button type="button" class="dialog-close icon-button" aria-label="关闭课程详情">${icon('close')}</button>` : ''}
+    <img class="detail-art" src="./assets/fretboard.svg" alt="" aria-hidden="true">
     <div class="detail-meta"><span>${entry.stage ? `W${entry.stage}` : '课程资料'}${entry.exercises.length ? ` / EX${String(entry.exercises[0]).padStart(2, '0')}` : ''}</span>
       <span class="kind-tag">${KINDS[entry.kind]}${entry.legacy ? ' · 旧版' : ''}</span></div>
     <h2 ${modal ? 'id="lesson-dialog-title"' : ''}>${escape(shortTitle(entry))}</h2>

@@ -4,7 +4,7 @@
 
 The owner has authorized the first application slice in PRD v0.2: exercise browsing and exact outbound Bilibili lesson links. Core practice logging remains planned. Online score playback, notation conversion, and Guitar Pro 8 integration are deferred.
 
-Design correction: use a mature, task-focused list-detail workspace. Duolingo is only a reference for restrained style and feedback; do not copy its layout, path, mascots, slogans, streaks, or reward structure. Read `docs/design/references-and-rationale.md` before design work.
+Design correction: use the owner-supplied Brilliant screenshot as the visual reference: white canvas, heavy black headings, royal-blue tactile controls, rounded outlined panels, and a small geometric musical illustration. Preserve the task-focused list-detail workspace. Duolingo is only a reference for restrained style and feedback; do not copy its layout, path, mascots, slogans, streaks, or reward structure. Read `docs/design/references-and-rationale.md` before design work.
 
 ## Read before work
 

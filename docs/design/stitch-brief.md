@@ -5,7 +5,7 @@ Date: 2026-10-18. Status: revised reference-led direction implemented for the in
 ## Current project and output
 
 - [EGuitarOmitrix — Practice Workspace](https://stitch.withgoogle.com/projects/6723020998384701419), private project.
-- Desktop screen: `projects/6723020998384701419/screens/266b12d02e4449d88c123f37aee52f56`.
+- Current desktop screen: `projects/6723020998384701419/screens/28e363c036c0459088b87a3e4336f2fe`. Previous workspace screen `266b12d02e4449d88c123f37aee52f56` is superseded.
 - Design references and functional analysis: [references and rationale](references-and-rationale.md).
 
 The current Stitch screen was generated successfully and visually inspected. It establishes a mature list-detail direction. Its generated source is not treated as authoritative course data or as a working application.
@@ -34,15 +34,15 @@ The earlier private project `5204896374042541007` produced mascot/course-path co
 
 ## Visual specification
 
-Near-white canvas, white panels, dark slate text, one deep teal accent. Fine borders and 6–10 px radii. A small abstract six-string mark identifies the tool. Headings and spacing should favor useful content density; no promotional hero is needed.
+The latest owner reference is Brilliant: white canvas, black heavy headings, royal blue actions with a dark 5 px bottom edge, outlined 20–24 px panels, and a small original geometric fretboard SVG. The six-string brand mark uses the same blue. Preserve exercise browsing and exact video links; no locked path or invented progress.
 
-Hover feedback is about 120 ms; selected content may transition for 160 ms; press feedback moves at most 1 px. Reduced-motion mode removes transitions and animations. Text and focus cues communicate state independently of movement.
+Hover feedback is about 120 ms; selected content may transition for 160 ms; primary press feedback moves 4 px. Reduced-motion mode removes transitions and animations. Text and focus cues communicate state independently of movement.
 
 Both human and Agent documentation are English. Learner UI is Simplified Chinese, while original titles, BV/CID identifiers, and technical notation stay recognizable.
 
 ## Implementation corrections to generated output
 
-- Retained the overall list-detail hierarchy, quiet palette, compact stage selection, and prominent source action.
+- Retained the list-detail hierarchy, white/blue palette, outlined panels, stage selection, and tactile source action.
 - Used actual catalog titles, durations, page numbers, CIDs, and related-media associations; generated durations are not trusted.
 - Removed generated utility icons and audio/player-ready states because no tuner, metronome, score player, or audio integration exists in this slice.
 - Preserved an explicit pending state for instructor assignments; no source-backed task catalog has yet been approved.
@@ -56,6 +56,12 @@ Both human and Agent documentation are English. Learner UI is Simplified Chinese
 4. Viewing a source does not claim practice completion or mastery.
 5. Unknown assignments, source duration, and actual practice duration cannot be confused.
 6. Phone layouts, keyboard focus, Escape, and reduced motion remain usable.
-7. Decorative elements are absent unless they help selection, understanding, or action.
+7. A small geometric musical illustration is allowed; decoration must remain secondary to selection and source access.
 
 Stitch suggested a full-catalog view, a feature-plan view, and a dark variant. The first two are implemented with actual metadata; a dark theme remains optional and is not required for the current slice.
+
+## Brilliant revision — 2026-10-18
+
+The owner explicitly requested redesign based on the attached Brilliant screenshot. A Stitch edit succeeded against the prior desktop screen and was visually inspected. The generated illustration screen is `4c01fb6eeaac47f4961b06b342ac69ca`; the application uses an original lightweight SVG instead. The local application adopts the white/blue palette, outlined rounded panels, circular exercise indices, geometric musical illustration, and tactile primary action while preserving functional source navigation. Static screenshots do not establish the reference product's actual motion behavior.
+
+The latest generated screen introduced unsupported requirement text, account controls, and document links. These were rejected. Actual catalog titles and durations remain authoritative; the generated claim that metadata was fully preserved was not relied on. Stitch also suggested mobile, dark-mode, and additional-stage variants; these were not separately generated. Responsive mobile behavior was verified in the application.

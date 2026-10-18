@@ -1,6 +1,6 @@
 # Design references and functional rationale
 
-Date: 2026-10-18. Status: revised direction based on the owner's explicit correction.
+Date: 2026-10-18. Status: Brilliant-inspired revision requested by the owner.
 
 ## Product fit comes before visual borrowing
 
@@ -46,15 +46,15 @@ Later, a real practice queue and session results can become the default workspac
 
 ## Project visual specification
 
-These are project choices informed by the references, not requirements copied from them:
+The owner supplied a screenshot of Brilliant's Arithmetic Thinking course page from [Mobbin](https://mobbin.com/screens/45ede6ec-1ebd-498f-9a48-2636087f1be4). The attached image was inspected directly; the Mobbin URL could not be read. This is evidence of the static visual style only, not of its animation behavior.
 
-- White panels on a near-white gray canvas; slate text; one deep teal accent for selection and primary actions.
-- Main title around 24–27 px; body 13–14 px; source IDs and video durations use tabular numerals.
-- Fine separators, 6–10 px radii, consistent pane padding. Compact but readable rows retain useful context.
-- A small abstract six-string mark is sufficient identity. No mascot, stock photo, decorative guitar diagram, slogan, large promotional hero, or staged reward image.
-- State changes use about 120–160 ms of restrained feedback. Press feedback translates at most 1 px. No continuous animation; reduced-motion preferences remove transitions and animation.
-- Source page, video length, media type, and unreviewed task state use different labels. Unknown practice requirements stay unknown.
-- At desktop size, list and details remain visible together. At phone size, the list stays primary and the selected details open in an accessible dialog.
+- White canvas, near-black heavy headings (30 px phone, 36 px desktop), royal-blue primary accent `#3f5cf0`.
+- Rounded 20–24 px outlined panels and generous spacing; black active navigation underline.
+- Primary actions have a dark-blue 5 px bottom edge, a 4 px press displacement, and a subtle local blue glow. These motion values are our implementation choices.
+- Circular exercise numbers support scanning. Blue marks selection only; unselected exercises remain available, with no locked progression.
+- One original SVG geometric fretboard illustration provides a musical visual cue. No copied Brilliant assets, mascot, motivational slogan, rewards, or fabricated progress.
+- Stable list-detail navigation supports repeated practice. Mobile uses the existing accessible detail dialog.
+- Reduced-motion preferences remove animation and transitions. Unknown assignments remain explicit.
 
 ## Evaluation criteria
 
@@ -64,6 +64,6 @@ These are project choices informed by the references, not requirements copied fr
 - Is the difference between video duration and prescribed practice duration clear?
 - Does a source launch avoid implying that real practice was completed?
 - Are compact layouts, keyboard focus, Escape dismissal, and reduced-motion settings usable?
-- Does each prominent element help selection, understanding, or action? Remove it if its only purpose is to look gamified.
+- Does each prominent element help selection, understanding, or action? Keep decorative imagery small and subordinate to the actual exercise and source action.
 
 Automated checks can cover rendering, links, focus, and responsive overflow. Comfort, density, and visual preference still require the owner's review; they are not claimed as established by screenshots alone.
