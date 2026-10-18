@@ -1,8 +1,8 @@
 # Product Requirements Document — EGuitarOmitrix
 
-- Version: 0.3
+- Version: 0.4
 - Date: 2026-10-18, Asia/Shanghai
-- Status: Assignment organization and manual practice-record/resume loop authorized and implemented
+- Status: Immersive timed practice and effort review authorized; automatic planning remains deferred
 - Owner: intSheep
 - Delivery: Private repository; GitHub Issues + Milestones + pull requests
 - Design: Stitch
@@ -156,7 +156,7 @@ If a verified machine-readable score exists, the future product could offer a br
 | FR-007 | P0 | Set a weekly session intention and per-session available minutes; allow overrides. | Changing from three sessions to one changes suggestions, not past records or course position. Multiple sessions in one day are supported. |
 | FR-008 | P0 | Recommend a bounded session from approved tasks, recent difficulties, and review needs. | Scheduled durations never exceed the chosen budget. Teacher dose and adapted allocation appear separately. The learner can replace or skip a suggestion. |
 | FR-009 | P0 | Keep course stages independent from calendar weeks and allow manual progression. | Seven days of absence create no overdue exercise copies, reset, or automatic promotion. Skipped work stays identifiable for later review. |
-| FR-010 | P0 | Run a simple session timer with start, pause, resume, finish, and manual logging. | Paused time is excluded. Refresh or sleep produces a recoverable draft and an elapsed-time review instead of silently counting the gap as practice. |
+| FR-010 | P0 | Run a foreground session timer with start, pause, resume and automatic recording on finish; no manual duration form. | Paused time is excluded. Refresh or sleep produces a recoverable draft and an elapsed-time review instead of silently counting the gap as practice. |
 | FR-011 | P0 | Log each practiced exercise with actual seconds, optional repetition count/unit, attempted tempo, self-reported clean tempo, quality checks, and notes. | A partial session saves; unknown quantities are not zero. Invalid negatives and impossible date ranges are rejected. Editable logs update aggregates without duplicate counting. |
 | FR-012 | P0 | Track exercise state separately from individual session completion. | States include not started, learning, review, and self-reported ready; each can be revisited. Finishing one timer cannot automatically mark an exercise mastered. |
 
@@ -173,7 +173,7 @@ If a verified machine-readable score exists, the future product could offer a br
 
 | ID | Priority | Requirement | Acceptance criterion |
 | --- | --- | --- | --- |
-| FR-017 | P0 | Provide an immediately usable exercise/source navigator while the broader tracker is developed. | All 140 entries remain available, 66 current teaching exercises appear in open stage lists, desktop uses list-detail, compact screens use a focused dialog, every outbound link resolves to the catalog page/CID, and no view is counted as practice. |
+| FR-017 | P0 | Provide an immediately usable exercise/source navigator while the broader tracker is developed. | All 140 entries remain available, 66 current teaching exercises appear in open stage lists, desktop uses list-detail, compact screens stack the selected exercise above the list, every outbound link resolves to the catalog page/CID, and no view is counted as practice. |
 
 ### Research requirements, without implementation authorization
 
@@ -237,11 +237,11 @@ The learner owns practice records. Content revisions own source evidence and tas
 ## 11. UX and nonfunctional requirements
 
 - NFR-001: Target current Windows Chrome/Edge and responsive layouts at 390 px and desktop widths; exact tested versions are recorded when implementation exists.
-- NFR-002: The practice workspace shows the current source action above the fold. In the future recording flow, require only actual time and a simple outcome; detailed repetition/tempo fields are optional. Avoid promotional headlines and decorative game navigation.
+- NFR-002: The workspace has one start action. The focus page records elapsed practice automatically; self-report after completion is optional. Source videos share one material picker and launch action. Avoid promotional headlines and decorative game navigation.
 - NFR-003: Keyboard access, visible focus, text labels for statuses, and readable notation-independent task text are required. Color alone must not convey review or progress state.
 - NFR-004: A failed save, unavailable storage, or quota error must remain visible and offer a safe retry/export; no success toast before persistence succeeds.
 - NFR-005: Schema upgrades validate and retain a recoverable prior snapshot. Future schema versions fail safely on older clients.
-- NFR-006: Time zones are explicit. Use Asia/Shanghai initially; weeks begin Monday. Sessions crossing midnight retain actual timestamps and a documented local-date allocation rule.
+- NFR-006: Charts use the browser local calendar, with a rolling seven-day view and 84-day activity calendar. Sessions crossing midnight retain actual timestamps and a documented local-date allocation rule.
 - NFR-007: No raw course media, credentials, or learner history in Git, issue attachments, or public design artifacts. Demo screens use labeled synthetic records.
 - NFR-008: Private repository and local-first behavior are product constraints; they do not imply cloud sync, cross-device access, or a security audit has been delivered.
 
@@ -276,8 +276,12 @@ The learner owns practice records. Content revisions own source evidence and tas
 
 ## 14. Delivery gate
 
-The owner authorized FR-017 navigation and subsequently the assignment/manual-record/resume slice. This implements bounded portions of FR-003/004/009/011–016; full source review, automatic session planning, timer sessions, weekly metrics and offline delivery remain later work. Notation conversion, online playback, and native launching are deferred and require a later implementation decision. No implementation estimate is assigned to unvalidated score preparation.
+The owner authorized FR-017 navigation and subsequently the assignment/manual-record/resume slice. This implements bounded portions of FR-003/004/009/011–016; The owner subsequently authorized FR-010 foreground timing, an actual-time review dashboard and a simple metronome in issue #12. Full source review, automatic planning and offline delivery remain later work. Notation conversion, online playback, and native launching are deferred and require a later implementation decision. No implementation estimate is assigned to unvalidated score preparation.
 
 Design choices must follow the [reference and functional rationale](../design/references-and-rationale.md): borrow restrained visual feedback from learning products while using an information architecture suited to repeated guitar practice.
 
 See [roadmap](roadmap.md), [Stitch brief](../design/stitch-brief.md), and [Agent guide](../engineering/AGENT_GUIDE.md).
+
+## 15. Focus slice acceptance (v0.4)
+
+The latest owner request supersedes earlier manual logging and disclosure-based layouts. Use one start action, automatic observed time, pause/resume, a recoverable paused draft and transactional finish. Hide global navigation during focus. Pause on video launch, hidden pages and interruptions. One material dialog contains the video selector and launch control. Use source-backed task summaries without extraction-status badges; unknown numeric targets remain unknown. Do not infer mastery from time or metronome settings. Show real accumulated time, exercise history, daily bars and an 84-day activity calendar. Retain older manual logs and backups. See [ADR 0003](../decisions/0003-focus-practice.md) and [Stitch decisions](../design/focus-practice.md).

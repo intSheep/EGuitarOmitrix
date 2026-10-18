@@ -35,3 +35,7 @@ Issue [#9](https://github.com/intSheep/EGuitarOmitrix/issues/9) tracks the autho
 ## Latest delivery update — 2026-10-18
 
 Issue #10 adds the assignment/manual-record/resume loop on top of PR #8. All 72 lessons have source-backed summaries; 64 remain AI-subtitle candidates and 8 use visually reviewed video cards. Manual logs, history, edit/delete/restore, backup merge and resume are implemented. This is partial progress against the larger import/planning/progress issues, which remain open. Timer, automatic planning, offline shell and score conversion are not included.
+
+## Focus revision — issue #12
+
+The owner subsequently authorized timed focus sessions and effort review. ADR 0003 replaces new manual duration entry while preserving old records. The simple metronome and consolidated materials are part of this slice. Automatic planning, offline shell and score conversion remain deferred.

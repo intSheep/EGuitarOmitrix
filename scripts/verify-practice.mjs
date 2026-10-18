@@ -1,48 +1,219 @@
-// Uses fresh browser contexts and synthetic records only. Never connects to an existing browser profile.
-const {chromium}=await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
-import assert from 'node:assert/strict';
-const baseURL=process.env.EGUITAR_QA_URL || 'http://localhost:5173';
-const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined,args:['--no-sandbox']});
-const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
-const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
-await page.goto(`${baseURL}/`);await page.locator('.practice-form').waitFor();
-assert.equal(await page.locator('.resume-card').count(),0);
-assert.match(await page.locator('.assignment-section').innerText(),/固定 40 BPM，不加速/);
-assert.equal(await page.locator('[name=minutes]').inputValue(),'');
-let form=page.locator('.practice-form');await form.locator('[name=minutes]').fill('12.5');await form.locator('[name=outcome]').selectOption('slow');await form.locator('[name=bpm]').fill('40');await form.locator('[name=nextFocus]').fill('Synthetic: next time keep rhythm');await form.locator('[name=note]').fill('<script>synthetic</script>');
-await page.reload();await page.locator('.practice-form').waitFor();assert.equal(await page.locator('[name=minutes]').inputValue(),'12.5');
-await page.locator('.practice-form [type=submit]').dblclick();await page.locator('.resume-card').waitFor();
-await page.reload();await page.locator('.resume-card').waitFor();assert.match(await page.locator('.resume-card').innerText(),/12.5 分钟/);
-await page.goto(`${baseURL}/#history`);await page.locator('.history-card').waitFor();assert.equal(await page.locator('.history-card').count(),1);assert.match(await page.locator('.history-card').innerText(),/<script>synthetic/);
-await page.locator('[data-edit-log]').click();await page.locator('#record-dialog[open]').waitFor();await page.locator('#record-dialog [name=minutes]').fill('15');await page.locator('#record-dialog [type=submit]').click();await page.waitForFunction(()=>document.querySelector('.history-result')?.textContent.includes('15 分钟'));
-await page.locator('[data-delete-log]').click();await page.locator('.empty-state').waitFor();await page.locator('.deleted-history summary').click();await page.locator('[data-restore-log]').click();await page.locator('.history-card').waitFor();
-const downloadPromise=page.waitForEvent('download');await page.locator('#export-practice').click();const download=await downloadPromise;await download.saveAs('/tmp/synthetic-practice-backup.json');
-await page.locator('#import-practice').setInputFiles('/tmp/synthetic-practice-backup.json');await page.locator('#confirm-import').waitFor();assert.match(await page.locator('#import-preview').innerText(),/新增 0 条记录/);await page.locator('#confirm-import').click();await page.locator('#confirm-import').waitFor({state:'detached'});await page.locator('.history-card').waitFor();assert.equal(await page.locator('.history-card').count(),1);
-await page.locator('#import-practice').setInputFiles({name:'future.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({app:'EGuitarOmitrix',schemaVersion:99,logs:[]}))});await page.waitForFunction(()=>document.querySelector('#import-preview').textContent.includes('版本不支持'));assert.equal(await page.locator('.history-card').count(),1);
-// Two-tab optimistic edit conflict must not lose the first save.
-const other=await context.newPage();await other.goto(`${baseURL}/#history`);await other.locator('[data-edit-log]').click();
-await page.locator('[data-edit-log]').click();await page.locator('#record-dialog [name=minutes]').fill('16');await page.locator('#record-dialog [type=submit]').click();await page.waitForFunction(()=>!document.querySelector('#record-dialog').open);
-await other.locator('#record-dialog [name=minutes]').fill('18');await other.locator('#record-dialog [type=submit]').click();await other.locator('.form-error:not([hidden])').waitFor();assert.match(await other.locator('.form-error:not([hidden])').innerText(),/另一窗口/);await other.close();
-// Record a different stage, then visit root: resume that exercise instead of video cursor.
-await page.goto(`${baseURL}/#practice?stage=3`);await page.locator('.practice-form').waitFor();await page.locator('.practice-form [name=minutes]').fill('6');await page.locator('.practice-form [name=outcome]').selectOption('learning');await page.locator('.practice-form [name=nextFocus]').fill('Synthetic W3 focus');await page.locator('.practice-form [type=submit]').click();await page.waitForFunction(()=>document.querySelector('.resume-card').textContent.includes('Synthetic W3'));
-await page.goto(`${baseURL}/`);await page.locator('.resume-card').waitFor();assert.equal(await page.locator('[data-stage="3"]').getAttribute('aria-pressed'),'true');
-await page.screenshot({path:'/tmp/practice-desktop.png'});
-await page.setViewportSize({width:820,height:1180});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.locator('.exercise-select').first().click();await page.locator('#lesson-dialog[open]').waitFor();await page.locator('#lesson-dialog .practice-form [name=minutes]').fill('7');await page.locator('#lesson-dialog .practice-form [name=outcome]').selectOption('steady');await page.locator('#lesson-dialog .practice-form [type=submit]').click();await page.waitForFunction(()=>!document.querySelector('#lesson-dialog').open);await page.screenshot({path:'/tmp/practice-mobile.png'});
-// Restore into fresh isolated storage.
-const fresh=await browser.newContext();const fp=await fresh.newPage();await fp.goto(`${baseURL}/#history`);await fp.locator('#import-practice').waitFor();await fp.locator('#import-practice').setInputFiles('/tmp/synthetic-practice-backup.json');await fp.locator('#confirm-import').click();await fp.locator('.history-card').waitFor();assert.equal(await fp.locator('.history-card').count(),1);
-const blocked=await browser.newContext();await blocked.addInitScript(()=>Object.defineProperty(window,'indexedDB',{get(){throw new Error('Synthetic blocked storage');}}));const bp=await blocked.newPage();await bp.goto(`${baseURL}/`);await bp.locator('.storage-error').first().waitFor();assert.equal(await bp.locator('.practice-form').count(),0);assert.ok(await bp.locator('[data-video-id]').count()>0);
-// Simulated write failure: retain inputs and show failure, never a success message.
-const failed=await browser.newContext();const failPage=await failed.newPage();
-await failPage.goto(`${baseURL}/`);await failPage.locator('.practice-form').waitFor();
-await failPage.evaluate(()=>{IDBObjectStore.prototype.put=function(){throw new DOMException('Synthetic disk full','QuotaExceededError');};});
-await failPage.locator('[name=minutes]').fill('9');await failPage.locator('[name=outcome]').selectOption('slow');await failPage.locator('.practice-form [type=submit]').click();
-await failPage.locator('.form-error:not([hidden])').waitFor();assert.equal(await failPage.locator('[name=minutes]').inputValue(),'9');assert.equal(await failPage.locator('.resume-card').count(),0);
-await failPage.reload();await failPage.locator('.practice-form').waitFor();assert.equal(await failPage.locator('.resume-card').count(),0);
-// Video-card sources have task text and direct card timestamp links.
-await fp.goto(`${baseURL}/#catalog?q=P119`);await fp.locator('[data-lesson]').click();
-await fp.locator('#lesson-dialog[open]').waitFor();assert.match(await fp.locator('#dialog-content .assignment-section').innerText(),/固定 50 BPM，不加速/);
-await fp.locator('#dialog-content .evidence-details summary').click();assert.equal(await fp.getByRole('link',{name:'查看末页任务卡 ↗'}).count(),1);
-await fp.keyboard.press('Escape');
-await page.goto(`${baseURL}/#practice`);await page.emulateMedia({reducedMotion:'reduce'});await page.locator('.exercise-row').first().waitFor();assert.equal(await page.locator('.lesson-detail > h2').evaluate(e=>getComputedStyle(e).animationName),'none');
-assert.deepEqual(errors,[]);console.log('PASS: drafts, actual save/reload, edit/delete/restore, idempotent backup, future rejection, two-tab conflict, cross-stage resume, mobile save, fresh restore, storage unavailable/write failure, video-card source, reduced motion; no page errors.');await browser.close();
+// Fresh isolated contexts; no personal records or existing browser profiles.
+import assert from "node:assert/strict";
+const { chromium } = await import(
+  process.env.PLAYWRIGHT_MODULE || "playwright"
+);
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,
+  args: ["--no-sandbox"],
+});
+const base = process.env.EGUITAR_QA_URL || "http://localhost:5173";
+const ctx = await browser.newContext({
+  viewport: { width: 1440, height: 1000 },
+  acceptDownloads: true,
+});
+const page = await ctx.newPage(),
+  errors = [];
+page.on("pageerror", (e) => errors.push(e.message));
+page.on("console", (m) => {
+  if (m.type() === "error" && !m.text().includes("favicon"))
+    errors.push(m.text());
+});
+try {
+  await page.goto(base);
+  await page.locator("[data-start]").waitFor();
+  assert.equal(await page.locator("[data-start]").count(), 1);
+  assert.equal(
+    await page.locator("details, [name=minutes], a[target=_blank]").count(),
+    0,
+  );
+  await page.locator("[data-start]").click();
+  await page.locator("#timer-value").waitFor();
+  await page.waitForTimeout(2200);
+  await page.locator("[data-action=pause]").click();
+  const paused = await page.locator("#timer-value").innerText();
+  await page.waitForTimeout(1200);
+  assert.equal(await page.locator("#timer-value").innerText(), paused);
+  await page.reload();
+  await page.locator("#timer-state").waitFor();
+  assert.match(await page.locator("#timer-state").innerText(), /上次/);
+  assert.equal(await page.locator("#timer-value").innerText(), paused);
+  await page.locator("[data-action=pause]").click();
+  await page.waitForTimeout(1200);
+  const other = await ctx.newPage();
+  await other.goto(base);
+  await other.locator("[data-start]").click();
+  await other.waitForFunction(() =>
+    document.querySelector("#notice").textContent.includes("另一标签页"),
+  );
+  await other.goto(base + "/#focus");
+  await other.locator("[data-action=finish]").click();
+  await other.waitForFunction(() =>
+    document.querySelector("#notice").textContent.includes("另一标签页"),
+  );
+  assert.equal(await other.locator(".completion").count(), 0);
+  await other.close();
+  await page.locator("[data-action=metronome]").click();
+  await page.locator("[data-action=metro-toggle]").click();
+  assert.equal(
+    await page.locator("[data-action=metro-toggle]").innerText(),
+    "停止节拍",
+  );
+  await page.locator("[data-material]").click();
+  assert.equal(await page.locator("a[target=_blank]").count(), 1);
+  await page.keyboard.press("Escape");
+  await page.screenshot({ path: "/tmp/focus-desktop.png" });
+  // Synthetic transaction abort: finishing must keep the draft and retry safely.
+  await page.evaluate(() => {
+    window.originalTransaction = IDBDatabase.prototype.transaction;
+    IDBDatabase.prototype.transaction = function (stores, ...args) {
+      const tx = window.originalTransaction.call(this, stores, ...args);
+      if (
+        Array.isArray(stores) &&
+        stores.includes("logs") &&
+        stores.includes("session")
+      )
+        queueMicrotask(() => tx.abort());
+      return tx;
+    };
+  });
+  await page.locator("[data-action=finish]").click();
+  await page.waitForFunction(() =>
+    document.querySelector("#notice").textContent.includes("保存失败"),
+  );
+  assert.equal(await page.locator("#timer-value").count(), 1);
+  await page.evaluate(
+    () => (IDBDatabase.prototype.transaction = window.originalTransaction),
+  );
+  await page.locator("[data-action=finish]").dblclick();
+  await page.locator(".completion").waitFor();
+  assert.equal(await page.locator(".session-row").count(), 1);
+  await page.locator("[data-outcome=slow]").click();
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector("[data-outcome=slow]")
+        ?.getAttribute("aria-pressed") === "true",
+  );
+  await page.screenshot({ path: "/tmp/focus-summary.png" });
+  await page.locator("[data-action=manage]").click();
+  const dl = page.waitForEvent("download");
+  await page.locator("[data-action=export]").click();
+  await (await dl).saveAs("/tmp/focus-synthetic-backup.json");
+  await page.locator("[data-delete]").click();
+  await page.waitForFunction(
+    () => document.querySelector("[data-delete]")?.textContent === "恢复",
+  );
+  await page.locator("[data-delete]").click();
+  await page.waitForFunction(
+    () => document.querySelector("[data-delete]")?.textContent === "删除",
+  );
+  await page.keyboard.press("Escape");
+  for (const width of [820, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    assert.equal(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      true,
+    );
+    await page.goto(base);
+    await page.locator("[data-start]").waitFor();
+    assert.equal(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      true,
+    );
+  }
+  await page.locator("[data-start]").click();
+  await page.locator("#timer-value").waitFor();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  assert.equal(
+    await page
+      .locator(".ambient-orbit")
+      .evaluate((e) => getComputedStyle(e).animationName),
+    "none",
+  );
+  await page.screenshot({ path: "/tmp/focus-mobile.png" });
+  const fresh = await browser.newContext();
+  const p = await fresh.newPage();
+  await p.goto(base + "/#history");
+  await p.locator("[data-action=manage]").click();
+  await p.locator("#import").setInputFiles("/tmp/focus-synthetic-backup.json");
+  await p.locator("[data-action=import-confirm]").click();
+  await p.locator(".session-row").waitFor();
+  assert.equal(await p.locator(".session-row").count(), 1);
+  const blocked = await browser.newContext();
+  await blocked.addInitScript(() =>
+    Object.defineProperty(window, "indexedDB", {
+      get() {
+        throw Error("Synthetic blocked storage");
+      },
+    }),
+  );
+  const b = await blocked.newPage();
+  await b.goto(base);
+  await b.locator("[data-start]").waitFor();
+  assert.equal(await b.locator("[data-start]").isDisabled(), true);
+  await b.locator("[data-material]").click();
+  await b.locator("#video-launch").waitFor();
+  // Upgrade a synthetic v1 database without rewriting legacy records.
+  const migrated = await browser.newContext();
+  await migrated.addInitScript(() => {
+    window.seedReady = new Promise((resolve) => {
+      const req = indexedDB.open("eguitar-practice-v1", 1);
+      req.onupgradeneeded = () => {
+        const store = req.result.createObjectStore("logs", { keyPath: "id" });
+        store.add({
+          id: "synthetic-legacy",
+          entryId: "36374643242",
+          assignmentVersion: "test",
+          minutes: 7,
+          outcome: "slow",
+          bpm: 40,
+          practicedAt: "2026-01-01T00:00:00Z",
+          createdAt: "2026-01-01T00:00:00Z",
+          updatedAt: "2026-01-01T00:00:00Z",
+          note: "Synthetic legacy note",
+          nextFocus: "Synthetic focus",
+          deletedAt: null,
+        });
+      };
+      req.onsuccess = () => {
+        req.result.close();
+        resolve();
+      };
+      req.onerror = () => resolve();
+    });
+  });
+  const mp = await migrated.newPage();
+  await mp.goto(base + "/#history?session=synthetic-legacy");
+  await mp.locator(".completion").waitFor();
+  assert.match(
+    await mp.locator(".completion").innerText(),
+    /Synthetic legacy note/,
+  );
+  assert.equal(await mp.locator(".session-duration").innerText(), "07:00");
+  // Hidden-page timing pauses and sound controls reset; no manual time input.
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      value: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.waitForFunction(() =>
+    document.querySelector("#timer-state").textContent.includes("离开页面"),
+  );
+  const stopped = await page.locator("#timer-value").innerText();
+  await page.waitForTimeout(1200);
+  assert.equal(await page.locator("#timer-value").innerText(), stopped);
+  assert.deepEqual(errors, []);
+  console.log(
+    "PASS: timer pause/reload, single-session lock, metronome, one video launch, atomic finish, rating, backup/import, delete/restore, responsive layouts, reduced motion, blocked storage, transaction failure/retry, v1 migration, hidden-page pause.",
+  );
+} finally {
+  await browser.close();
+}
