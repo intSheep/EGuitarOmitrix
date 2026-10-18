@@ -67,3 +67,9 @@ The owner supplied a screenshot of Brilliant's Arithmetic Thinking course page f
 - Does each prominent element help selection, understanding, or action? Keep decorative imagery small and subordinate to the actual exercise and source action.
 
 Automated checks can cover rendering, links, focus, and responsive overflow. Comfort, density, and visual preference still require the owner's review; they are not claimed as established by screenshots alone.
+
+## C-major position reference (2026-10-18)
+
+The owner clarified that the quick-reference button means the five C-major scale positions, not the starting fret of a chord. Stitch project `6723020998384701419`, screen `3a92fe2b586a4308821380f551098cbf`, informed the white modal, blue selection controls and horizontal six-string diagram. Generated course labels, rewards, pinning and unrelated tuner controls were discarded.
+
+The reference is an independently constructed standard-tuning C-major note map, not an additional instructor assignment or inferred practice sequence. Position ranges align with the visible course diagrams (P047, P031, P082, P067 and P015). Some course diagrams show only the exercised strings; the reference supplies the complete conventional scale pattern. Notes are computed from string tuning and fret, with no inferred finger numbers, tempo or repetitions. Root notes use both shape and color. A visible switch changes scale degrees to note names. Opening the modal does not change the practice timer, score playback or metronome. Native dialog behavior supplies Escape dismissal and focus restoration.

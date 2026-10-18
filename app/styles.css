@@ -2876,3 +2876,16 @@ button:disabled {
     top: -16px;
   }
 }
+
+#position-dialog { width: min(700px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); box-sizing: border-box; padding: 28px; border: 2px solid #17203a; border-radius: 24px; background: white; color: #17203a; }
+#position-dialog::backdrop { background: rgb(16 24 40 / 42%); }
+.position-heading, .position-meta, .position-legend { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.position-heading h2 { margin: 0; font-size: clamp(22px, 4vw, 30px); }
+.position-choices { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin: 28px 0 20px; }
+.position-choices .button { padding: 10px 4px; min-width: 0; }
+.position-choices [aria-pressed="true"] { color: white; background: #3f5cf0; border-color: #273fae; }
+#position-dialog svg { display: block; width: 100%; margin-top: 18px; font: 600 18px system-ui, sans-serif; }
+.position-legend { flex-wrap: wrap; font-size: 14px; }
+.position-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.position-legend i { width: 16px; height: 16px; border-radius: 4px; background: #3f5cf0; }
+@media (max-width: 480px) { #position-dialog { padding: 16px; } .position-heading .button { padding: 8px 12px; } .position-choices { gap: 4px; } }
