@@ -1,6 +1,6 @@
 # Product Requirements Document — EGuitarOmitrix
 
-- Version: 0.4
+- Version: 0.5
 - Date: 2026-10-18, Asia/Shanghai
 - Status: Immersive timed practice and effort review authorized; automatic planning remains deferred
 - Owner: intSheep
@@ -285,3 +285,7 @@ See [roadmap](roadmap.md), [Stitch brief](../design/stitch-brief.md), and [Agent
 ## 15. Focus slice acceptance (v0.4)
 
 The latest owner request supersedes earlier manual logging and disclosure-based layouts. Use one start action, automatic observed time, pause/resume, a recoverable paused draft and transactional finish. Hide global navigation during focus. Pause on video launch, hidden pages and interruptions. One material dialog contains the video selector and launch control. Use source-backed task summaries without extraction-status badges; unknown numeric targets remain unknown. Do not infer mastery from time or metronome settings. Show real accumulated time, exercise history, daily bars and an 84-day activity calendar. Retain older manual logs and backups. See [ADR 0003](../decisions/0003-focus-practice.md) and [Stitch decisions](../design/focus-practice.md).
+
+## 16. Owner-authorized score pilot (v0.5)
+
+The owner now authorizes video-frame extraction, reviewed MusicXML/GP preparation and browser score playback. FR-018: preserve timestamped source evidence, page overlap decisions and unknowns when preparing scores; never infer unseen notation. FR-019: display local structured scores in the immersive page with playback, tempo/loop controls and GP downloads. Initial acceptance covers one static and one scrolling source, not the whole course. Native launch helpers, microphone grading and automatic six-line-tab recognition remain outside scope. See [actual coverage and validation](../research/video-score-preparation.md).
