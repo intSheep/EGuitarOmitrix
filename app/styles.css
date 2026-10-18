@@ -2889,3 +2889,7 @@ button:disabled {
 .position-legend span { display: inline-flex; align-items: center; gap: 8px; }
 .position-legend i { width: 16px; height: 16px; border-radius: 4px; background: #3f5cf0; }
 @media (max-width: 480px) { #position-dialog { padding: 16px; } .position-heading .button { padding: 8px 12px; } .position-choices { gap: 4px; } }
+
+#score-dialog [hidden] { display: none !important; }
+#score-choice-label { max-width: 100%; min-width: 0; }
+#score-choice { min-width: 0; max-width: min(100%, 28rem); font: inherit; padding: .55rem; border: 1px solid var(--line, #d5d8df); border-radius: .5rem; }

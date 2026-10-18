@@ -2,7 +2,7 @@
 export function scoreSignature(score) {
   return JSON.stringify({
     tempo: score.tempo,
-    bars: score.masterBars.map(b => [b.timeSignatureNumerator, b.timeSignatureDenominator, b.isRepeatStart, b.repeatCount, b.alternateEndings]),
+    bars: score.masterBars.map(b => [b.timeSignatureNumerator, b.timeSignatureDenominator, b.isRepeatStart, b.repeatCount, b.alternateEndings, b.isAnacrusis]),
     tracks: score.tracks.map(t => t.staves.map(st => ({
       tuning: st.tuning,
       bars: st.bars.map(b => b.voices.map(v => v.beats.map(x => ({

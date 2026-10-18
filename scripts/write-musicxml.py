@@ -26,6 +26,11 @@ if meter not in ([4, 4], [3, 4], [2, 4]):
     raise ValueError('Unsupported meter')
 if not x['bars']:
     raise ValueError('No measures')
+incomplete_measures = x.get('incompleteMeasures', [])
+if (not isinstance(incomplete_measures, list)
+        or any(type(i) is not int or not 1 <= i <= len(x['bars']) for i in incomplete_measures)
+        or len(set(incomplete_measures)) != len(incomplete_measures)):
+    raise ValueError('Invalid incomplete measure indices')
 
 
 def add(parent, name, text=None, **attrs):
@@ -58,9 +63,11 @@ pending = {}
 cursor = Fraction(0)
 beat_start = Fraction(0)
 for index, bar in enumerate(x['bars'], 1):
-    if sum(Fraction(str(n['quarters'])) for n in bar if not n.get('chord')) != meter[0]:
+    duration = sum(Fraction(str(n['quarters'])) for n in bar if not n.get('chord'))
+    incomplete = index in x.get('incompleteMeasures', [])
+    if (incomplete and not 0 < duration < meter[0]) or (not incomplete and duration != meter[0]):
         raise ValueError(f'Measure {index}: duration does not match meter')
-    m = add(part, 'measure', number=str(index))
+    m = add(part, 'measure', number=str(index), **({'implicit': 'yes'} if incomplete else {}))
     if index == 1:
         at = add(m, 'attributes')
         add(at, 'divisions', 960)
@@ -102,7 +109,7 @@ for index, bar in enumerate(x['bars'], 1):
         if tie not in (None, 'start', 'stop', 'continue') or n.get('pick') not in (None, 'up', 'down'):
             raise ValueError('Unsupported tie or pick direction')
         if rest:
-            if set(n) - {'rest', 'quarters'}:
+            if set(n) - {'rest', 'quarters', 'tuplet'}:
                 raise ValueError('Rest cannot have a pitch or technical annotations')
             identity = None
         elif mode == 'tab':
