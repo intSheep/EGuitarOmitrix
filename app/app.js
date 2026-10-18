@@ -39,6 +39,7 @@ import {
   dayKey,
 } from "./session.js";
 import { Metronome } from "./metronome.js";
+import { showTuner, closeTuner } from "./tuner.js";
 const root = document.querySelector("#app"),
   modal = document.querySelector("#record-dialog");
 const esc = (v) =>
@@ -151,14 +152,14 @@ function workspace() {
   const lessons = primaryLessons(course, stage);
   if (e.legacy && e.stage === stage) lessons.push(e);
   if (e.stage !== stage || e.kind !== "lesson") e = lessons[0];
-  return `<div class="page-heading"><h1>练习台</h1><a class="text-link" href="#history">练习回顾</a></div><div class="stage-pills">${STAGES.map((s) => `<a class="button secondary" aria-current="${s.id === stage ? "step" : "false"}" href="#practice?stage=${s.id}&lesson=${primaryLessons(course, s.id)[0].id}">W${s.id}</a>`).join("")}</div><div class="practice-layout"><section class="exercise-list"><div class="list-heading"><h2>${esc(STAGES.find((s) => s.id === stage).title)}</h2></div><ul>${lessons.map((l) => `<li class="exercise-row ${l.id === e.id ? "is-selected" : ""}"><a class="exercise-select" href="#practice?stage=${stage}&lesson=${l.id}"><span class="exercise-number">${String(l.exercises[0]).padStart(2, "0")}</span><span class="exercise-label"><strong>${esc(shortTitle(l))}</strong><span>${seconds(l.id) > 0 ? `累计 ${time(seconds(l.id))}${guidance(l).last?.outcome === "mastered" ? " · 已掌握" : ""}` : "尚未练习"}</span></span></a></li>`).join("")}</ul></section><aside class="lesson-detail"><img class="detail-art" src="./assets/fretboard.svg" alt=""><h2>${esc(shortTitle(e))}</h2>${requirements(e)}${resumePanel(e)}<div class="single-start"><button class="button primary wide" data-start="${draft?.entryId || e.id}" ${!db ? "disabled" : ""}>${draft ? (draft.finishing ? "确认上次练习" : "继续未结束的练习") : guidance(e).last ? "接着练" : "开始练习"}</button>${draft && draft.entryId !== e.id ? `<p>${esc(shortTitle(entry(draft.entryId)))}</p>` : ""}</div><button class="button secondary wide" data-material="${e.id}">课程资料</button><section class="effort-mini"><h3>最近七天</h3>${bars()}</section></aside></div>`;
+  return `<div class="page-heading"><h1>练习台</h1><div class="workspace-tools"><button class="button secondary" data-tuner>调音器</button><a class="text-link" href="#history">练习回顾</a></div></div><div class="stage-pills">${STAGES.map((s) => `<a class="button secondary" aria-current="${s.id === stage ? "step" : "false"}" href="#practice?stage=${s.id}&lesson=${primaryLessons(course, s.id)[0].id}">W${s.id}</a>`).join("")}</div><div class="practice-layout"><section class="exercise-list"><div class="list-heading"><h2>${esc(STAGES.find((s) => s.id === stage).title)}</h2></div><ul>${lessons.map((l) => `<li class="exercise-row ${l.id === e.id ? "is-selected" : ""}"><a class="exercise-select" href="#practice?stage=${stage}&lesson=${l.id}"><span class="exercise-number">${String(l.exercises[0]).padStart(2, "0")}</span><span class="exercise-label"><strong>${esc(shortTitle(l))}</strong><span>${seconds(l.id) > 0 ? `累计 ${time(seconds(l.id))}${guidance(l).last?.outcome === "mastered" ? " · 已掌握" : ""}` : "尚未练习"}</span></span></a></li>`).join("")}</ul></section><aside class="lesson-detail"><img class="detail-art" src="./assets/fretboard.svg" alt=""><h2>${esc(shortTitle(e))}</h2>${requirements(e)}${resumePanel(e)}<div class="single-start"><button class="button primary wide" data-start="${draft?.entryId || e.id}" ${!db ? "disabled" : ""}>${draft ? (draft.finishing ? "确认上次练习" : "继续未结束的练习") : guidance(e).last ? "接着练" : "开始练习"}</button>${draft && draft.entryId !== e.id ? `<p>${esc(shortTitle(entry(draft.entryId)))}</p>` : ""}</div><button class="button secondary wide" data-material="${e.id}">课程资料</button><section class="effort-mini"><h3>最近七天</h3>${bars()}</section></aside></div>`;
 }
 function focus() {
   if (!draft)
     return `<h1>选择一个练习开始</h1><a class="button primary" href="#practice">返回练习台</a>`;
   const e = entry(draft.entryId),
     a = task(e.id);
-  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><h1>${esc(shortTitle(e))}</h1><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div>${requirements(e)}<div class="tool-dock"><button class="button secondary" data-position-reference>把位速查</button><button class="button secondary" data-score="${e.id}">乐谱</button>${!teacherPrescription(a).noMetronome ? button("metronome", "节拍器") : ""}<button class="button secondary" data-material="${e.id}">课程资料</button></div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></section>`;
+  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><h1>${esc(shortTitle(e))}</h1><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div>${requirements(e)}<div class="tool-dock"><button class="button secondary" data-tuner>调音器</button><button class="button secondary" data-position-reference>把位速查</button><button class="button secondary" data-score="${e.id}">乐谱</button>${!teacherPrescription(a).noMetronome ? button("metronome", "节拍器") : ""}<button class="button secondary" data-material="${e.id}">课程资料</button></div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></section>`;
 }
 function history() {
   const all = activeLogs(logs), record = all.find(l=>l.id===route().params.get('session')), days = dailySeconds(logs);
@@ -376,6 +377,11 @@ document.addEventListener("click", async (ev) => {
       return;
     }
     if (el.hasAttribute("data-position-reference")) showPositionReference();
+    if (el.hasAttribute("data-tuner")) {
+      await pause("调音中，计时已暂停");
+      showTuner();
+      return;
+    }
     if (el.dataset.editResult) {
       const l=logs.find(l=>l.id===el.dataset.editResult);
       openModal(`<h2 id="record-title">修改本次结果</h2><form id="result-form" data-log="${l.id}" data-updated="${l.updatedAt}"><label>实际稳定 BPM · 选填<input name="bpm" type="number" min="1" max="400" value="${l.bpm ?? ''}"></label><label>熟练程度<select name="outcome"><option value="">未确认</option>${Object.entries(OUTCOMES).map(([k,v])=>`<option value="${k}" ${l.outcome===k?'selected':''}>${v}</option>`).join('')}</select></label><p id="result-error" role="alert"></p><button class="button primary" type="submit">保存修改</button></form>`);
@@ -608,6 +614,7 @@ modal.addEventListener(
   () => lastTrigger?.isConnected && lastTrigger.focus(),
 );
 window.addEventListener("hashchange", async () => {
+  closeTuner();
   closeScore();
   if (route().name !== "focus") {
     try {

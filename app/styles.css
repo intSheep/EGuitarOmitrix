@@ -2894,6 +2894,60 @@ button:disabled {
 #score-choice-label { max-width: 100%; min-width: 0; }
 #score-choice { min-width: 0; max-width: min(100%, 28rem); font: inherit; padding: .55rem; border: 1px solid var(--line, #d5d8df); border-radius: .5rem; }
 
+/* Automatic tuner: horizontal studio guitar and direct pitch guidance. */
+.workspace-tools { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+#tuner-dialog { width:min(980px, calc(100vw - 40px)); max-width:none; max-height:calc(100dvh - 32px); margin:auto; padding:28px 40px 18px; border:1px solid #dde0e7; border-radius:24px; background:white; color:#171717; overflow-y:auto; box-shadow:0 24px 100px rgb(25 31 58 / .16); }
+#tuner-dialog::backdrop { background:rgb(25 31 48 / .28); backdrop-filter:blur(5px); }
+#tuner-dialog [hidden] { display:none !important; }
+.tuner-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.tuner-heading h2 { margin:0; font-size:25px; line-height:1.3; font-weight:800; letter-spacing:-.03em; }
+.tuner-subtitle { margin-top:5px; color:#747985; font-size:12px; }
+.tuner-subtitle span { padding:0 5px; }
+#tuner-close { display:grid; place-items:center; flex:none; width:36px; height:36px; border:1px solid #e5e7eb; border-radius:50%; color:#6c7180; }
+#tuner-close:hover { background:#f1f4ff; color:#171717; }
+#tuner-close svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; }
+.tuner-instrument { position:relative; margin:22px 0 12px; width:100%; aspect-ratio:3/1; }
+.tuner-instrument img { display:block; width:100%; height:auto; }
+.tuner-string-overlay { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.tuner-string-overlay g { visibility:hidden; }
+.tuner-string-overlay [data-active=true] { visibility:visible; }
+.tuner-string-overlay path { fill:none; stroke:#6385ff; stroke-width:5; stroke-linecap:round; }
+.tuner-string-overlay circle { fill:#3f5cf0; stroke:white; stroke-width:3; }
+.tuner-string-status { display:grid; grid-template-columns:repeat(6,1fr); list-style:none; margin:0; padding:0; border-bottom:1px solid #e8eaf0; }
+.tuner-string-status li { display:flex; align-items:baseline; justify-content:center; gap:9px; padding:12px 0; border-bottom:2px solid transparent; color:#969ba5; }
+.tuner-string-status span { font-size:12px; }
+.tuner-string-status strong { font-size:16px; font-weight:650; }
+.tuner-string-status [data-detected=true] { color:#304bd9; border-bottom-color:#3f5cf0; }
+#tuner-readout { display:grid; grid-template-columns:180px minmax(0,1fr); gap:36px; align-items:center; padding:25px 28px 23px; font-variant-numeric:tabular-nums; }
+.tuner-note-group { text-align:center; }
+#tuner-target { font-size:12px; color:#777d89; }
+#tuner-note { display:block; margin:7px 0 0; font-size:76px; line-height:1.1; font-weight:750; letter-spacing:-.055em; }
+#tuner-note sub { font-size:.36em; vertical-align:baseline; margin-left:5px; letter-spacing:0; color:#8a8d99; }
+.tuner-direction-row { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+#tuner-direction { font-size:21px; line-height:1.4; font-weight:700; }
+#tuner-adjustment { font-size:15px; color:#666d7b; }
+#tuner-readout[data-direction=in-tune] #tuner-direction { color:#304bd9; }
+.tuner-deviation { position:relative; height:18px; margin:22px 5px 0; background:repeating-linear-gradient(90deg, #d8dde7 0 1px, transparent 1px 5%); border-bottom:1px solid #d8dde7; }
+.tuner-deviation-center { position:absolute; left:45%; width:10%; height:100%; background:#e8ecff; border-inline:1px solid #b8c4ff; }
+#tuner-needle { position:absolute; top:-4px; width:3px; height:26px; border-radius:2px; background:#3f5cf0; transform:translateX(-50%); }
+.tuner-deviation-labels { display:flex; justify-content:space-between; color:#8a919e; font-size:10px; margin:6px 0 0; }
+.tuner-values { display:flex; gap:20px; margin-top:12px; color:#747987; font-size:12px; }
+.tuner-footer { display:flex; align-items:center; gap:32px; padding-top:18px; border-top:1px solid #edf0f4; }
+.tuner-input-group { flex:1; min-width:0; }
+.tuner-input { display:flex; align-items:center; gap:10px; min-width:0; max-width:420px; }
+.tuner-mic { width:18px; height:18px; flex:none; fill:none; stroke:#959aa6; stroke-width:1.5; stroke-linecap:round; }
+#tuner-device { flex:1; width:0; min-width:0; font:inherit; font-size:12px; padding:8px 20px 8px 0; border:0; border-radius:0; background:white; color:#747987; text-overflow:ellipsis; }
+#tuner-level { width:48px; height:5px; flex:none; appearance:none; border:0; background:#edf0f7; border-radius:4px; overflow:hidden; }
+#tuner-level::-webkit-meter-bar { border:0; background:#edf0f7; border-radius:4px; height:5px; }
+#tuner-level::-webkit-meter-optimum-value { background:#3f5cf0; border-radius:4px; }
+#tuner-level::-moz-meter-bar { background:#3f5cf0; }
+#tuner-status { color:#7a7f8c; font-size:12px; line-height:1.6; min-height:20px; margin-top:4px; }
+.tuner-actions { flex:0 0 180px; }
+.tuner-actions .button { width:100%; min-height:48px; border-radius:12px; font-size:14px; }
+.tuner-privacy { text-align:right; color:#8b919d; font-size:11px; margin-top:12px; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+@media(max-width:650px) { #tuner-dialog { width:calc(100vw - 24px); padding:22px 20px 18px; border-radius:20px; } .tuner-heading h2 { font-size:23px; } .tuner-instrument { margin-top:26px; } .tuner-string-status li { gap:3px; flex-direction:column; align-items:center; padding:10px 0; } .tuner-string-status span { font-size:10px; } .tuner-string-status strong { font-size:14px; } #tuner-readout { grid-template-columns:86px minmax(0,1fr); padding:25px 0; gap:18px; } #tuner-note { font-size:56px; } #tuner-target { font-size:11px; } .tuner-direction-row { display:block; } #tuner-direction { display:block; font-size:19px; } #tuner-adjustment { display:block; margin-top:4px; font-size:12px; } .tuner-values { gap:12px; font-size:11px; } .tuner-footer { flex-direction:column; align-items:stretch; gap:16px; } .tuner-actions { flex:auto; } .tuner-privacy { text-align:center; } .workspace-tools { gap:12px; } }
+
 /* Quiet end-of-session confirmation and learner-authored goals. */
 .finish-page { max-width: 660px; margin: 24px auto 64px; }
 .finish-page h1 { font-size: clamp(28px, 5vw, 40px); margin-bottom: 12px; }

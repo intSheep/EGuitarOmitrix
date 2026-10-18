@@ -137,3 +137,21 @@ This change consumes existing evidence-linked assignment metadata; it is not a f
 - `scripts/verify-lesson-review.mjs`: isolated synthetic browser contexts at 1440/768/390; empty state, status filter, version selection, pagination, single-point chart, result editing and no document overflow passed. Desktop and phone screenshots inspected.
 - `scripts/verify-guidance.mjs`: existing quiet finish/resume, save recovery and fixed-tempo checks passed at all three widths. No personal records were inspected or modified, and no course payload is added to Git.
 - Limits: stable BPM and proficiency remain self-reported; no audio assessment or inferred comparable-speed trend. Exact records supplement the visual charts. No storage migration required.
+
+## Local microphone tuner and electric-guitar redesign — issue #37
+
+2026-10-18, FR-020:
+
+- `npm test`: 44 tests passed, including all six synthetic open-string tones, ±12/40-cent detuning at 44.1/48/96 kHz, stronger harmonics, moderate noise, silence/DC/weak/aperiodic rejection, out-of-range high notes and explicit octave deviations.
+- `scripts/verify-tuner.mjs`: passed at 1440/768/390 px using Chromium's synthetic WAV capture through the real microphone/WebAudio interfaces. Confirmed auto/manual selection, guitar string highlighting, numeric deviation, input replacement, safe device-label rendering, stable timer pause, metronome stop, stop/Escape/navigation/background cleanup, delayed permission grant cleanup, disconnected track, denied/missing/busy input and silence feedback. Device labels, switching and error cases use injected fixtures. No personal recording or live practice database was used.
+- `scripts/verify-guidance.mjs`: existing goal/finish/resume and fixed-tempo scenarios passed at 1440/768/390 px with the tuner integrated. The subsequent guitar illustration changes only rendering and passed the tuner checks again.
+- `npm run build` and `git diff --check` passed. Inspected actual desktop/mobile screenshots and all retained Stitch references. Final guitar layout supersedes the earlier form and arc designs; owner aesthetic review remains open.
+- The restricted sandbox prevented Chromium startup and disrupted existing audio subprocess tests. Those checks were rerun successfully with approved local process access; the sandbox attempts were not counted as passing tests.
+
+Limits: synthetic capture is not validation of a physical guitar, Windows microphone/USB drivers, room noise, physical unplugging or alternate browsers. Score playback uses the existing pause hook; actual score-audio/tuner overlap was not acoustically measured. The ±5-cent center indication is a UI tolerance, not measured hardware accuracy. No CI was triggered.
+
+### Automatic horizontal tuner refinement
+
+The owner's latest direction replaces both the toy-like vertical SVG and the interim photographic material style. The final generated illustration uses the app's white/grey, charcoal and royal-blue palette, conventional horizontal guitar proportions and 3+3 tuning machines. The selected RGBA asset is local to the app; its exact generation/edit prompts are documented. Manual string/mode controls are removed. The status row only indicates the nearest detected open-string target.
+
+`npm test` passed all 44 checks after removing the manual target API. Browser acceptance additionally exercises each of six standard strings at −25 and +25 cents with synthetic oscillators through WebAudio, asserting the automatically selected target and the actual UI instruction: tighten when flat, loosen when sharp. The existing real Chromium synthetic-WAV capture, permissions, device switching and capture cleanup checks remain in the same script. Final illustration screenshots at 1440/768/390 px verify horizontal layout, image load, noninteractive status labels and no horizontal overflow. No physical hardware accuracy claim is added.
