@@ -75,3 +75,7 @@ Test source adapters and schema migrations with synthetic or authorized isolated
 - Playback research: report documented capabilities and untested assumptions. Do not report a library test, score conversion, or GP8 launch unless separately authorized and actually run.
 
 Documentation-only changes need link, consistency, and diff checks. Do not invent a passing runtime test suite when no application exists.
+
+## Implemented quiet guidance boundary
+
+Issue #31 and ADR 0004 authorize learner goals, end-of-session stable BPM/proficiency confirmation and same-version resume guidance. This is not the broader automatic planner. Keep `tempoUsage` evidence separate from `bpm` self-report, preserve nulls and legacy untyped BPM, and never promote mastery from timer or target attainment. Backup schema 2 adds goals; schema 1 imports remain supported. Conflict checks and atomic import must cover goals and logs together. Test with isolated synthetic browser profiles.

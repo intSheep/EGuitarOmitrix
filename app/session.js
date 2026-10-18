@@ -21,7 +21,7 @@ export function createSession(
 export function resumeSession(s, wall, mono) {
   return { ...s, running: true, lastWall: wall, lastMono: mono, reason: "" };
 }
-export function tickSession(s, wall, mono) {
+export function tickSession(s, wall, mono, metronomeBpm = null) {
   if (!s.running) return s;
   const dw = wall - s.lastWall,
     dm = mono - s.lastMono;
@@ -42,9 +42,16 @@ export function tickSession(s, wall, mono) {
     else intervals.push({ start: s.lastWall, end: wall });
   }
   const elapsedMs = s.elapsedMs + counted;
+  const tempoUsage = (s.tempoUsage || []).map(x => ({...x}));
+  if (counted > 0 && Number.isInteger(metronomeBpm) && metronomeBpm >= 20 && metronomeBpm <= 300) {
+    const item = tempoUsage.find(x => x.bpm === metronomeBpm);
+    if (item) item.seconds += counted / 1000;
+    else tempoUsage.push({bpm: metronomeBpm, seconds: counted / 1000});
+  }
   return {
     ...s,
     elapsedMs,
+    tempoUsage,
     intervals,
     lastWall: wall,
     lastMono: mono,
@@ -52,9 +59,9 @@ export function tickSession(s, wall, mono) {
     reason: elapsedMs >= 86400000 ? "本次练习已达24小时，请结束保存" : "",
   };
 }
-export function pauseSession(s, wall, mono, reason = "已暂停") {
+export function pauseSession(s, wall, mono, reason = "已暂停", metronomeBpm = null) {
   return {
-    ...tickSession(s, wall, mono),
+    ...tickSession(s, wall, mono, metronomeBpm),
     running: false,
     lastWall: null,
     lastMono: null,
@@ -83,6 +90,9 @@ export function sessionLog(s, now = Date.now()) {
     practicedAt: s.createdAt,
     createdAt: s.createdAt,
     updatedAt: new Date(now).toISOString(),
+    tempoUsage: s.tempoUsage || [],
+    goal: s.goal || null,
+    bpmBasis: "self-reported-stable",
     outcome: null,
     bpm: null,
     note: "",

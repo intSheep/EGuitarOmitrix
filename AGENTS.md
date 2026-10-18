@@ -2,7 +2,7 @@
 
 ## Current scope
 
-The owner has authorized PRD v0.4: source navigation, clean lesson requirements, immersive automatic timing, a metronome, and effort review. Preserve the approved Brilliant visual style. See ADR 0003. Automatic planning remains later work. The owner now authorizes local video frame extraction, reviewed MusicXML/GP conversion and an embedded score viewer/playback pilot. Do not infer unseen notation. Native Guitar Pro launch helpers remain deferred; offer file download/import. See the score preparation research.
+The owner has authorized PRD v0.4: source navigation, clean lesson requirements, immersive automatic timing, a metronome, and effort review. Preserve the approved Brilliant visual style. See ADR 0003. Automatic planning remains later work. The owner authorizes quiet practice goals, end-of-session BPM/proficiency confirmation and same-version resume guidance; see ADR 0004. The owner now authorizes local video frame extraction, reviewed MusicXML/GP conversion and an embedded score viewer/playback pilot. Do not infer unseen notation. Native Guitar Pro launch helpers remain deferred; offer file download/import. See the score preparation research.
 
 Design correction: use the owner-supplied Brilliant screenshot as the visual reference: white canvas, heavy black headings, royal-blue tactile controls, rounded outlined panels, and a small geometric musical illustration. Preserve the task-focused list-detail workspace. Duolingo is only a reference for restrained style and feedback; do not copy its layout, path, mascots, slogans, streaks, or reward structure. Read `docs/design/references-and-rationale.md` before design work.
 

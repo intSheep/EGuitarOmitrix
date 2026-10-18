@@ -79,21 +79,20 @@ try {
     };
   });
   await page.locator("[data-action=finish]").click();
-  await page.waitForFunction(() =>
-    document.querySelector("#notice").textContent.includes("保存失败"),
-  );
-  assert.equal(await page.locator("#timer-value").count(), 1);
+  await page.locator("#finish-form button[type=submit]").click();
+  await page.waitForFunction(() => document.querySelector("#finish-error").textContent.includes("保存失败"));
+  assert.equal(await page.locator("#finish-form").count(), 1);
   await page.evaluate(
     () => (IDBDatabase.prototype.transaction = window.originalTransaction),
   );
-  await page.locator("[data-action=finish]").dblclick();
+  await page.locator("#finish-form button[type=submit]").dblclick();
   await page.locator(".completion").waitFor();
   assert.equal(await page.locator(".session-row").count(), 1);
-  await page.locator("[data-outcome=slow]").click();
+  await page.locator("[data-outcome=learning]").click();
   await page.waitForFunction(
     () =>
       document
-        .querySelector("[data-outcome=slow]")
+        .querySelector("[data-outcome=learning]")
         ?.getAttribute("aria-pressed") === "true",
   );
   await page.screenshot({ path: "/tmp/focus-summary.png" });

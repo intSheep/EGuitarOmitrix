@@ -5,7 +5,7 @@ import { validateLog, activeLogs, latestLog, validateBackup, mergePreview } from
 // Synthetic records only. No real learner history.
 const log=(id='synthetic-1',extra={})=>({id,entryId:'123',assignmentVersion:'test',minutes:5,outcome:'learning',bpm:null,practicedAt:'2026-01-01T00:00:00.000Z',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-01-01T00:00:00.000Z',note:'Synthetic fixture',nextFocus:'Synthetic next step',deletedAt:null,...extra});
 test('actual duration and self-report reject invalid values without assigning defaults',()=>{
-  for(const changes of [{minutes:0},{minutes:-1},{minutes:Infinity},{bpm:0},{bpm:40.5},{outcome:'mastered'},{practicedAt:'bad'},{practicedAt:'2999-01-01'},{note:1}])assert.throws(()=>validateLog(log('x',changes)));
+  for(const changes of [{minutes:0},{minutes:-1},{minutes:Infinity},{bpm:0},{bpm:40.5},{outcome:'invented'},{practicedAt:'bad'},{practicedAt:'2999-01-01'},{note:1}])assert.throws(()=>validateLog(log('x',changes)));
   assert.equal(validateLog(log()).bpm,null);
 });
 test('resume uses actual practice date, excludes deleted records, and keeps course identities separate',()=>{
@@ -15,7 +15,7 @@ test('resume uses actual practice date, excludes deleted records, and keeps cour
 test('backup validation rejects future schemas, duplicate ids and foreign lessons before merge',()=>{
   const backup={app:'EGuitarOmitrix',schemaVersion:1,logs:[log()]};
   assert.equal(validateBackup(backup,new Set(['123'])).length,1);
-  assert.throws(()=>validateBackup({...backup,schemaVersion:2},new Set(['123'])));
+  assert.throws(()=>validateBackup({...backup,schemaVersion:3},new Set(['123'])));
   assert.throws(()=>validateBackup({...backup,logs:[log(),log()]},new Set(['123'])));
   assert.throws(()=>validateBackup(backup,new Set(['456'])));
 });
