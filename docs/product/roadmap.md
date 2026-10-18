@@ -31,3 +31,7 @@ Issue [#9](https://github.com/intSheep/EGuitarOmitrix/issues/9) tracks the autho
 - The owner currently does not know of separate score files and only identifies notation in the videos. Score production effort is therefore unresolved.
 - A native launcher is not required to evaluate a downloaded GP8-compatible score.
 - No automatic reminder, scheduled crawl, public deployment, or score conversion is part of the initial source-navigation slice.
+
+## Latest delivery update — 2026-10-18
+
+Issue #10 adds the assignment/manual-record/resume loop on top of PR #8. All 72 lessons have source-backed summaries; 64 remain AI-subtitle candidates and 8 use visually reviewed video cards. Manual logs, history, edit/delete/restore, backup merge and resume are implemented. This is partial progress against the larger import/planning/progress issues, which remain open. Timer, automatic planning, offline shell and score conversion are not included.

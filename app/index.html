@@ -30,6 +30,7 @@
     <nav class="navigation" aria-label="主导航">
       <a href="#practice" data-nav="practice"><svg class="icon"><use href="#i-strings"/></svg><span>练习台</span></a>
       <a href="#catalog" data-nav="catalog"><svg class="icon"><use href="#i-book"/></svg><span>课程目录</span></a>
+      <a href="#history" data-nav="history"><svg class="icon"><use href="#i-clock"/></svg><span>练习记录</span></a>
       <a href="#plan" data-nav="plan"><svg class="icon"><use href="#i-compass"/></svg><span>功能计划</span></a>
     </nav>
     <a class="source-link" href="https://www.bilibili.com/video/BV1FT411Z7iu/" target="_blank" rel="noopener noreferrer">原课程 <svg class="icon"><use href="#i-external"/></svg></a>
@@ -39,11 +40,12 @@
       <div id="app" aria-busy="true"><div class="loading-state"><p>正在载入课程目录…</p></div></div>
       <noscript><p>请启用 JavaScript 浏览课程，或<a href="https://www.bilibili.com/video/BV1FT411Z7iu/" target="_blank" rel="noopener noreferrer">直接前往 B站原课程</a>。</p></noscript>
     </main>
-    <footer class="footer"><span>电吉他入门课程 · BV1FT411Z7iu</span><span>练习记录与乐谱跟练将在后续阶段提供</span></footer>
+    <footer class="footer"><span>电吉他入门课程 · BV1FT411Z7iu</span><span>练习记录仅保存在当前浏览器 · 可导出备份</span></footer>
   </div>
   <dialog id="lesson-dialog" aria-labelledby="lesson-dialog-title">
     <div id="dialog-content"></div>
   </dialog>
+  <dialog id="record-dialog" aria-labelledby="record-title"></dialog>
   <div id="notice" class="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

@@ -41,3 +41,13 @@ The restricted command sandbox did not expose the same live filesystem/socket be
 - Selection, exact Bilibili page/CID popup targets, six related P007 media entries, catalog search and legacy filters, missing subtitles, phone dialog and Escape focus restoration passed.
 - Reduced-motion and unavailable-storage fallback passed; no browser console or page errors. Six existing Node tests and static build passed.
 - Outbound requests were intercepted for destination assertions; actual Bilibili playback was not tested. No fabricated practice completion or teacher prescription was added.
+
+
+## Assignment / manual-record / resume slice — 2026-10-18
+
+- Inventory: 72 distinct teaching CIDs, 66 current and 6 legacy; 64 AI-subtitle candidates plus 8 visually inspected closing video cards. Source file SHA-256 and evidence ranges retained. Unknown numbers stay unknown. No full subtitles, video frames, audio or scores committed.
+- 12 Node tests passed, including inventory/provenance, invalid records, unknown BPM, resume ordering, deletion exclusion, backup schemas and conflicting-version rejection.
+- Isolated Chromium 156.0.8078.4 passed: empty state, draft reload, actual save and reload, double-click duplicate prevention, edit, soft-delete/restore, export, identical-import deduplication, future-version rejection, fresh-profile restore, two-tab stale-edit rejection, cross-stage resume, phone save and 820 px overflow check.
+- Simulated unavailable IndexedDB and write/quota failure: no false saved state, failed form inputs retained. Markup-like notes render literally. No page errors. Reduced-motion behavior and video-card source links verified.
+- Browser QA uses fresh contexts and synthetic records only; the owner's active browser database was never touched. The committed `scripts/verify-practice.mjs` can reproduce this against the local server with Playwright available. Optional environment variables: `PLAYWRIGHT_MODULE`, `PLAYWRIGHT_CHROMIUM_EXECUTABLE`, `EGUITAR_QA_URL`. It writes synthetic backups/screenshots under `/tmp`.
+- Static build and whitespace checks passed. Source video playback itself was not tested. No automatic timer, multi-exercise session grouping, offline shell, tempo scoring, notation conversion or GP8 launch is delivered.

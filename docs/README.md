@@ -16,3 +16,9 @@ All project prose is English. Audience determines the location, not a different 
 The PRD owns requirements. Research documents own dated external findings. GitHub owns work status. Stitch owns design exploration; repository briefs record its references and review status. Examples are not approved course data.
 
 Implementation decision: [ADR 0001](decisions/0001-local-first-video-navigator.md). Verification: [first-slice validation](engineering/validation.md).
+
+## Assignment and logging additions
+
+- Human review: [Assignment inventory](product/assignment-inventory.md).
+- Engineering: [Manual record persistence](decisions/0002-manual-practice-records.md).
+- Runtime data: `app/data/assignments.json`; authored notes: `content/assignment-notes.json` and `content/visual-assignment-notes.json`.
