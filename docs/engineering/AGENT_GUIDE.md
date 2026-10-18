@@ -10,7 +10,7 @@ Status: source navigation, requirements and timed focus/review are authorized. A
 - Planner: approved exercises plus availability and prior outcomes to a proposed session.
 - Practice store: user-confirmed attempts and editable history, independent of source refresh.
 - Progress: derived views from confirmed attempts, never from playback or page views.
-- Score/player adapters: research only; no dependencies, runtime, or launcher should be added in the present scope.
+- Score/player adapters: owner-authorized local score and embedded-audio pilot under FR-019. Preserve candidate/reviewed sync status; native GP8 inspection is authorized, but URI handlers and file-association changes are not. See `../research/audio-score-pipeline.md`.
 
 ## Proposed records
 

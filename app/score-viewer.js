@@ -97,12 +97,17 @@ export async function showScore(entryId, title) {
         ),
       );
       const variable = tempos.size > 1;
-      bpm.disabled = variable;
-      bpm.value = defaultBpm || tempo;
-      player.playbackSpeed = variable ? 1 : (defaultBpm || tempo) / tempo;
-      status.textContent = variable
+      const embedded = !!score.backingTrack?.rawAudioFile;
+      bpm.dataset.mode = embedded ? "rate" : "bpm";
+      bpm.parentElement.firstChild.textContent = embedded ? "速度 % " : "BPM ";
+      bpm.min = embedded ? "25" : "20";
+      bpm.max = embedded ? "200" : "300";
+      bpm.disabled = variable && !embedded;
+      bpm.value = embedded ? 100 : defaultBpm || tempo;
+      player.playbackSpeed = embedded || variable ? 1 : (defaultBpm || tempo) / tempo;
+      status.textContent = variable && !embedded
         ? "这份谱包含变速，按原谱速度播放。"
-        : `${score.masterBars.length} 小节 · 原谱 ${tempo} BPM`;
+        : `${score.masterBars.length} 小节 · 原谱 ${tempo} BPM${score.backingTrack?.rawAudioFile ? " · 内嵌音频" : ""}`;
       update();
     });
     player.playerStateChanged.on((e) => {
@@ -116,11 +121,12 @@ export async function showScore(entryId, title) {
       (player.isLooping = e.target.checked);
     dialog.querySelector("#score-bpm").onchange = (e) => {
       const bpm = Number(e.target.value);
-      if (!Number.isFinite(bpm) || bpm < 20 || bpm > 300) {
-        status.textContent = "BPM 范围为 20–300";
+      const rate = e.target.dataset.mode === "rate";
+      if (!Number.isFinite(bpm) || bpm < Number(e.target.min) || bpm > Number(e.target.max)) {
+        status.textContent = rate ? "速度范围为 25%–200%" : "BPM 范围为 20–300";
         return;
       }
-      player.playbackSpeed = bpm / player.score.tempo;
+      player.playbackSpeed = rate ? bpm / 100 : bpm / player.score.tempo;
     };
     dialog.querySelector("#score-gp").onclick = () => {
       try {
