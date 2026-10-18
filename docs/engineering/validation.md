@@ -63,3 +63,7 @@ The restricted command sandbox did not expose the same live filesystem/socket be
 ## 2026-10-18 — Storage recovery and flat catalog (#14)
 
 `verify-storage-recovery.mjs` passed with isolated browser storage: a real v1 database connection blocks v2 opening; repeated retry clicks preserve the pending request; closing the old tab restores the app without reloading (a window identity marker survives); a synthetic temporary open failure recovers with retry. Catalog rows and 390 px layout were verified and desktop/mobile screenshots inspected. All 16 unit tests, build and existing practice browser regression passed. User records were not accessed or modified.
+
+## 2026-10-18 — Grouped course library (#18)
+
+Stitch output and implemented desktop/mobile screenshots inspected. `verify-catalog.mjs` passed for chapter grouping, stage/type/search/legacy filters, zero-result reset, overview stage zero, exact exercise and material actions, and 820/390 px overflow checks. `verify-storage-recovery.mjs` passed against the new catalog. All 16 unit tests and static build passed. Browser contexts were isolated and contained no user records.

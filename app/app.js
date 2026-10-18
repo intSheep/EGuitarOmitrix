@@ -163,33 +163,59 @@ function history() {
     )
     .join("")}</section>`;
 }
+function catalogLink(changes) {
+  const params = new URLSearchParams(route().params);
+  for (const [key, value] of Object.entries(changes)) {
+    if (value === null || value === "" || value === "all") params.delete(key);
+    else params.set(key, String(value));
+  }
+  return `#catalog${params.size ? `?${params}` : ""}`;
+}
 function catalog() {
   const params = route().params,
     q = params.get("q") || "";
-  const stage = Number(params.get("stage")) || "all",
-    kind = params.get("kind") || "all",
+  const stage = /^[0-7]$/.test(params.get("stage"))
+    ? Number(params.get("stage"))
+    : "all";
+  const kind = params.get("kind") || "all",
     includeLegacy = params.get("legacy") === "1";
-  const entries = filterEntries(course, {
-    query: q,
-    stage,
-    kind,
-    includeLegacy,
-  });
-  return `<h1>课程目录</h1><form id="search"><input name="q" aria-label="搜索课程" placeholder="搜索课程、伴奏" value="${esc(q)}"><select name="stage" aria-label="课程阶段"><option value="">全部阶段</option>${STAGES.map((s) => `<option value="${s.id}" ${stage === s.id ? "selected" : ""}>W${s.id}</option>`).join("")}</select><select name="kind" aria-label="视频类型"><option value="all">全部类型</option>${Object.entries(
-    KINDS,
-  )
-    .map(
-      ([k, v]) =>
-        `<option value="${k}" ${kind === k ? "selected" : ""}>${v}</option>`,
-    )
-    .join(
-      "",
-    )}</select><label><input type="checkbox" name="legacy" value="1" ${includeLegacy ? "checked" : ""}>包含旧版</label><button class="button secondary">搜索</button></form><div class="course-directory">${entries
-    .map(
-      (e) =>
-        `<article class="directory-row"><span class="directory-page">P${String(e.page).padStart(3, "0")}</span><div class="directory-title"><h2>${esc(shortTitle(e))}</h2><span>${e.stage ? `W${e.stage} · ` : ""}${KINDS[e.kind]}${e.legacy ? " · 旧版" : ""}</span></div>${e.kind === "lesson" ? `<a class="directory-action" href="#practice?stage=${e.stage}&lesson=${e.id}">选择练习</a>` : `<button class="directory-action" data-material="${e.id}">查看资料</button>`}</article>`,
-    )
-    .join("")}</div>`;
+  const types = [
+    ["all", "全部"],
+    ["lesson", "讲解"],
+    ["backing", "伴奏"],
+    ["demo", "示范"],
+    ["followAlong", "跟练"],
+    ["other", "其他"],
+  ];
+  const matches = filterEntries(course, { query: q, includeLegacy }).filter(
+    (e) =>
+      kind === "all" ||
+      (kind === "other"
+        ? !["lesson", "backing", "demo", "followAlong"].includes(e.kind)
+        : e.kind === kind),
+  );
+  const entries = matches.filter((e) => stage === "all" || e.stage === stage);
+  const stages = [{ id: 0, title: "课程导览" }, ...STAGES];
+  const glyph = (e) =>
+    `<svg class="icon" aria-hidden="true"><use href="#i-${e.kind === "lesson" ? "strings" : e.kind === "backing" ? "clock" : "book"}"/></svg>`;
+  const row = (e) => {
+    const inside = `<span class="library-icon kind-${e.kind}">${glyph(e)}</span><span class="library-row-text"><strong>${esc(shortTitle(e))}</strong><span class="library-meta">P${String(e.page).padStart(3, "0")}<span>·</span>${KINDS[e.kind]}<span>·</span>${Math.floor(e.durationSeconds / 60)}:${String(e.durationSeconds % 60).padStart(2, "0")}${e.legacy ? '<span class="library-old">旧版</span>' : ""}</span></span><span class="library-row-action">${e.kind === "lesson" ? "查看练习" : "查看资料"}</span>`;
+    return e.kind === "lesson"
+      ? `<a class="directory-row directory-action" href="#practice?stage=${e.stage}&lesson=${e.id}">${inside}</a>`
+      : `<button class="directory-row directory-action" data-material="${e.id}">${inside}</button>`;
+  };
+  return `<div class="library-header"><div><p class="library-eyebrow">电吉他入门</p><h1>课程目录</h1></div><span class="library-total">${course.entries.filter((e) => includeLegacy || !e.legacy).length} 节课程与资料</span></div><div class="library-layout"><nav class="library-stages" aria-label="课程阶段"><a href="${catalogLink({ stage: null })}" ${stage === "all" ? 'aria-current="page"' : ""}><span>全部课程</span><span class="library-count">${matches.length}</span></a>${stages.map((s) => `<a href="${catalogLink({ stage: s.id })}" ${stage === s.id ? 'aria-current="page"' : ""}><span class="library-stage-label">${s.id ? `<b>W${s.id}</b>` : "<b>入门</b>"}<span>${s.title}</span></span><span class="library-count">${matches.filter((e) => e.stage === s.id).length}</span></a>`).join("")}</nav><section class="library-content" aria-label="课程内容"><form id="library-search" class="library-search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input name="q" type="search" value="${esc(q)}" placeholder="搜索课程、练习或歌曲" aria-label="搜索课程"><button type="submit">搜索</button></form><div class="library-toolbar"><nav class="library-types" aria-label="内容类型">${types.map(([key, label]) => `<a href="${catalogLink({ kind: key })}" ${kind === key ? 'aria-current="page"' : ""}>${label}</a>`).join("")}</nav><label class="library-legacy"><input id="library-legacy" type="checkbox" ${includeLegacy ? "checked" : ""}>包含旧版</label></div><div class="course-directory">${
+    entries.length
+      ? stages
+          .map((s) => {
+            const list = entries.filter((e) => e.stage === s.id);
+            return list.length
+              ? `<section class="library-group"><header><h2>${s.id ? `<span>W${s.id}</span>` : ""}${s.title}</h2><span>${list.length} 节</span></header>${list.map(row).join("")}</section>`
+              : "";
+          })
+          .join("")
+      : `<div class="library-empty"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><h2>没有找到匹配的课程</h2><a class="button secondary" href="#catalog">清除筛选</a></div>`
+  }</div></section></div>`;
 }
 function render() {
   if (!course) return;
@@ -444,6 +470,8 @@ document.addEventListener("click", async (ev) => {
   }
 });
 document.addEventListener("change", async (ev) => {
+  if (ev.target.id === "library-legacy")
+    location.hash = catalogLink({ legacy: ev.target.checked ? "1" : null });
   try {
     if (ev.target.id === "bpm") {
       metro.stop();
@@ -478,6 +506,10 @@ document.addEventListener("change", async (ev) => {
   }
 });
 document.addEventListener("submit", (e) => {
+  if (e.target.id === "library-search") {
+    e.preventDefault();
+    location.hash = catalogLink({ q: new FormData(e.target).get("q").trim() });
+  }
   if (e.target.id === "search") {
     e.preventDefault();
     location.hash = `catalog?${new URLSearchParams(new FormData(e.target))}`;
