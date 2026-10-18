@@ -1,6 +1,6 @@
 # Implementation guide for Agents
 
-Status: source navigation and the manual assignment/record/resume slice are authorized and implemented. ADR 0002 specifies the current implementation; broader timer/planner contracts below remain proposed. Read [the PRD](../product/PRD.md) and [research scope](../research/practice-playback.md) first.
+Status: source navigation, requirements and timed focus/review are authorized. ADR 0003 supersedes ADR 0002 for new session capture; legacy records remain readable. Broader planner contracts below remain proposed. Read [the PRD](../product/PRD.md) and [research scope](../research/practice-playback.md) first.
 
 ## Boundaries
 

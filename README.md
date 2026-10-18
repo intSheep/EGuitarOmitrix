@@ -2,9 +2,9 @@
 
 A private electric-guitar practice companion. The first slice provides a task-focused exercise workspace and exact links to the course's Bilibili lessons, backing tracks, and demonstrations.
 
-**Current:** PRD v0.3; 140 source entries, assignment summaries for all 66 current and 6 legacy lessons, manual actual-duration/outcome/BPM/next-focus records, per-exercise history, editing, reversible deletion, backup merge, and resume after refresh. Records stay in this browser's IndexedDB. Most tasks are AI-subtitle candidates; eight were recovered from visually inspected video closing cards. Uncertain values are labeled.
+**Current:** PRD v0.4; 140 source entries and task summaries for 72 lessons. One start action opens an immersive automatic timer with a metronome and consolidated course materials. Finishing saves actual time and opens an effort review with daily bars, activity calendar and exercise history. Records stay in browser IndexedDB, with backup merge and reversible deletion. Source uncertainties remain in the inventory.
 
-Open an exercise, inspect the teacher task and its source time, practice, then save actual minutes and your outcome. Next time, the latest practiced exercise and next-focus note appear on the workspace. Use **练习记录** to edit or export a backup. No timer or automatic grading is included. Score conversion/playback and Guitar Pro integration remain deferred.
+Select an exercise, click **开始练习**, pause as needed, then finish to save. Refresh restores a paused draft. Videos and hidden pages pause timing. Use **练习回顾** for history and backups. Outcome ratings are optional. Score conversion/playback and Guitar Pro integration remain deferred.
 
 ## Run locally
 
@@ -45,3 +45,6 @@ Both human-facing and Agent-facing documentation are English. Original Chinese c
 Use GitHub Issues, Milestones, and pull requests with requirement/acceptance traceability. Source metadata may be committed; full transcripts, videos, scores, credentials, and personal practice records stay outside Git. A source launch is not a practice result.
 
 Agents should start with [AGENTS.md](AGENTS.md).
+
+- [Focus session storage decision](docs/decisions/0003-focus-practice.md)
+- [Focus and summary Stitch design](docs/design/focus-practice.md)

@@ -51,3 +51,11 @@ The restricted command sandbox did not expose the same live filesystem/socket be
 - Simulated unavailable IndexedDB and write/quota failure: no false saved state, failed form inputs retained. Markup-like notes render literally. No page errors. Reduced-motion behavior and video-card source links verified.
 - Browser QA uses fresh contexts and synthetic records only; the owner's active browser database was never touched. The committed `scripts/verify-practice.mjs` can reproduce this against the local server with Playwright available. Optional environment variables: `PLAYWRIGHT_MODULE`, `PLAYWRIGHT_CHROMIUM_EXECUTABLE`, `EGUITAR_QA_URL`. It writes synthetic backups/screenshots under `/tmp`.
 - Static build and whitespace checks passed. Source video playback itself was not tested. No automatic timer, multi-exercise session grouping, offline shell, tempo scoring, notation conversion or GP8 launch is delivered.
+
+## 2026-10-18 — Focus sessions and effort review (#12)
+
+- `npm test`: 16 tests passed, including interruption/pause accounting, local midnight allocation, timer-log validation and existing catalog/content invariants.
+- `npm run build` and `git diff --check`: passed.
+- `scripts/verify-practice.mjs`: passed in isolated Chromium 156 contexts, with no access to the user's browser profile. Verified one start control, no manual duration input/disclosures, pause and refresh recovery, exclusive ownership for both resume and finish across tabs, WebAudio control state, one material video-launch action, atomic finish without duplicate records, optional outcome updates, backup export/import, reversible deletion, blocked-storage behavior, synthetic transaction failure and retry, v1 database migration preserving notes, hidden-page pause, and reduced motion.
+- Browser layouts checked at 1440, 820 and 390 pixels; no horizontal overflow. Desktop focus, completion and phone focus screenshots inspected. No sample logs were written to the live profile or repository.
+- Sound scheduling and controls were exercised in headless Chromium; subjective audio quality and timing on the user's physical output device are not verified. Sleep is simulated in pure-clock tests, not a physical suspend/resume test. No CI workflow was triggered. Full offline loading, cloud sync and notation conversion remain outside this slice.
