@@ -1,8 +1,8 @@
 # Product Requirements Document — EGuitarOmitrix
 
-- Version: 0.1
+- Version: 0.2
 - Date: 2026-10-18, Asia/Shanghai
-- Status: Draft for owner review
+- Status: First video-navigation slice authorized; broader tracker remains planned
 - Owner: intSheep
 - Delivery: Private repository; GitHub Issues + Milestones + pull requests
 - Design: Stitch
@@ -14,7 +14,7 @@ Help a working adult continue an electric-guitar course even when practice is li
 
 A course stage must not expire because a calendar week passed. The learner should be able to return after a break, choose the time available, and continue with a small, clear set of exercises.
 
-This revision defines the product and investigates playback options. It does not implement an application or commit the project to a playback integration.
+The owner authorized an initial implementation on 2026-10-18: exercise browsing and direct navigation to the corresponding Bilibili episodes. This revision plans the core tracker, implements that bounded entry point, and defers notation conversion/playback. The owner later clarified that Duolingo is a reference for selected style and motion, not its mascot, copy, game structure, or layout.
 
 ## 2. User problem and operating context
 
@@ -66,7 +66,7 @@ Collect pilot feedback manually and locally. Third-party analytics are outside t
 
 ## 5. Scope and release boundary
 
-### MVP, after requirements review
+### Core tracker plan
 
 1. Import existing course metadata and subtitle files; keep missing content visible.
 2. Extract editable assignment candidates and verify them against timestamped evidence.
@@ -76,13 +76,22 @@ Collect pilot feedback manually and locally. Third-party analytics are outside t
 6. Show exercise history and weekly activity without punitive streak mechanics.
 7. Preserve local data and provide versioned export/restore.
 
+### First implemented slice
+
+- A task-focused practice workspace with W1–W7 stage selection, a persistent desktop exercise-detail pane, and compact-screen detail dialogs.
+- A searchable catalog of 140 source entries, including 66 current teaching exercises; support media and old revisions remain distinguishable.
+- Exact outbound Bilibili links using BV ID, observed page, and CID. Only the last opened source entry is remembered locally; it is not practice progress.
+- A neutral, adult-oriented visual system with brief selection/press feedback. No mascot, slogan, serpentine path, XP, or fabricated learner history.
+
+This slice does not yet publish reviewed assignments, build a session plan, log practice, grade skill, or play notation.
+
 ### Later candidates
 
 - Optional authenticated subtitle refresh, with explicit missing-track, expired-access, and retry states.
 - Assisted transcription/OCR for missing speech or visual teaching material, followed by human review.
 - Optional reminders, richer audio notes, and multi-device sync.
 
-### Research only in this request
+### Deferred playback work
 
 - In-platform notation rendering, synthesized playback, BPM adjustment, and passage looping.
 - Structured score creation/conversion and export for Guitar Pro 8.
@@ -151,6 +160,12 @@ If a verified machine-readable score exists, the future product could offer a br
 | FR-015 | P0 | Store reviewed tasks and practice records locally; export and restore a versioned backup. | After the app has been initialized, imported tasks and logging work offline. Restore validates before committing and preserves the previous workspace on failure. Media files are excluded and listed for relinking. |
 | FR-016 | P0 | Preserve user edits and history across content refresh and deletion. | Re-import offers a reviewable diff. Retired exercises remain resolvable from old logs. Deleting a log offers undo and updates history. |
 
+### First-slice navigation requirement
+
+| ID | Priority | Requirement | Acceptance criterion |
+| --- | --- | --- | --- |
+| FR-017 | P0 | Provide an immediately usable exercise/source navigator while the broader tracker is developed. | All 140 entries remain available, 66 current teaching exercises appear in open stage lists, desktop uses list-detail, compact screens use a focused dialog, every outbound link resolves to the catalog page/CID, and no view is counted as practice. |
+
 ### Research requirements, without implementation authorization
 
 | ID | Priority | Research question | Deliverable |
@@ -213,7 +228,7 @@ The learner owns practice records. Content revisions own source evidence and tas
 ## 11. UX and nonfunctional requirements
 
 - NFR-001: Target current Windows Chrome/Edge and responsive layouts at 390 px and desktop widths; exact tested versions are recorded when implementation exists.
-- NFR-002: Today should show the next action above the fold. Recording requires only actual time and a simple outcome; detailed repetition/tempo fields are optional.
+- NFR-002: The practice workspace shows the current source action above the fold. In the future recording flow, require only actual time and a simple outcome; detailed repetition/tempo fields are optional. Avoid promotional headlines and decorative game navigation.
 - NFR-003: Keyboard access, visible focus, text labels for statuses, and readable notation-independent task text are required. Color alone must not convey review or progress state.
 - NFR-004: A failed save, unavailable storage, or quota error must remain visible and offer a safe retry/export; no success toast before persistence succeeds.
 - NFR-005: Schema upgrades validate and retain a recoverable prior snapshot. Future schema versions fail safely on older clients.
@@ -252,6 +267,8 @@ The learner owns practice records. Content revisions own source evidence and tas
 
 ## 14. Delivery gate
 
-The next implementation milestone starts only after the owner chooses the MVP scope. Online notation, score conversion, and native launching remain research-only backlog items even if the core tracker is approved. No date estimate is assigned until the source-review and design workload is understood.
+The owner authorized the FR-017 source-navigation slice in this conversation. Requirements for assignment review, session planning, logging, and progress remain the next planned core functionality. Notation conversion, online playback, and native launching are deferred and require a later implementation decision. No implementation estimate is assigned to unvalidated score preparation.
+
+Design choices must follow the [reference and functional rationale](../design/references-and-rationale.md): borrow restrained visual feedback from learning products while using an information architecture suited to repeated guitar practice.
 
 See [roadmap](roadmap.md), [Stitch brief](../design/stitch-brief.md), and [Agent guide](../engineering/AGENT_GUIDE.md).

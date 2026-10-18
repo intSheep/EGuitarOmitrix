@@ -48,7 +48,7 @@ Requirement IDs, acceptance criteria, source inputs, and dependencies are clear.
 
 The issue's actual deliverable exists; acceptance is supported by appropriate evidence; relevant docs are updated; no secrets or course/personal payloads are committed; review is complete. A research issue can be done with a sourced conclusion and stated unknowns. That does not make the investigated feature done.
 
-For this documentation baseline, checks cover relative links, requirement traceability, inventory arithmetic, English prose organization, source-backed claims, and whitespace. There are no runtime tests, build results, or production deployments to report.
+Documentation checks cover links, requirement traceability, source-backed claims, and whitespace. Application changes also require meaningful unit checks and browser verification appropriate to the scope. Record actual evidence and limits in `docs/engineering/validation.md`; a local build is not a deployment.
 
 ## Review and scope changes
 
