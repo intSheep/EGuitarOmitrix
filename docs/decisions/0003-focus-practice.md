@@ -17,3 +17,7 @@ The WebAudio metronome schedules four-beat clicks in a short lookahead queue. It
 ## Deferred
 
 No automatic exercise promotion, planner, source approval editor, offline service worker, cloud synchronization, score conversion or native app launch. Existing source uncertainties remain in the content inventory and timestamped evidence; the regular practice UI presents the usable prescription without extraction-process badges.
+
+## Blocked upgrade recovery — issue #14
+
+`onblocked` is a pending upgrade state, not a terminal connection failure. Keep its original open request alive and notify the UI. The catalog renders while storage waits. When the old connections close, the same request succeeds and loads records and the paused draft before enabling practice. Repeated retry clicks share one pending attempt; genuine connection failures can create a new attempt. No storage deletion, reload, or automatic session resumption occurs. A persistent notice explains the required action and exposes retry.
