@@ -1773,6 +1773,20 @@ dialog {
   padding-left: 22px;
   line-height: 1.85;
 }
+/* Restore markers removed by the global list reset in the detail pane. */
+.lesson-detail .requirements ul {
+  list-style: disc outside;
+  padding-left: 1.25rem;
+}
+.lesson-detail .requirements li {
+  padding-left: 0.25rem;
+}
+.lesson-detail .requirements li + li {
+  margin-top: 0.5rem;
+}
+.lesson-detail .requirements li::marker {
+  color: #3f5cf0;
+}
 .task-pills {
   display: flex;
   flex-wrap: wrap;
