@@ -8,12 +8,9 @@ export const STRINGS = [
   { string: 1, note: 'E4', midi: 64 },
 ].map(s => ({ ...s, frequency: 440 * 2 ** ((s.midi - 69) / 12) }));
 
-export function tuningReading(frequency, string = null) {
+export function tuningReading(frequency) {
   if (!Number.isFinite(frequency) || frequency <= 0) return null;
-  const target = string === null
-    ? STRINGS.reduce((a, b) => Math.abs(Math.log2(frequency / a.frequency)) < Math.abs(Math.log2(frequency / b.frequency)) ? a : b)
-    : STRINGS.find(s => s.string === string);
-  if (!target) return null;
+  const target = STRINGS.reduce((a, b) => Math.abs(Math.log2(frequency / a.frequency)) < Math.abs(Math.log2(frequency / b.frequency)) ? a : b);
   const cents = 1200 * Math.log2(frequency / target.frequency);
   const midi = Math.round(69 + 12 * Math.log2(frequency / 440));
   const names = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];

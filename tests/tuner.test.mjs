@@ -31,12 +31,12 @@ test('silence, DC, weak signal, aperiodic noise and unsupported high notes do no
     assert.equal(detectPitch(data, 48000).frequency, null);
   }
 });
-test('manual target preserves large deviations and octave differences', () => {
-  const value = tuningReading(STRINGS[0].frequency * 2, 6);
-  assert.ok(Math.abs(value.cents - 1200) < 1e-8);
+test('automatic target preserves measured octave and large deviations without folding', () => {
+  const value = tuningReading(STRINGS[0].frequency * 2);
+  assert.ok(Math.abs(value.cents - 200) < 1e-8);
+  assert.equal(value.target.string, 4);
   assert.equal(value.direction, 'sharp');
   assert.equal(value.note, 'E3');
   assert.equal(tuningReading(null), null);
   assert.equal(tuningReading(Infinity), null);
-  assert.equal(tuningReading(110, 9), null);
 });

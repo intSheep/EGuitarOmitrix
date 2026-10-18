@@ -28,7 +28,16 @@ async function context(mode = 'normal', width = 1440) {
       if (mode === 'busy') throw new DOMException('Synthetic busy input', 'NotReadableError');
       if (mode === 'delayed') await new Promise(resolve => { window.tunerQA.grant = resolve; });
       // Device switching is an injected two-device fixture; capture itself stays real.
-      const stream = await capture({ audio: { ...constraints.audio, deviceId: undefined }, video: false });
+      let stream;
+      if (mode.startsWith('tone:')) {
+        const synth = new NativeAudio();
+        const oscillator = synth.createOscillator(), output = synth.createMediaStreamDestination();
+        oscillator.frequency.value = Number(mode.slice(5));
+        oscillator.connect(output); oscillator.start(); await synth.resume();
+        stream = output.stream;
+        const track = stream.getAudioTracks()[0], originalStop = track.stop.bind(track);
+        track.stop = () => { originalStop(); oscillator.stop(); synth.close(); };
+      } else stream = await capture({ audio: { ...constraints.audio, deviceId: undefined }, video: false });
       window.tunerQA.streams.push(stream);
       if (mode === 'silent') stream.getAudioTracks()[0].enabled = false;
       return stream;
@@ -61,12 +70,11 @@ try {
     assert.match(await page.locator('#tuner-direction').innerText(), /准确/);
     assert.match(await page.locator('#tuner-frequency').innerText(), /110\.\d+ Hz/);
     assert.equal(await page.evaluate(() => tunerQA.requests[0].audio.echoCancellation), false);
-    await page.locator('[data-tuner-string="6"]').click();
-    assert.equal(await page.locator('[data-guitar-string="6"]').getAttribute('data-active'), 'true');
-    await page.waitForFunction(() => document.querySelector('#tuner-cents').textContent.includes('+500'));
-    assert.match(await page.locator('#tuner-direction').innerText(), /偏高/);
-    await page.locator('[data-tuner-string="auto"]').click();
-    await page.waitForFunction(() => document.querySelector('#tuner-direction').textContent === '准确');
+    assert.equal(await page.locator('[data-tuner-string]').count(), 0);
+    assert.equal(await page.locator('.tuner-string-status button').count(), 0);
+    assert.equal(await page.locator('[data-string-status="5"]').getAttribute('data-detected'), 'true');
+    assert.match(await page.locator('#tuner-target').innerText(), /接近 5 弦/);
+    assert.ok(await page.locator('.tuner-instrument img').evaluate(e => e.complete && e.naturalWidth > e.naturalHeight * 2));
     await page.locator('#tuner-device').selectOption('synthetic-2');
     await page.waitForFunction(() => tunerQA.requests.length === 2 && document.querySelector('#tuner-note').textContent === 'A2');
     assert.equal(await page.evaluate(() => tunerQA.requests[1].audio.deviceId.exact), 'synthetic-2');
@@ -75,6 +83,7 @@ try {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     assert.equal(await page.locator('#tuner-dialog').evaluate(e => e.scrollWidth > e.clientWidth), false);
     await page.screenshot({ path: `/tmp/eguitar-tuner-${width}.png` });
+    await page.locator('#tuner-dialog').screenshot({ path: `/tmp/eguitar-tuner-horizontal-${width}.png` });
     await page.keyboard.press('Escape');
     await released(page);
     assert.equal(await page.locator('[data-tuner]').first().evaluate(e => e === document.activeElement), true);
@@ -95,6 +104,21 @@ try {
     await page.evaluate(() => { location.hash = 'history'; });
     await page.waitForFunction(() => !document.querySelector('#tuner-dialog').open); await released(page);
     await ctx.close();
+  }
+  // Separate synthetic oscillators exercise automatic string changes and the
+  // actual UI guidance in either direction, without selecting any target.
+  for (const [midi, string] of [[40, 6], [45, 5], [50, 4], [55, 3], [59, 2], [64, 1]]) {
+    for (const cents of [-25, 25]) {
+      const frequency = 440 * 2 ** ((midi - 69) / 12 + cents / 1200);
+      const { ctx, page } = await context(`tone:${frequency}`);
+      await open(page); await page.locator('#tuner-start').click();
+      await page.waitForFunction(string => document.querySelector(`[data-string-status="${string}"]`)?.dataset.detected === 'true', string);
+      assert.match(await page.locator('#tuner-target').innerText(), new RegExp(`接近 ${string} 弦`));
+      assert.equal(await page.locator('#tuner-direction').innerText(), cents < 0 ? '偏低' : '偏高');
+      assert.equal(await page.locator('#tuner-adjustment').innerText(), cents < 0 ? '稍微拧紧一点' : '稍微放松一点');
+      if (string === 6 && cents < 0) await page.locator('#tuner-dialog').screenshot({ path:'/tmp/eguitar-tuner-six-flat.png' });
+      await page.locator('#tuner-stop').click(); await released(page); await ctx.close();
+    }
   }
   for (const [mode, message] of [['denied', /权限/], ['missing', /找不到/], ['busy', /无法读取/], ['silent', /声音较小/]]) {
     const { ctx, page } = await context(mode);
@@ -124,5 +148,5 @@ try {
     await ctx.close();
   }
   assert.deepEqual(errors, []);
-  console.log('Tuner: real Chromium capture/WebAudio with synthetic A2/harmonics, auto/manual cents, input switching, paused practice/metronome, stop/Escape/navigation/background/disconnect/delayed grant, permission/missing/busy/silent states and responsive focus passed. No real instrument accuracy claim.');
+  console.log('Tuner: real Chromium capture/WebAudio with synthetic A2/harmonics, automatic six-string detection/tighten-loosen guidance, input switching, paused practice/metronome, stop/Escape/navigation/background/disconnect/delayed grant, permission/missing/busy/silent states and responsive focus passed. No real instrument accuracy claim.');
 } finally { await browser.close(); }
