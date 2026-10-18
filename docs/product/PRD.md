@@ -289,3 +289,7 @@ The latest owner request supersedes earlier manual logging and disclosure-based 
 ## 16. Owner-authorized score pilot (v0.5)
 
 The owner now authorizes video-frame extraction, reviewed MusicXML/GP preparation and browser score playback. FR-018: preserve timestamped source evidence, page overlap decisions and unknowns when preparing scores; never infer unseen notation. FR-019: display local structured scores in the immersive page with playback, tempo/loop controls and GP downloads. Initial acceptance covers one static and one scrolling source, not the whole course. Native launch helpers, microphone grading and automatic six-line-tab recognition remain outside scope. See [actual coverage and validation](../research/video-score-preparation.md).
+
+### FR-019 extension — Embedded audio preparation (2026-10-18)
+
+Owner-authorized local MusicXML/score-model → audio processing → explicit sync points → audio-embedded GP pipeline. Keep candidate and reviewed alignment distinct. Include source hashes, trim parameters and synchronization evidence. Test GP reimport and browser playback independently from GP8 musical acceptance. Native GP8 inspection is authorized; no system protocol/file-association change is needed. The initial tooling rejects repeats/jumps, keeps uncertain timing out of accepted lesson defaults, and provides a documented GP8 acceptance gate. Current real artifact is a demonstration-audio draft; independent backing alignment and native acceptance remain open in #22.

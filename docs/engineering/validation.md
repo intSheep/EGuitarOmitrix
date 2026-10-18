@@ -76,3 +76,9 @@ Stitch output and implemented desktop/mobile screenshots inspected. `verify-cata
 - `verify-scores.mjs`: both actual local pilots render, playback state toggles, BPM and loop controls work, source-frame views open, downloaded GP reimports with expected measure counts, and 390 px overlay avoids overflow. Screenshots inspected. Tests use isolated browser storage.
 - Existing `verify-practice.mjs` passed after integrating score controls; learner data was not accessed. Live preview restarted to load ES-module/font/audio resource types.
 - Not verified: native Windows Guitar Pro 8 import, subjective physical audio output, full-score technique equivalence across all importers. Remaining 70 teaching entries are not transcribed. Standard tuning is assumed in the two pilots and documented in local manifests. No course score/media files were committed.
+
+## 2026-10-18 — Embedded-audio GP chain (#22)
+
+20 unit/integration tests pass, including a synthetic audio packaging test with lead-in offsets, exact embedded-byte recovery and sync recovery within one millisecond, invalid/unsupported anchors and refusing overwrite. Existing source videos and user storage were not modified. `verify-audio-score.mjs` passed in isolated Chromium: embedded WAV decoded and time advanced, half-speed changed the media rate, pause/close stopped playback, and download/reimport retained audio and anchors. Build and diff checks passed. This does not establish subjective audio quality or musical alignment.
+
+The actual P073 export is a demonstration-audio **candidate**, not a verified P072 backing. P072 first-bar alignment remains pending. GP8 was not accessed: Windows computer-use initialization failed on the WSL workspace URI before any app observation. See [pipeline and acceptance gates](../research/audio-score-pipeline.md). #22 remains open for independent backing synchronization and GP8 acceptance.
