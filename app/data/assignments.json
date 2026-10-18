@@ -1,0 +1,1487 @@
+{
+  "schemaVersion": 1,
+  "bvid": "BV1FT411Z7iu",
+  "version": "2026-10-18.2",
+  "items": [
+    {
+      "entryId": "36374643242",
+      "page": 3,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "体会全身放松与持琴姿势；关注右手手腕的摆动和触弦动作。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P003 W1-EX1 右手空弦下拨(含六线谱介绍).ai-zh.json",
+        "sha256": "83229fd08b228b9d850fec36b9da8fa1e658f6f79ddd735de416ccd84e064ff2",
+        "from": 860,
+        "to": 894.42,
+        "doseQuote": "每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374710788",
+      "page": 4,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "边弹边说唱名；练习快速反应各弦唱名，注意坐姿与放松。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P004 W1-EX2 左手按弦练习(含乐理常识&调音).ai-zh.json",
+        "sha256": "cce52aeb70a6ce92221c790cc3e30ef4026652f492582b92a58938302264d804",
+        "from": 759,
+        "to": 782.7,
+        "doseQuote": "教练习每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374773897",
+      "page": 5,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "放松肩膀；体会手指独立控制，边弹边数拍。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P005 W1-EX3 1&2指纵向爬格子.ai-zh.json",
+        "sha256": "7d2afea7151d301468c358e6e925e120107926f8885f6ecc77a6de5dce592bad",
+        "from": 316,
+        "to": 335.04,
+        "doseQuote": "每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374775237",
+      "page": 6,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "注意声音连续、饱满，边弹边数拍。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P006 W1-EX4 1&3指纵向爬格子.ai-zh.json",
+        "sha256": "f098742e6550d4ff96026357fe6319e6a25901c2fedf8836345a17f94a77a89a",
+        "from": 181,
+        "to": 192.82,
+        "doseQuote": "教练习每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374776025",
+      "page": 7,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步；字幕目标为 100 BPM",
+      "summary": "踩拍、数拍；关注声音连贯与对拍，移动时偶尔看手。",
+      "uncertainty": "原课含连续3分钟、短休息及以酸胀决定提速的安排；需结合原视频核对，不作为自动训练规则。",
+      "evidence": {
+        "file": "P007 W1-EX5 1&2指全指板爬格子.ai-zh.json",
+        "sha256": "c73071ac84875cc695be902ec12d710fec4bb9a25c3aaf5c4d811684d35f3487",
+        "from": 565,
+        "to": 618.8,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374777796",
+      "page": 8,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步；目标及加速条件参照原课核对",
+      "summary": "踩拍、数拍；听声音连贯与对拍，不持续盯着手。",
+      "uncertainty": "原课含连续3分钟及酸胀相关安排；另有每天不超过10分钟的提示（172秒附近）。",
+      "evidence": {
+        "file": "P008 W1-EX6 1&3指全指板爬格子.ai-zh.json",
+        "sha256": "8890709e9f1d7b2020449b4644751165e58c6f1fc2499a9caf74815d44414a7f",
+        "from": 441,
+        "to": 477.74,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374841474",
+      "page": 15,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 80 BPM",
+      "summary": "踩拍并说出所弹的音；慢速可看图，熟悉后记住指位。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P015 W1-EX7 第五把位C调音阶.ai-zh.json",
+        "sha256": "6e142461f51a5a3c32c4ac38ce47c5174c4eba3eee164dc57201756a7325dba2",
+        "from": 505,
+        "to": 536.32,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374842320",
+      "page": 16,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "固定 60 BPM，不加速",
+      "summary": "踩拍、数拍；提前想下一小节的音和节奏，不依赖看谱。",
+      "uncertainty": "第一次可先理解音符时值，再看后续练习，不必等本项达标。",
+      "evidence": {
+        "file": "P016 W1-EX8 全&二分&四分音符节奏转换.ai-zh.json",
+        "sha256": "4b94a4319cd084cc62d30a04631bad48274651b4d3c4b828d9e90f04148c2fb6",
+        "from": 195,
+        "to": 226.04,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374843007",
+      "page": 17,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "video-card-reviewed",
+      "dailyMinutes": 30,
+      "sessionsPerDay": null,
+      "tempo": "曲谱标速的 50%→100%；前四张 50→100 BPM，最后一张 40→80 BPM",
+      "summary": "踩拍、数拍；看谱而不看手，不背谱，练习对指板音的反应。",
+      "uncertainty": "可逐张加入；已练好的谱不必每天重弹。",
+      "evidence": {
+        "file": "P017 W1-EX9 C调简谱视奏(含简谱介绍).mp4",
+        "sha256": "3a2a8815d977ff14cef8fd555eb96317073295625d98167bd0578658250e0d7e",
+        "from": 540,
+        "to": 585.653696,
+        "cardAt": 584.85,
+        "doseQuote": "每天30分钟",
+        "provenance": "Video closing card and burned-in captions visually inspected; no audio verification"
+      }
+    },
+    {
+      "entryId": "35754410769",
+      "page": 25,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "每天从 60 BPM 到 120 BPM",
+      "summary": "关注明亮的拨弦声音、均匀节奏与对拍；踩拍、数拍。",
+      "uncertainty": "加速步长被字幕识别为“加时”，需听校。",
+      "evidence": {
+        "file": "P025 W2-EX1 单弦交替拨弦.ai-zh.json",
+        "sha256": "4e72340f5fd8dbdc45d014aeccb1faa18fb3896fbe819f431b9545601374aa27",
+        "from": 280,
+        "to": 296.26,
+        "doseQuote": "教练习每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35766863905",
+      "page": 27,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "每天从 60 BPM 到 120 BPM",
+      "summary": "不看手，踩拍并说出音名；练习快速反应弦的音名。",
+      "uncertainty": "加速步长被字幕识别为“加时”，需听校。",
+      "evidence": {
+        "file": "P027 W2-EX2 多弦交替拨弦.ai-zh.json",
+        "sha256": "5431acf19b3f0b27b5efa9e184e77a9a60f53daeb83fdc4170fd3916ba81cfcc",
+        "from": 148,
+        "to": 164.12,
+        "doseQuote": "每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36375627364",
+      "page": 29,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步；目标待听校",
+      "summary": "踩拍、数拍；移动时偶尔看手，不用的手指放松。",
+      "uncertainty": "结尾目标识别为“一半”；连续3分钟及酸胀相关安排需核对。",
+      "evidence": {
+        "file": "P029 W2-EX3 2&3指全指板爬格子.ai-zh.json",
+        "sha256": "277a8c9fd4f263c92de296b4d896607c7842fc8009f318f149c1f180ef492784",
+        "from": 274,
+        "to": 304.64,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35768895337",
+      "page": 30,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步，目标 120 BPM",
+      "summary": "踩拍、数拍；放松不用的手指、拇指与手腕。",
+      "uncertainty": "原课按连续3分钟及酸胀情况决定提速，不自动应用。",
+      "evidence": {
+        "file": "P030 W2-EX4 4&1指双弦爬格子.ai-zh.json",
+        "sha256": "94ce70a2ce74205fb57ed86fc728969f682221e8acea777621ed15124d65d591",
+        "from": 206,
+        "to": 220.08,
+        "doseQuote": "教练习每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35773678164",
+      "page": 31,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 80 BPM",
+      "summary": "踩拍并说唱名；可看音阶图，注意声音连续且平均。",
+      "uncertainty": "连续3分钟无问题后加10 BPM。",
+      "evidence": {
+        "file": "P031 W2-EX5 第二把位C调音阶.ai-zh.json",
+        "sha256": "ae41c61de0c895bee7afdcf3dcc620a374e5277bf68ba432ab9cad0b0cb458d3",
+        "from": 263,
+        "to": 276.98,
+        "doseQuote": "这练习每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35915894409",
+      "page": 32,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "看图、踩拍、边弹边唱，集中注意力练音准。",
+      "uncertainty": "不要求短期内立即唱准。",
+      "evidence": {
+        "file": "P032 W2-EX6 大&小二度模唱.ai-zh.json",
+        "sha256": "65921c3f81d2ab9194fa07689b2c013445e3737ff815f4cab71657a402331679",
+        "from": 436,
+        "to": 457.92,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35925003923",
+      "page": 33,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "踩拍、数拍；提前思考下一小节的音、位置和节奏。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P033 W2-EX7 二&四&八分音符节奏转换.ai-zh.json",
+        "sha256": "26fa2df01aed4c9bec80320167fa6f54e7dcc76fa9f2da87b6a28d0b7e2c1155",
+        "from": 217,
+        "to": 242.02,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35935947302",
+      "page": 34,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 30,
+      "sessionsPerDay": null,
+      "tempo": "前四张谱 50→100 BPM；最后一张 40→80 BPM",
+      "summary": "看谱视奏、不背谱；踩拍并尝试唱准。",
+      "uncertainty": "不必每天从初速开始，也不必每天练完所有谱。",
+      "evidence": {
+        "file": "P034 W2-EX8 第二把位简谱视奏(含拍号介绍).ai-zh.json",
+        "sha256": "af6968539e46dc4df619a1b4e5da7847bed015ceab835657b95814b635837947",
+        "from": 481,
+        "to": 511.22,
+        "doseQuote": "每天练30分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35927689172",
+      "page": 35,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "每句 40→80 BPM，再连起来从 40→80 BPM",
+      "summary": "看谱、踩拍、边弹边唱；注意折指动作。",
+      "uncertainty": "436秒附近另有弹歌前单独练折指1分钟的说明。",
+      "evidence": {
+        "file": "P035 W2-EX9 周杰伦-青花瓷(含折指技巧).ai-zh.json",
+        "sha256": "f6d7465f81bb84560485dcf335e92fa169da6ee54eb322040b5d0bb30c0ca51d",
+        "from": 489,
+        "to": 504.54,
+        "doseQuote": "每天练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35954494947",
+      "page": 42,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "每天从 40 BPM 到 80 BPM",
+      "summary": "踩拍、数拍，不看手；听节奏平均并对准节拍器。",
+      "uncertainty": "加速步长识别为“加时”，待听校；作为热身。",
+      "evidence": {
+        "file": "P042 W3-EX1 单弦含16分音符的交替拨弦(含音符时值).ai-zh.json",
+        "sha256": "643be8b70eb9f0c7b207e11a0347ac20f61f8a3548a3bdbc90c9319b277cbb78",
+        "from": 290,
+        "to": 306.72,
+        "doseQuote": "教练习每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35124217171",
+      "page": 44,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步，目标 100 BPM",
+      "summary": "踩拍、说唱名；滑到目标位置的瞬间对准拍点。",
+      "uncertainty": "提速步长识别不清，待听校。",
+      "evidence": {
+        "file": "P044 W3-EX2 滑弦技巧练习.ai-zh.json",
+        "sha256": "d0e72ff9de21d5d6a2f3b2f45c17812a26ebc75c5c5f533ab0cc434a575758b5",
+        "from": 272,
+        "to": 287.6,
+        "doseQuote": "每天要练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35940010914",
+      "page": 45,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步，目标 100 BPM",
+      "summary": "保持声音持续，小指用力适度，手腕与拇指放松。",
+      "uncertainty": "原课以连续3分钟及酸胀情况决定提速，不自动应用。",
+      "evidence": {
+        "file": "P045 W3-EX3 4&1指全指板爬格子.ai-zh.json",
+        "sha256": "11ad890c9b425ef0a6e591c55bba880a1645ac18d6a37cc9d9331bd3e31c7443",
+        "from": 439,
+        "to": 469.72,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35641164260",
+      "page": 46,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 80 BPM",
+      "summary": "踩拍、数拍；保留手指，放松手腕与拇指。",
+      "uncertainty": "184秒附近明确提醒不要练太久；提速条件需看原课。",
+      "evidence": {
+        "file": "P046 W3-EX4 双弦保留指爬格子.ai-zh.json",
+        "sha256": "8c95a52a71bf5a656c6e4a99298a27bc1a5aa512bca4b3a445bcc71956779fbf",
+        "from": 217,
+        "to": 230.5,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35985557871",
+      "page": 47,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "video-card-reviewed",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步，目标 100 BPM；无问题后加10 BPM",
+      "summary": "踩拍、看图弹；记住唱名与音名的对应关系。",
+      "uncertainty": "可先熟悉音阶位置，再加入闷音和唱名音名；口述允许必要时看手，末页简写为不看手。",
+      "evidence": {
+        "file": "P047 W3-EX5 第一把位音阶及闷音练习.mp4",
+        "sha256": "b958ae688855844d1a853937343d314564daa3c1077c6f25f46fd050318dcdaa",
+        "from": 490,
+        "to": 535.720313,
+        "cardAt": 534.92,
+        "doseQuote": "每天10分钟",
+        "provenance": "Video closing card and burned-in captions visually inspected; no audio verification"
+      }
+    },
+    {
+      "entryId": "35987328051",
+      "page": 48,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "踩拍，边弹边唱准；先看图，熟悉后记住音的位置。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P048 W3-EX6 三度模唱练习.ai-zh.json",
+        "sha256": "2f4ab31ff58674640a13ed542764a499307473379ab4b6c703cb1ad45322d542",
+        "from": 156,
+        "to": 174.68,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35991388833",
+      "page": 49,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步；最终数值未明确",
+      "summary": "踩拍、数拍；慢速看图，熟悉后背图看琴，提前准备换位。",
+      "uncertainty": "“每天加时”识别不清，步长待听校。",
+      "evidence": {
+        "file": "P049 W3-EX7 音阶串连及反拍练习(含休止符).ai-zh.json",
+        "sha256": "852fa979d555747b796744758d4819c71490a1d8de70b8ac83849fde5af2fbe7",
+        "from": 340,
+        "to": 363.86,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36612280319",
+      "page": 51,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "前两张谱 50→100 BPM；后三张 40→80 BPM",
+      "summary": "看谱不背谱，踩拍；能唱则唱，至少读出音。换把可偶尔看手。",
+      "uncertainty": "把时间留给弹不好的谱例，不必每天重练全部。",
+      "evidence": {
+        "file": "P051 W3-EX8 1&2把位简谱视奏.ai-zh.json",
+        "sha256": "f9cbbab05546a7f4efc272152de86341ef0eb245b91139e65580713a2930dbe7",
+        "from": 994,
+        "to": 1020.3,
+        "doseQuote": "每天练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "36374056410",
+      "page": 56,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "每句 40→80 BPM，再连起来从 40→80 BPM",
+      "summary": "踩拍、唱或读唱名；背谱并脱谱演奏。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P056 W3-EX9 许巍-蓝莲花Solo.ai-zh.json",
+        "sha256": "5c37db1553078b4a205aedd5e91f11199bd540a8f0cd54041c8a2ba3cf0511ee",
+        "from": 287,
+        "to": 304.32,
+        "doseQuote": "每天练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35645427377",
+      "page": 62,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "每天 50→80 BPM，每分钟加10 BPM",
+      "summary": "踩拍、数拍，不看手；听三连音是否平均。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P062 W4-EX1 单弦含三连音的交替拨弦.ai-zh.json",
+        "sha256": "58f94f62a9cfd0912bb5bbd3fbd73a033fdb94ba14a84023874be844c6302a96",
+        "from": 118,
+        "to": 131.26,
+        "doseQuote": "每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35239366341",
+      "page": 64,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步，目标 100 BPM",
+      "summary": "击弦动作不变形，注意节奏均匀；踩拍、数拍。",
+      "uncertainty": "连续3分钟及酸胀相关提速条件、字幕“加时”需听校。",
+      "evidence": {
+        "file": "P064 W4-EX2 击弦技巧练习.ai-zh.json",
+        "sha256": "12fad91d8641b3d619de5eb783fc3bce61e7cc9553db5b13deea382ae003fa21",
+        "from": 269,
+        "to": 290.42,
+        "doseQuote": "每天要练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "25953244586",
+      "page": 65,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步；目标待听校",
+      "summary": "踩拍、数拍；手腕、拇指保持放松。",
+      "uncertainty": "末句目标识别不清；连续3分钟及酸胀相关提速条件需核对。",
+      "evidence": {
+        "file": "P065 W4-EX3 纵向保留指爬格子.ai-zh.json",
+        "sha256": "1c11f312cb4b12c72115f92554b9eddf6595ac681be2f19a16a3907f8ca33f9d",
+        "from": 117,
+        "to": 129.71,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35646671449",
+      "page": 66,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步，目标 80 BPM",
+      "summary": "踩拍、数拍，不看手；注意小指不要提前松开。",
+      "uncertainty": "手指动作的具体措辞和酸胀相关提速条件需看原课。",
+      "evidence": {
+        "file": "P066 W4-EX4 4&3指原地交替练习.ai-zh.json",
+        "sha256": "daaa62bbf311cb9cd519b3e2be06e481d6592e8042165c498d0e4714b8272a86",
+        "from": 79,
+        "to": 92.38,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35160195658",
+      "page": 67,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM；无问题后每次加5 BPM",
+      "summary": "踩拍并数出小拍子；注意十六分音符均匀。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P067 W4-EX5 第四把位部分音阶及制音拨弦.ai-zh.json",
+        "sha256": "d91c3e4622c2a42fb4dd76e3ad0a838041ed28d4da893b29360919ba97c89172",
+        "from": 258,
+        "to": 275.86,
+        "doseQuote": "教练习每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35164196792",
+      "page": 68,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "video-card-reviewed",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "记住 do 与其他音的相对位置；边唱边听，努力唱准。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P068 W4-EX6 相对于do的音程模唱.mp4",
+        "sha256": "9620cd8b7ee9ef90aa857479f2956089aefdde70967f826bc1a2a5739aa24775",
+        "from": 135,
+        "to": 180.700313,
+        "cardAt": 179.9,
+        "doseQuote": "每天5分钟",
+        "provenance": "Video closing card and burned-in captions visually inspected; no audio verification"
+      }
+    },
+    {
+      "entryId": "35868577298",
+      "page": 69,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "video-card-reviewed",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM",
+      "summary": "踩拍、数拍；看谱不看手，提前想下一处的左右手动作。",
+      "uncertainty": "可每天只练一张谱。",
+      "evidence": {
+        "file": "P069 W4-EX7 八分音符含休止和延音的节奏视奏.mp4",
+        "sha256": "c7170c4c0edccffaeea66b8b39b34c7852b1e6c7dd3d2374ddb2c6ddce9d1837",
+        "from": 501,
+        "to": 546.179773,
+        "cardAt": 545.38,
+        "doseQuote": "每天10分钟",
+        "provenance": "Video closing card and burned-in captions visually inspected; no audio verification"
+      }
+    },
+    {
+      "entryId": "35868051606",
+      "page": 70,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 30,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步；最终数值未明确",
+      "summary": "看谱，踩拍并唱或读音；知道所弹的调和音。",
+      "uncertainty": "最后一张谱可先尝试，困难处留待后续回练。",
+      "evidence": {
+        "file": "P070 W4-EX8 非C调简谱视奏.ai-zh.json",
+        "sha256": "3892989863665aa2825425e63861c02f6b61e6f4d326e78a10aaf706b289c78b",
+        "from": 827,
+        "to": 849.8,
+        "doseQuote": "每天要练30分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35224489557",
+      "page": 71,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 30,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 100 BPM；无问题后加10 BPM",
+      "summary": "踩拍、说唱名；背谱脱谱演奏，看手时注意头部姿势。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P071 W4-EX9 火影忍者-剪影solo.ai-zh.json",
+        "sha256": "01498c0c63894187a20fe2956e979b4f37036cbe3548c5ab685d1f913cde3c6c",
+        "from": 263,
+        "to": 285.78,
+        "doseQuote": "教练习每天要练30分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35258240947",
+      "page": 76,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "50→80 BPM，每分钟加10 BPM",
+      "summary": "踩拍、数拍；听节奏是否平均、重音是否突出。",
+      "uncertainty": "作为热身。",
+      "evidence": {
+        "file": "P076 W5-EX1 单弦含重音的节奏转换拨弦.ai-zh.json",
+        "sha256": "b05398731147dc83e7f278ef174ee4b3d345d215bdfecf88bfd66a9bb7a206fb",
+        "from": 167,
+        "to": 181.46,
+        "doseQuote": "每天要练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35240544496",
+      "page": 78,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步，目标 100 BPM",
+      "summary": "踩拍、数拍；听勾弦节奏是否平均。",
+      "uncertainty": "连续3分钟及酸胀相关提速条件需看原课。",
+      "evidence": {
+        "file": "P078 W5-EX2 勾弦技巧练习.ai-zh.json",
+        "sha256": "b4d56b3ada12430e1ac2cb6d5912e43226f2c171891f90bcdb482e36f81c53ee",
+        "from": 300,
+        "to": 314.2,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35259220913",
+      "page": 79,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步，目标 120 BPM；无问题后加10 BPM",
+      "summary": "踩拍、数拍；听节奏是否对准拍点。",
+      "uncertainty": "不必每天都从初速开始。",
+      "evidence": {
+        "file": "P079 W5-EX3 单弦横向爬格子.ai-zh.json",
+        "sha256": "cbe0044932d8c90efd5e24cc2639d182e8f240b3dc5dfcb8645fd2f9e6a285af",
+        "from": 227,
+        "to": 245.42,
+        "doseQuote": "这样练习每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35260073728",
+      "page": 80,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步，目标 120 BPM",
+      "summary": "踩拍、数拍；保留手指，小指不要提前松开。",
+      "uncertainty": "连续3分钟及酸胀相关提速条件需看原课。",
+      "evidence": {
+        "file": "P080 W5-EX4 纵向1434保留指爬格子.ai-zh.json",
+        "sha256": "e1bd294d77678649eb1648554cbff8c726077af057bd27e4b6edc2c2f982e9bb",
+        "from": 141,
+        "to": 155.72,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35876506785",
+      "page": 81,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 50 BPM；无问题后加5 BPM",
+      "summary": "数出小拍子，眼睛看谱并提前往后看。",
+      "uncertainty": "可每天只弹一张谱。",
+      "evidence": {
+        "file": "P081 W5-EX5 十六分音符少1个音的节奏视奏.ai-zh.json",
+        "sha256": "dee8d28edebfd84055034ed926895ae160bcd5ac854ed5c0c9fe0019e1b99923",
+        "from": 503,
+        "to": 518.4,
+        "doseQuote": "每天要练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35378040456",
+      "page": 82,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "每句 50→80 BPM，再连起来从 50→80 BPM",
+      "summary": "踩拍并唱或哼音高；先唱出每句节奏再弹，避免只盯六线谱。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P082 W5-EX6 AIR-鸟之诗.ai-zh.json",
+        "sha256": "90f056c6763690e7d9bdca89bb8feb28803da11ffd98f9d93264a39fe590c34a",
+        "from": 554,
+        "to": 576.7,
+        "doseQuote": "每天练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35635398418",
+      "page": 83,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，最高 60 BPM；无问题后加5 BPM",
+      "summary": "踩拍、数拍；优先把扫弦动作做对。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P083 W5-EX7 扫弦技巧练习.ai-zh.json",
+        "sha256": "27f662f11b57f7d998bf0ac0d9d6042f20937dc268104bcbc8be7f05417669e8",
+        "from": 290,
+        "to": 310.14,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35337538838",
+      "page": 84,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步，目标 90 BPM；无问题后加10 BPM",
+      "summary": "踩拍、数拍；先记住和弦位置，再看左手食指演奏。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P084 W5-EX8 根音在5&6弦上的五和弦.ai-zh.json",
+        "sha256": "1b5f9e0430ca4d5d1c61d53a1681f2c9a0920d702f608c9c0014711998be2be2",
+        "from": 575,
+        "to": 591.54,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35340420911",
+      "page": 85,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "不用节拍器；反应目标约5秒",
+      "summary": "独立记忆音的位置，不从空弦逐品推算、不借其他音推算。",
+      "uncertainty": "前文规定五六弦前12品、不带升降号的音，可分弦练习。",
+      "evidence": {
+        "file": "P085 W5-EX9 5&6弦指板音横向记忆练习.ai-zh.json",
+        "sha256": "fbc4bc87e01a2f10125253363cc3907e05ea45503701413dbaa5949ad4502161",
+        "from": 62,
+        "to": 84.04,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35341731236",
+      "page": 86,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "video-card-reviewed",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步，目标 90 BPM",
+      "summary": "踩拍、数拍；先背下和弦位置再弹，避免边看谱边找和弦。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P086 W5-EX10 周杰伦-爱的飞行日记.mp4",
+        "sha256": "44c40411300a37e53fb1b091b5b51f33c6e93b82b543ad8523410fc082c09e9b",
+        "from": 137,
+        "to": 182.462404,
+        "cardAt": 181.66,
+        "doseQuote": "每天20分钟",
+        "provenance": "Video closing card and burned-in captions visually inspected; no audio verification"
+      }
+    },
+    {
+      "entryId": "35357261911",
+      "page": 91,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "每天从 50 BPM 到 80 BPM",
+      "summary": "踩拍、数拍；检查均匀节奏、对拍与重音。",
+      "uncertainty": "加速步长识别为“加时”，待听校。",
+      "evidence": {
+        "file": "P091 W6-EX1 先上拨的单弦节奏转换拨弦.ai-zh.json",
+        "sha256": "8be9ffdf72cbd633e8709448402b5684d7481227dcb056e299c3fcfc88a9a853",
+        "from": 82,
+        "to": 96.92,
+        "doseQuote": "每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35402220938",
+      "page": 93,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步；目标待听校",
+      "summary": "踩拍、说音名并记住三弦音位；先做对揉弦动作，不急于提速。",
+      "uncertainty": "最后的目标数值识别不清，不填入自动目标。",
+      "evidence": {
+        "file": "P093 W6-EX2 揉弦技巧练习.ai-zh.json",
+        "sha256": "a316607ffab05faa00944194582a00352eca322a43abeb588a8b1f73df1a0be2",
+        "from": 778,
+        "to": 797.58,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35402876806",
+      "page": 94,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM",
+      "summary": "踩拍、数拍；记住一弦音的位置。",
+      "uncertainty": "连续3分钟及酸胀相关提速条件需看原课。",
+      "evidence": {
+        "file": "P094 W6-EX3 单弦手指协调性练习.ai-zh.json",
+        "sha256": "8b38fdc345409e6a486ec74959d3ae55b9ce81402c6fefc9d8e5f697872925ae",
+        "from": 116,
+        "to": 129.82,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35417165011",
+      "page": 95,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步，目标 100 BPM",
+      "summary": "踩拍、数拍；听击勾弦是否均匀。",
+      "uncertainty": "连续3分钟及酸胀相关提速条件需看原课。",
+      "evidence": {
+        "file": "P095 W6-EX4 单指连续击勾弦练习.ai-zh.json",
+        "sha256": "0b8c8d03892b87817bfa6638daa2e73a758fe009dc9c0d834a430729871ff49a",
+        "from": 184,
+        "to": 196.98,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35868248627",
+      "page": 96,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 50 BPM；无问题后加5 BPM",
+      "summary": "踩拍、数拍，眼睛看谱并提前往后看，保持专注。",
+      "uncertainty": "可每天只练一张谱。",
+      "evidence": {
+        "file": "P096 W6-EX5 16分音符少2个音的节奏视奏(含五线谱介绍).ai-zh.json",
+        "sha256": "7b7207a97a16f14f23ff0ce93a18a23052d6fe5f9aa939cc41405aa5283f2bde",
+        "from": 823,
+        "to": 842.82,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35505898513",
+      "page": 97,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "video-card-reviewed",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "每句 40→60 BPM，再连起来从 40→60 BPM",
+      "summary": "踩拍；先唱熟节奏再弹，不一直盯六线谱，慢速时说出音。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P097 W6-EX6 Beyond-光辉岁月solo.mp4",
+        "sha256": "9bb58e07fbe0ea438c8670fb72a1390e9258408f95a06d2ebabffbf77c8c27ec",
+        "from": 510,
+        "to": 555.428313,
+        "cardAt": 554.63,
+        "doseQuote": "每天20分钟",
+        "provenance": "Video closing card and burned-in captions visually inspected; no audio verification"
+      }
+    },
+    {
+      "entryId": "35485322399",
+      "page": 100,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "固定 40 BPM，不加速",
+      "summary": "看指板并提前找到下个和弦根音；说出音、和弦及构成音。",
+      "uncertainty": "留时间思考，不以速度替代音与和弦的反应。",
+      "evidence": {
+        "file": "P100 W6-EX7 根音在三弦的C调原位三和弦(含和弦乐理).ai-zh.json",
+        "sha256": "cbc2d6b3ab86a82291d9fc328a16831b97f09cbeb37b6ff32c7d87f3ced3b873",
+        "from": 782,
+        "to": 807.9,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35485714822",
+      "page": 101,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "不用节拍器；反应目标约5秒",
+      "summary": "独立记住各音的位置，不靠推算；逐弦练习。",
+      "uncertainty": "前文限定前三根弦前12品不带升降号的音。",
+      "evidence": {
+        "file": "P101 W6-EX8 1&2&3弦指板音横向记忆练习.ai-zh.json",
+        "sha256": "6953edb993c769e267a8b6751e68c7fb5707fdcac900312dcbcbb3bc39cf440f",
+        "from": 37,
+        "to": 51.8,
+        "doseQuote": "就练习每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35506751265",
+      "page": 102,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM；无问题后加5 BPM",
+      "summary": "踩拍，数出小拍子；保持扫弦速度均匀，不在发声时突然加速。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P102 W6-EX9 制音移位扫弦(含斜线记谱法).ai-zh.json",
+        "sha256": "bbcff25a5d13603bc7905f65d5ed8a8bc34f7a32761fa23f4ed469ef4ee4d1fa",
+        "from": 203,
+        "to": 218.64,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35507603753",
+      "page": 103,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "50 BPM 起步，目标 90 BPM；无问题后加10 BPM",
+      "summary": "踩拍、数拍；先记住制音扫弦与正常扫弦的位置再弹。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P103 W6-EX10轻音少女-Don't say lazy.ai-zh.json",
+        "sha256": "4e140484ff5f4ad3c96f45f42c1328780e00a7a307ca1d0e26bbcccc697d33ab",
+        "from": 168,
+        "to": 184.3,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35357787770",
+      "page": 108,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 5,
+      "sessionsPerDay": null,
+      "tempo": "每天从 40 BPM 到 50 BPM",
+      "summary": "踩拍、数拍；听节奏均匀与对拍，可跟配套跟练视频。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P108 W7-EX1 单弦含六连音的节奏转换拨弦.ai-zh.json",
+        "sha256": "2ff4b025e13443e9dfde866de6a23338762b95dc9342a3453a75ef3308342d08",
+        "from": 144,
+        "to": 157.08,
+        "doseQuote": "每天练5分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35521433344",
+      "page": 110,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM；无问题后加5 BPM",
+      "summary": "优先做对推弦动作，对比推弦音高与滑弦音高。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P110 W7-EX2 推弦技巧练习.ai-zh.json",
+        "sha256": "f8a450d28d083e6adcc717a307f360211e2e76bac7a2eaa0d39e20b35e1ac3b2",
+        "from": 297,
+        "to": 311.76,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35525560219",
+      "page": 111,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM",
+      "summary": "踩拍、数拍；尤其检查换弦时节奏是否卡顿。",
+      "uncertainty": "连续3分钟及酸胀相关条件需看原课；57秒附近要求不用失真掩盖问题。",
+      "evidence": {
+        "file": "P111 W7-EX3 多弦手指协调性练习.ai-zh.json",
+        "sha256": "f79106637c5b840d821065d20e5036df8626863c299766a7445ea600229c9318",
+        "from": 95,
+        "to": 111.9,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35538077168",
+      "page": 112,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM",
+      "summary": "踩拍、数拍；听连续击勾弦节奏是否平均。",
+      "uncertainty": "连续3分钟及酸胀相关提速条件需看原课。",
+      "evidence": {
+        "file": "P112 W7-EX4 双指连续击勾弦练习.ai-zh.json",
+        "sha256": "6000f886b7df54db2229bdb966c3c2858b19ad37cf57a2d668cb42d2c27a1e13",
+        "from": 100,
+        "to": 113.96,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35546072667",
+      "page": 113,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "video-card-reviewed",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "每句 50→100 BPM，再连起来从 50→100 BPM",
+      "summary": "踩拍并说出音；逐句唱熟节奏并背下后脱谱演奏。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P113 W7-EX5 夜鹿-花上亡灵solo.mp4",
+        "sha256": "6b066dca86e64bb28c6f24e5220e73aca4ab7feac3d5124c0176809d14c68605",
+        "from": 412,
+        "to": 457.409887,
+        "cardAt": 456.61,
+        "doseQuote": "每天20分钟",
+        "provenance": "Video closing card and burned-in captions visually inspected; no audio verification"
+      }
+    },
+    {
+      "entryId": "25950756073",
+      "page": 116,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM；无问题后加5 BPM",
+      "summary": "踩拍、数拍；右手扫弦和左手拍弦组合成的三连音保持平均。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P116 W7-EX6 布鲁斯shuffle节奏扫弦.ai-zh.json",
+        "sha256": "9188f400ce201a1543c8830d4a05162c1e79ced39431f306d4f7a7f124077dba",
+        "from": 133,
+        "to": 146.72,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35566127014",
+      "page": 117,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": null,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM；无问题后加5 BPM",
+      "summary": "提前想下一小节的和弦，可逐行练习；先背谱再看琴弹。",
+      "uncertainty": "每日时长字幕识别为“2分钟”，需听原音确认；困难时先放下，不硬练。",
+      "evidence": {
+        "file": "P117 W7-EX7 ZZ Top-Tush.ai-zh.json",
+        "sha256": "60fd26d741725aa18291247a97dd0af7c5e88b016d4635d9ef866f44363eddd5",
+        "from": 477,
+        "to": 506.5,
+        "doseQuote": "教练习每天练2分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35567698461",
+      "page": 118,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "不用节拍器；三根弦找音目标约10秒",
+      "summary": "独立反应音的位置；说出一个音后在三根弦上找到。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P118 W7-EX8 1&2&3弦指板音强化记忆练习.ai-zh.json",
+        "sha256": "0efb4086cc69e41d02ac3ea65b93cadb0e0ca5286341bc8bf515a3e0749cfd5d",
+        "from": 159,
+        "to": 177.2,
+        "doseQuote": "每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "35589260821",
+      "page": 119,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "video-card-reviewed",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "固定 50 BPM，不加速",
+      "summary": "踩拍并说和弦名，提前想下一个和弦及其形状。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P119 W7-EX9 三个音的转位大&小三和弦.mp4",
+        "sha256": "3b2bebacca1a426c7b7561cfa4a4d1626e04e533d67fb879965308c320a2c2fb",
+        "from": 612,
+        "to": 657.867755,
+        "cardAt": 657.07,
+        "doseQuote": "每天10分钟",
+        "provenance": "Video closing card and burned-in captions visually inspected; no audio verification"
+      }
+    },
+    {
+      "entryId": "35625765829",
+      "page": 120,
+      "legacy": false,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM；无问题后加5 BPM",
+      "summary": "踩拍、数拍；反应哪根手指弹根音，先背谱再看琴弹。",
+      "uncertainty": null,
+      "evidence": {
+        "file": "P120 W7-EX10 五月天-温柔.ai-zh.json",
+        "sha256": "48f599838104aeccfacd14678c393b8b2df4c1286bb70def1fdc29e4e150e9c7",
+        "from": 967,
+        "to": 985.78,
+        "doseQuote": "教练习每天练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "1416879604",
+      "page": 125,
+      "legacy": true,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "60 BPM 起步，目标 120 BPM",
+      "summary": "踩拍、背谱；右手有力，左手护弦干净；先摸熟音再跟节拍器。",
+      "uncertainty": "旧版任务，独立保留，不替代当前同编号练习。",
+      "evidence": {
+        "file": "P125 (旧)W4-EX9 Master of puppet(含六线谱节奏符号).ai-zh.json",
+        "sha256": "55cd7f52a6e04b29d7dccdd7ff0755c2e255e0b674e74defa5221764f4049b26",
+        "from": 254,
+        "to": 270.48,
+        "doseQuote": "每天要练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "28541193021",
+      "page": 128,
+      "legacy": true,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "每句 40→80 BPM，再连起来从 40→80 BPM",
+      "summary": "踩拍、背唱名并脱谱演奏，而非只记品位。",
+      "uncertainty": "旧版任务。",
+      "evidence": {
+        "file": "P128 (旧)W5-EX9 夏霞Solo(含调性乐理).ai-zh.json",
+        "sha256": "5c74021fc5844672cce83d85a647a85ca382617899542f9c64ea9507a0d42b5e",
+        "from": 362,
+        "to": 379.68,
+        "doseQuote": "每天练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "28553842478",
+      "page": 131,
+      "legacy": true,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 60 BPM；无问题后加5 BPM",
+      "summary": "踩拍；知道所弹和弦，而非只记品位。",
+      "uncertainty": "旧版任务。",
+      "evidence": {
+        "file": "P131 (旧)W5-EX11 魔兽世界-亡灵序曲.ai-zh.json",
+        "sha256": "42e2c90ef220073038d7f584ebeaff396f23d9bbf942bd7fee370eeb82788d95",
+        "from": 268,
+        "to": 283.86,
+        "doseQuote": "每天要练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "28540207124",
+      "page": 134,
+      "legacy": true,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 15,
+      "sessionsPerDay": null,
+      "tempo": "每句 40→60 BPM，再连起来从 40→60 BPM",
+      "summary": "先唱节奏再弹，边弹边唱；六线谱只辅助指法。",
+      "uncertainty": "旧版任务。",
+      "evidence": {
+        "file": "P134 (旧)W6-EX10 你的名字-梦灯笼.ai-zh.json",
+        "sha256": "9217a166f5efe66b06535745014cb232f4835897c6a9be300842b91189472413",
+        "from": 436,
+        "to": 455.84,
+        "doseQuote": "教练习每天练15分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "28554365836",
+      "page": 137,
+      "legacy": true,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 10,
+      "sessionsPerDay": null,
+      "tempo": "从原速一半开始，目标原速；绝对 BPM 未明确",
+      "summary": "踩拍、数拍，看谱不看手；速度快后体会爵士八分的节奏。",
+      "uncertainty": "旧版任务；字幕“元素”疑为“原速”，需听校。",
+      "evidence": {
+        "file": "P137 (旧)W7-EX10 孤独摇滚-你没事吧.ai-zh.json",
+        "sha256": "6ea38e21dbf961068a9d6b43609c21bbf8d8eb549160b2dff261bdae29bef579",
+        "from": 76,
+        "to": 92.64,
+        "doseQuote": "教练习每天练10分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    },
+    {
+      "entryId": "28556854592",
+      "page": 138,
+      "legacy": true,
+      "version": "2026-10-18.2",
+      "status": "subtitle-candidate",
+      "dailyMinutes": 20,
+      "sessionsPerDay": null,
+      "tempo": "40 BPM 起步，目标 70 BPM",
+      "summary": "踩拍、数拍；注意左手护弦是否干净。",
+      "uncertainty": "旧版任务。",
+      "evidence": {
+        "file": "P138 (旧)W7-EX12 放克歌曲-Get lucky.ai-zh.json",
+        "sha256": "bd4ab7c153f65b86ed4f06ee928c73211819a28fea4f6ea0c21cf79a9c7d1725",
+        "from": 218,
+        "to": 233.74,
+        "doseQuote": "每天要练20分钟",
+        "provenance": "AI subtitles; paraphrase reviewed against text, not audio"
+      }
+    }
+  ],
+  "guidance": [
+    {
+      "page": 2,
+      "from": 1,
+      "to": 30,
+      "summary": "原课建议多项练习并行；时间不足时，可选择部分技巧练习和歌曲练习，不必只练爬格子。"
+    },
+    {
+      "page": 23,
+      "from": 1,
+      "to": 10,
+      "summary": "第一阶段为过渡内容；原课提出累计练习时间建议，不作为应用自动晋级门槛。"
+    },
+    {
+      "page": 41,
+      "from": 13,
+      "to": 23,
+      "summary": "开始第三阶段前，应实际练习前面的内容；观看不等于练习。"
+    },
+    {
+      "page": 74,
+      "from": 11,
+      "to": 21,
+      "summary": "暂时弹不好的项目可以保留，学习后续内容后再回练。"
+    },
+    {
+      "page": 123,
+      "from": 1,
+      "to": 18,
+      "summary": "末阶段歌曲难度较高；不要求立即完美，后续可以继续回练。"
+    }
+  ]
+}

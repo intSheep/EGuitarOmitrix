@@ -1,8 +1,8 @@
 # Product Requirements Document — EGuitarOmitrix
 
-- Version: 0.2
+- Version: 0.3
 - Date: 2026-10-18, Asia/Shanghai
-- Status: First video-navigation slice authorized; broader tracker remains planned
+- Status: Assignment organization and manual practice-record/resume loop authorized and implemented
 - Owner: intSheep
 - Delivery: Private repository; GitHub Issues + Milestones + pull requests
 - Design: Stitch
@@ -80,10 +80,19 @@ Collect pilot feedback manually and locally. Third-party analytics are outside t
 
 - A task-focused practice workspace with W1–W7 stage selection, a persistent desktop exercise-detail pane, and compact-screen detail dialogs.
 - A searchable catalog of 140 source entries, including 66 current teaching exercises; support media and old revisions remain distinguishable.
-- Exact outbound Bilibili links using BV ID, observed page, and CID. Only the last opened source entry is remembered locally; it is not practice progress.
+- Exact outbound Bilibili links using BV ID, observed page, and CID. The source-navigation cursor stays independent from the practice database; opening a video is not practice progress.
 - A neutral, adult-oriented visual system with brief selection/press feedback. No mascot, slogan, serpentine path, XP, or fabricated learner history.
 
-This slice does not yet publish reviewed assignments, build a session plan, log practice, grade skill, or play notation.
+### Assignment and manual logging slice (2026-10-18)
+
+The owner accepted the Brilliant style and authorized organizing all lesson assignments, recording actual time and playing level, and resuming next time. This slice adds:
+
+- 72 lesson summaries: 64 text-reviewed AI-subtitle candidates and 8 visually reviewed video closing cards; current/legacy identities remain separate. All have source timestamps/checksums, with uncertain numeric values left unknown.
+- Manual actual minutes, self-reported level, optional BPM, notes and next focus; editable history and reversible deletion.
+- IndexedDB persistence, versioned export, previewed non-overwriting merge, stale-edit detection and visible save failures.
+- Resume from the latest actual practice, independent of the latest watched video. Explicit source URLs retain precedence.
+
+These records are single-exercise attempts, not automatically grouped sessions. The broader timer, flexible auto-planner, weekly analytics, audio verification/review editor, offline shell, and score playback remain later work. See ADR 0002 for exact persistence semantics.
 
 ### Later candidates
 
@@ -267,7 +276,7 @@ The learner owns practice records. Content revisions own source evidence and tas
 
 ## 14. Delivery gate
 
-The owner authorized the FR-017 source-navigation slice in this conversation. Requirements for assignment review, session planning, logging, and progress remain the next planned core functionality. Notation conversion, online playback, and native launching are deferred and require a later implementation decision. No implementation estimate is assigned to unvalidated score preparation.
+The owner authorized FR-017 navigation and subsequently the assignment/manual-record/resume slice. This implements bounded portions of FR-003/004/009/011–016; full source review, automatic session planning, timer sessions, weekly metrics and offline delivery remain later work. Notation conversion, online playback, and native launching are deferred and require a later implementation decision. No implementation estimate is assigned to unvalidated score preparation.
 
 Design choices must follow the [reference and functional rationale](../design/references-and-rationale.md): borrow restrained visual feedback from learning products while using an information architecture suited to repeated guitar practice.
 

@@ -1,6 +1,6 @@
 # Implementation guide for Agents
 
-Status: the source-navigation slice FR-017 is authorized and implemented. Broader practice contracts below remain proposed. Read [the PRD](../product/PRD.md) and [research scope](../research/practice-playback.md) first.
+Status: source navigation and the manual assignment/record/resume slice are authorized and implemented. ADR 0002 specifies the current implementation; broader timer/planner contracts below remain proposed. Read [the PRD](../product/PRD.md) and [research scope](../research/practice-playback.md) first.
 
 ## Boundaries
 
@@ -60,7 +60,7 @@ Examples illustrate semantics only. They must not be seeded as approved tasks or
 
 ## Implementation decisions to make later
 
-The initial product is a single-user, browser-local application. ADR 0001 selects buildless HTML/CSS/ES modules and navigation-only localStorage for FR-017. Choose durable practice storage, offline delivery, import bundle format, and model-provider boundaries before implementing the broader tracker. IndexedDB is a candidate, not an already selected dependency. If a local service or desktop wrapper is later selected, preserve export compatibility and keep local ownership explicit.
+The initial product is a single-user, browser-local application. ADR 0001 selects buildless HTML/CSS/ES modules and navigation-only localStorage for FR-017. Choose durable practice storage, offline delivery, import bundle format, and model-provider boundaries before implementing the broader tracker. ADR 0002 selects IndexedDB for manually reported records; timer/session and offline-shell choices remain separate. If a local service or desktop wrapper is later selected, preserve export compatibility and keep local ownership explicit.
 
 Test source adapters and schema migrations with synthetic or authorized isolated fixtures. Never let a test alter the original Downloads packages or daily practice history.
 

@@ -90,3 +90,9 @@ Product implications:
 They are sufficient to draft many assignment instructions, durations, and practice constraints. They do not reliably capture every note, rhythm, string/fret position, fingering, score marking, or silent demonstration. Missing independent subtitles are not equivalent to missing instructional content.
 
 For the tracking MVP, missing visual details can be linked and manually clarified. For playable notation, a separate verified score asset is required. No `.gp`, MusicXML, or other structured-score inventory has been established from the two inspected packages. The owner clarified that separate score files are not currently known and only notation in the videos has been identified. Obtaining an original structured score or transcribing and verifying a small excerpt is therefore a future prerequisite for playback trials.
+
+## Assignment follow-up — 2026-10-18
+
+All 72 teaching entries now have paraphrased assignments in the [inventory](assignment-inventory.md). For the eight missing-subtitle lessons, local video endings were sampled and their final assignment cards were visually inspected. They are labeled video-card-reviewed, not audio-verified. Source video hashes, ranges and card timestamps are retained; no video frames or complete transcripts are committed. P047 has a contextual difference between the spoken-caption allowance to look at the hand when needed and the terse card instruction; that difference is preserved in the note.
+
+Other entries remain text-reviewed AI-subtitle candidates. In particular P117's daily time and P029/P065/P093 final tempo are still uncertain; no value is guessed. This work organizes homework and does not transcribe musical notation.

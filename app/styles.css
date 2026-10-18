@@ -319,3 +319,62 @@ dialog { border-width: 2px; border-radius: 24px; }
   .catalog-card { padding: 20px; }
   .filter-row .stage-pills { gap: 4px; }
 }
+/* Source-backed assignments and self-reported practice. */
+.resume-card { display: flex; justify-content: space-between; gap: 24px; align-items: center; padding: 24px 28px; border: 2px solid var(--accent-border); border-radius: 20px; background: var(--accent-soft); margin: 0 0 30px; }
+.resume-card h2 { font-size: 21px; margin: 6px 0; }
+.resume-card p { overflow-wrap: anywhere; }
+.next-focus { margin-top: 10px; color: #384991; white-space: pre-wrap; overflow-wrap: anywhere; }
+.stage-guidance { color: var(--muted); font-size: 12px; margin: -10px 0 24px; }
+.stage-guidance summary { cursor: pointer; padding: 6px 0; }
+.stage-guidance p { margin-top: 10px; max-width: 700px; }
+.prescription { display: flex; align-items: center; gap: 14px; margin: 0 0 12px; padding: 12px 14px; background: #f5f6fb; border-radius: 12px; }
+.prescription span { color: var(--muted); font-size: 12px; }
+.prescription strong { font-size: 16px; }
+.detail-section .tempo-note { margin-top: 10px; color: #293e98; font-weight: 600; }
+.detail-section .uncertain-note { margin-top: 10px; color: #79551d; font-size: 12px; }
+.evidence-details { font-size: 11px; color: var(--muted); margin-top: 8px; }
+.evidence-details summary { cursor: pointer; }
+.evidence-details p { margin-top: 7px; }
+.exercise-progress { color: #3a508d !important; }
+.practice-form { display: grid; gap: 14px; }
+.practice-form label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; min-width: 0; }
+.practice-form input, .practice-form select, .practice-form textarea { width: 100%; min-width: 0; padding: 10px; border: 1px solid var(--line-strong); border-radius: 9px; background: white; color: var(--ink); font: inherit; min-height: 42px; }
+.practice-form textarea { resize: vertical; }
+.form-pair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+.form-hint, .local-note { font-size: 11px; color: var(--muted); }
+.form-error, .storage-error { color: #9d2929; font-size: 13px; background: #fff0f0; padding: 12px; border-radius: 8px; }
+.last-attempt { margin-top: 24px; padding: 14px; background: #f8f9ff; border-radius: 12px; font-size: 12px; }
+.last-attempt p { margin-top: 7px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.history-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.history-tools > label:first-child { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.history-tools select { max-width: 100%; min-width: 0; padding: 10px; border: 1px solid var(--line); background: white; }
+.backup-label { position: relative; cursor: pointer; }
+.backup-label input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.backup-label:focus-within { outline: 3px solid var(--accent); outline-offset: 3px; }
+.history-list { display: grid; gap: 16px; margin-top: 24px; }
+.history-card { border: 2px solid var(--line); border-radius: 20px; padding: 24px; display: flex; justify-content: space-between; gap: 24px; }
+.history-card h2 { font-size: 18px; }
+.history-card p { overflow-wrap: anywhere; white-space: pre-wrap; }
+.history-card > div:first-child { min-width: 0; }
+.history-result { margin: 12px 0; font-weight: 650; }
+.history-actions { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.deleted-history { margin-top: 32px; color: var(--muted); }
+.deleted-history summary { cursor: pointer; }
+#import-preview:not(:empty) { margin: 20px 0; padding: 20px; background: var(--accent-soft); border-radius: 14px; }
+#import-preview .button { margin-top: 14px; }
+#record-dialog { position: fixed; }
+.record-close { float: right; font-size: 26px; }
+#record-title { font-size: 20px; padding-right: 40px; }
+@media (max-width: 1000px) { .app-header { gap: 22px; } .navigation { gap: 20px; } .history-card { flex-direction: column; } }
+@media (max-width: 760px) {
+  .resume-card { align-items: flex-start; flex-direction: column; gap: 16px; padding: 20px; }
+  .resume-card h2 { font-size: 18px; }
+  .resume-card p { font-size: 12px; }
+  .resume-card .button { width: 100%; }
+  .history-tools > label:first-child { flex-basis: 100%; }
+  .history-tools select { flex: 1; }
+  .history-card { padding: 20px; }
+  .form-pair { grid-template-columns: 1fr; gap: 14px; }
+  .stage-guidance { font-size: 11px; }
+  .navigation { gap: 0; }
+}

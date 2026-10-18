@@ -2,7 +2,9 @@
 
 A private electric-guitar practice companion. The first slice provides a task-focused exercise workspace and exact links to the course's Bilibili lessons, backing tracks, and demonstrations.
 
-**Current:** PRD v0.2; working source navigator with 140 catalog entries, 66 current teaching exercises, seven stages, search/type/revision filters, responsive details, and outbound video links. Only the last opened source is stored locally. Practice logging, instructor-task review, notation conversion/playback, and Guitar Pro integration remain later work.
+**Current:** PRD v0.3; 140 source entries, assignment summaries for all 66 current and 6 legacy lessons, manual actual-duration/outcome/BPM/next-focus records, per-exercise history, editing, reversible deletion, backup merge, and resume after refresh. Records stay in this browser's IndexedDB. Most tasks are AI-subtitle candidates; eight were recovered from visually inspected video closing cards. Uncertain values are labeled.
+
+Open an exercise, inspect the teacher task and its source time, practice, then save actual minutes and your outcome. Next time, the latest practiced exercise and next-focus note appear on the workspace. Use **练习记录** to edit or export a backup. No timer or automatic grading is included. Score conversion/playback and Guitar Pro integration remain deferred.
 
 ## Run locally
 
@@ -26,6 +28,8 @@ The build copies the static application into ignored `dist/`. The development se
 - [Product requirements](docs/product/PRD.md)
 - [Design references and functional rationale](docs/design/references-and-rationale.md)
 - [Stitch brief and output](docs/design/stitch-brief.md)
+- [Assignment inventory](docs/product/assignment-inventory.md)
+- [Practice storage decision](docs/decisions/0002-manual-practice-records.md)
 - [Source assessment](docs/product/source-assessment.md)
 - [Playback and GP8 research](docs/research/practice-playback.md)
 - [Roadmap](docs/product/roadmap.md)
