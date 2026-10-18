@@ -1,3 +1,4 @@
+import { teacherPrescription, todayPractice } from "./prescription.js";
 import { FINISH_OUTCOMES, emptyGoals, optionalNumber, resumeGuidance, mergeGoals } from "./guidance.js";
 import { showPositionReference } from "./position-reference.js";
 import { showScore, pauseScore, closeScore } from "./score-viewer.js";
@@ -78,10 +79,6 @@ const route = () => {
 };
 const entry = (id) => course.entries.find((e) => e.id === id);
 const task = (id) => assignments.items.find((a) => a.entryId === id);
-const tempoText = (a) =>
-  (a?.tempo || "")
-    .replace("字幕目标为", "目标")
-    .replace(/；(?:目标待听校|最终数值未明确|绝对 BPM 未明确)/g, "");
 const recent = () => activeLogs(logs)[0];
 const selected = () =>
   entry(route().params.get("lesson")) ||
@@ -99,6 +96,10 @@ function notice(message) {
   clearTimeout(notice.timer);
   notice.timer = setTimeout(() => (n.hidden = true), 6000);
 }
+function dailyProgress(e) {
+  const a=task(e.id), prescription=teacherPrescription(a), progress=todayPractice(logs,draft,a);
+  return `<section class="daily-progress" aria-label="本课今日进度"><div class="daily-heading"><h3>本课今天</h3><span>未练时长不结转</span></div><p class="teacher-dose">老师要求 · ${prescription.dailyMinutes === null ? '每日时长未明确' : `每天 ${prescription.dailyMinutes} 分钟`}</p><p class="teacher-tempo">${esc(prescription.tempo)}</p><div class="daily-values"><span>已练 <strong>${time(progress.seconds)}</strong></span>${progress.remainingSeconds === null ? '' : `<span>${progress.completed ? '今日时长已完成' : `还差 <strong>${time(progress.remainingSeconds)}</strong>`}</span>`}</div>${progress.targetSeconds === null ? '' : `<progress aria-label="本课今天已练时长" max="${progress.targetSeconds}" value="${Math.min(progress.seconds,progress.targetSeconds)}"></progress>`}</section>`;
+}
 function requirements(e) {
   const a = task(e.id);
   if (!a) return "";
@@ -108,7 +109,7 @@ function requirements(e) {
     .map((t) => `<li>${esc(t)}</li>`)
     .join(
       "",
-    )}</ul><div class="task-pills">${a.dailyMinutes ? `<span>每天 ${a.dailyMinutes} 分钟</span>` : ""}${a.tempo ? `<span>${esc(tempoText(a))}</span>` : ""}</div></section>`;
+    )}</ul></section><div data-daily-progress="${e.id}">${dailyProgress(e)}</div>`;
 }
 function bars() {
   const days = dailySeconds(logs),
@@ -130,7 +131,7 @@ function resumePanel(e) {
 function finishPage() {
   if (!draft) return '<h1>本次练习已结束</h1><a class="button primary" href="#practice">返回练习台</a>';
   const review=draft.review || {}, e=entry(draft.entryId);
-  return `<section class="finish-page"><h1>收好这次练习</h1><p>${esc(shortTitle(e))}</p><div class="finish-time"><strong>${time(draft.elapsedMs/1000)}</strong><span>专注时间</span></div>${draft.goal?.minutes ? `<label>本次目标 ${draft.goal.minutes} 分钟<progress max="${draft.goal.minutes*60}" value="${Math.min(draft.elapsedMs/1000,draft.goal.minutes*60)}"></progress></label>` : ''}${tempoEvidence(draft)}<form id="finish-form"><label for="stable-bpm">实际稳定 BPM · 选填</label><input id="stable-bpm" name="bpm" type="number" min="1" max="400" step="1" inputmode="numeric" value="${esc(review.bpm ?? '')}" placeholder="未确认可留空"><fieldset class="finish-outcomes"><legend>这次练得怎么样 · 选填</legend>${Object.entries(FINISH_OUTCOMES).map(([k,v])=>`<label><input type="radio" name="outcome" value="${k}" ${review.outcome===k?'checked':''}><span>${v}</span></label>`).join('')}</fieldset><p id="finish-error" role="alert"></p><div class="finish-actions"><button class="button primary" type="submit">保存练习</button><button class="button secondary" type="button" data-action="resume-finish">继续练习</button></div></form></section>`;
+  return `<section class="finish-page"><h1>收好这次练习</h1><p>${esc(shortTitle(e))}</p><div class="finish-time"><strong>${time(draft.elapsedMs/1000)}</strong><span>专注时间</span></div>${draft.goal?.minutes ? `<label>本次目标 ${draft.goal.minutes} 分钟<progress max="${draft.goal.minutes*60}" value="${Math.min(draft.elapsedMs/1000,draft.goal.minutes*60)}"></progress></label>` : ''}<div data-daily-progress="${e.id}">${dailyProgress(e)}</div>${tempoEvidence(draft)}<form id="finish-form"><label for="stable-bpm">实际稳定 BPM · 选填</label><input id="stable-bpm" name="bpm" type="number" min="1" max="400" step="1" inputmode="numeric" value="${esc(review.bpm ?? '')}" placeholder="未确认可留空"><fieldset class="finish-outcomes"><legend>这次练得怎么样 · 选填</legend>${Object.entries(FINISH_OUTCOMES).map(([k,v])=>`<label><input type="radio" name="outcome" value="${k}" ${review.outcome===k?'checked':''}><span>${v}</span></label>`).join('')}</fieldset><p id="finish-error" role="alert"></p><div class="finish-actions"><button class="button primary" type="submit">保存练习</button><button class="button secondary" type="button" data-action="resume-finish">继续练习</button></div></form></section>`;
 }
 function tempoEvidence(record) {
   return record.tempoUsage?.length ? `<div class="tempo-evidence"><h3>节拍器使用</h3>${record.tempoUsage.map(x=>`<span>${x.bpm} BPM · ${time(x.seconds)}</span>`).join('')}</div>` : '';
@@ -156,7 +157,7 @@ function focus() {
     return `<h1>选择一个练习开始</h1><a class="button primary" href="#practice">返回练习台</a>`;
   const e = entry(draft.entryId),
     a = task(e.id);
-  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><h1>${esc(shortTitle(e))}</h1><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div>${requirements(e)}<div class="tool-dock"><button class="button secondary" data-position-reference>把位速查</button><button class="button secondary" data-score="${e.id}">乐谱</button>${!/不用|不使用|不需要|不跟节拍器/.test(a?.tempo || "") ? button("metronome", "节拍器") : ""}<button class="button secondary" data-material="${e.id}">课程资料</button></div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || Number(a?.tempo?.match(/\d+/)?.[0]) || 60}" ${/固定/.test(a?.tempo || "") ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></section>`;
+  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><h1>${esc(shortTitle(e))}</h1><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div>${requirements(e)}<div class="tool-dock"><button class="button secondary" data-position-reference>把位速查</button><button class="button secondary" data-score="${e.id}">乐谱</button>${!teacherPrescription(a).noMetronome ? button("metronome", "节拍器") : ""}<button class="button secondary" data-material="${e.id}">课程资料</button></div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></section>`;
 }
 function history() {
   const all = activeLogs(logs),
@@ -270,6 +271,9 @@ function render() {
   updateClock();
 }
 function updateClock() {
+  document.querySelectorAll('[data-daily-progress]').forEach(node=>{
+    const e=entry(node.dataset.dailyProgress);if(e)node.innerHTML=dailyProgress(e);
+  });
   if (!draft) return;
   const timer = document.querySelector("#timer-value");
   if (timer) timer.textContent = time(draft.elapsedMs / 1000);
@@ -642,7 +646,7 @@ function sampleClock(withMetronome = true) {
   if (draft && release) draft = tickSession(draft, Date.now(), performance.now(), withMetronome && metro.running ? metro.bpm : null);
 }
 setInterval(async () => {
-  if (!draft?.running || !release || document.hidden) return;
+  if (!draft?.running || !release || document.hidden) { updateClock(); return; }
   sampleClock();
   if (!draft.running) metro.stop();
   updateClock();
