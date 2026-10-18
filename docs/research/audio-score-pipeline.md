@@ -54,3 +54,7 @@ Output: `audio.wav`, `score.gp`, and `manifest.json`. The manifest retains sourc
 - Native GP8 inspection is blocked: the prescribed Windows `computer-use` entry point failed before listing apps with `sandboxCwd is not a local file URI: file:///home/zpy/create/EGuitarOmitrix`. No GP8 launch, opening, playback, save or listening result is claimed. Restore the Windows control bridge or perform the above acceptance manually before promoting a candidate.
 
 All course media, exports, config and manifests stay ignored/local. No URI handler, file association or OS setting was changed. No new frontend layout was introduced; this reuses the existing Stitch-designed score viewer. Remaining acceptance in #22: independent P072 alignment and native GP8 listening/reopen verification.
+
+## Subsequent owner acceptance and batch processing
+
+The owner later accepted the P072 pure-backing version entering at 6.54 seconds after spectral inspection and successive listening trials. That supersedes the earlier unresolved P072 entry above. Native verification here means owner listening in the Guitar Pro context, not automated app control/save/reopen. Later batches must select their own onset and tempo. See [batch two](score-batch-two.md) for the accepted artifact and three new pending-listening outputs.
