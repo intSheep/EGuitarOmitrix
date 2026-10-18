@@ -8,6 +8,8 @@ Design correction: use the owner-supplied Brilliant screenshot as the visual ref
 
 ## Read before work
 
+The owner additionally authorizes a browser-local microphone tuner (FR-020, issue #37). Standard six-string tuning, explicit microphone control and input selection are included. Opening it pauses practice and playback; capture must stop on close, navigation and background. Tuning creates no practice or proficiency evidence. Recording and uploading are outside this feature.
+
 1. `docs/product/PRD.md` for product scope and requirement IDs.
 2. `docs/engineering/AGENT_GUIDE.md` for invariants and verification scenarios.
 3. `docs/process/PROJECT_MANAGEMENT.md` for issue, milestone, and PR conventions.

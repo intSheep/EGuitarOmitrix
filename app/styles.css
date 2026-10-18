@@ -2894,6 +2894,75 @@ button:disabled {
 #score-choice-label { max-width: 100%; min-width: 0; }
 #score-choice { min-width: 0; max-width: min(100%, 28rem); font: inherit; padding: .55rem; border: 1px solid var(--line, #d5d8df); border-radius: .5rem; }
 
+/* Microphone tuner: original electric guitar and six stable string keys. */
+.workspace-tools { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+#tuner-dialog { width:min(600px, calc(100vw - 32px)); max-width:none; max-height:calc(100dvh - 32px); margin:auto; padding:30px 36px 22px; border:1px solid #d9dde5; border-radius:24px; background:white; color:#171717; overflow-y:auto; box-shadow:0 24px 100px rgb(25 31 58 / .16); }
+#tuner-dialog::backdrop { background:rgb(25 31 48 / .25); backdrop-filter:blur(5px); }
+#tuner-dialog [hidden] { display:none !important; }
+.tuner-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.tuner-heading h2 { margin:0; font-size:26px; line-height:1.3; font-weight:850; letter-spacing:-.04em; }
+.tuner-subtitle { margin-top:5px; color:#717582; font-size:12px; }
+.tuner-subtitle span { padding:0 5px; }
+#tuner-close { display:grid; place-items:center; flex:none; width:36px; height:36px; border:1px solid #e5e7eb; border-radius:50%; color:#6c7180; }
+#tuner-close:hover { background:#f1f4ff; color:#171717; }
+#tuner-close svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; }
+.tuner-instrument { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.05fr); align-items:center; gap:24px; padding:12px 12px 14px; }
+.tuner-guitar { width:100%; height:330px; display:block; overflow:visible; }
+.guitar-body { fill:#3f5cf0; stroke:#293fac; stroke-width:2; }
+.guitar-guard { fill:#fff; stroke:#d8deef; stroke-width:1.2; }
+.guitar-neck,.guitar-head { fill:#faf0da; stroke:#cabd9f; stroke-width:1.3; }
+.guitar-fret { fill:none; stroke:#c1b798; stroke-width:1; }
+.guitar-dots { fill:#aa9d80; }
+.guitar-nut { stroke:#efeee8; stroke-width:3; }
+.guitar-peg { fill:#e1e5ec; stroke:#8993a5; stroke-width:1.3; }
+.guitar-pickups { fill:#f5f6fa; stroke:#b9c2d2; stroke-width:1; }
+.guitar-bridge,.guitar-jack { fill:#dbe1ed; stroke:#8a96aa; stroke-width:1; }
+.guitar-knobs { fill:#fff; stroke:#c3ccdf; stroke-width:1.3; }
+.guitar-arm { fill:none; stroke:#9ca8be; stroke-width:2.5; stroke-linecap:round; }
+.guitar-switch { stroke:#8d99ad; stroke-width:2; stroke-linecap:round; }
+.guitar-strings path { fill:none; stroke:#72798a; stroke-linecap:round; opacity:.7; }
+.guitar-strings [data-active=true] { stroke:#233fdb; stroke-width:2.8; opacity:1; }
+#tuner-readout { text-align:center; font-variant-numeric:tabular-nums; min-width:0; padding:0; }
+.tuner-listening-label { font-size:12px; letter-spacing:.08em; color:#8b909b; }
+#tuner-note { display:block; margin:12px 0 10px; font-size:100px; line-height:1.05; font-weight:800; letter-spacing:-.065em; }
+#tuner-note sub { font-size:.31em; vertical-align:baseline; margin-left:5px; letter-spacing:0; color:#8a8d99; }
+#tuner-direction { min-height:24px; margin:0; font-size:14px; color:#767b88; font-weight:550; }
+#tuner-readout[data-direction=in-tune] #tuner-direction { color:#3f5cf0; }
+#tuner-readout[data-direction=in-tune] #tuner-direction::before { content:'✓'; margin-right:6px; }
+.tuner-deviation { position:relative; height:18px; margin:24px 5px 0; background:repeating-linear-gradient(90deg, #d8dde7 0 1px, transparent 1px 10%); border-bottom:1px solid #d8dde7; }
+.tuner-deviation-center { position:absolute; left:45%; width:10%; height:100%; background:#e8ecff; border-inline:1px solid #b8c4ff; }
+#tuner-needle { position:absolute; top:-4px; width:3px; height:26px; border-radius:2px; background:#3f5cf0; transform:translateX(-50%); }
+.tuner-deviation-labels { display:flex; justify-content:space-between; color:#989eaa; font-size:10px; margin:6px 0 0; }
+.tuner-values { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 12px; margin-top:18px; color:#747987; font-size:12px; }
+.tuner-mode { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; font-size:12px; }
+#tuner-target { color:#7a7f8c; }
+.tuner-mode button { display:flex; align-items:center; gap:6px; padding:6px 9px; border-radius:20px; color:#717582; background:#f4f5f7; }
+.tuner-mode [aria-pressed=true] { color:#3451da; background:#eef1ff; }
+.tuner-auto-dot { width:5px; height:5px; border-radius:50%; background:currentColor; }
+.tuner-strings { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px; }
+.tuner-strings button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-width:0; height:76px; padding:8px 0; border:1px solid #dfe3eb; border-bottom:3px solid #d5dae4; border-radius:14px; background:white; }
+.tuner-strings button:hover { background:#f5f7ff; border-color:#b4c0f5; }
+.tuner-strings strong { font-size:24px; line-height:1.1; font-weight:750; }
+.tuner-strings sub { font-size:11px; vertical-align:baseline; margin-left:2px; color:#969ba7; }
+.tuner-strings span { font-size:11px; color:#8b909c; }
+.tuner-strings [aria-pressed=true],.tuner-strings [data-detected=true] { color:white; background:#3f5cf0; border-color:#3f5cf0; border-bottom-color:#283fae; box-shadow:0 3px 8px rgb(63 92 240 / .14); }
+.tuner-strings [aria-pressed=true] :is(span,sub),.tuner-strings [data-detected=true] :is(span,sub) { color:#e3e8ff; }
+.tuner-footer { margin-top:25px; padding-top:20px; border-top:1px solid #edf0f4; }
+.tuner-input { display:flex; align-items:center; gap:10px; min-width:0; }
+.tuner-mic { width:18px; height:18px; flex:none; fill:none; stroke:#959aa6; stroke-width:1.5; stroke-linecap:round; }
+#tuner-device { flex:1; width:0; min-width:0; font:inherit; font-size:12px; padding:8px 20px 8px 0; border:0; border-radius:0; background:white; color:#747987; text-overflow:ellipsis; }
+#tuner-level { width:48px; height:5px; flex:none; appearance:none; border:0; background:#edf0f7; border-radius:4px; overflow:hidden; }
+#tuner-level::-webkit-meter-bar { border:0; background:#edf0f7; border-radius:4px; height:5px; }
+#tuner-level::-webkit-meter-optimum-value { background:#3f5cf0; border-radius:4px; }
+#tuner-level::-moz-meter-bar { background:#3f5cf0; }
+#tuner-status { color:#7a7f8c; font-size:12px; line-height:1.6; min-height:20px; margin:7px 0 15px; }
+.tuner-actions .button { width:100%; min-height:48px; border-radius:12px; font-size:14px; }
+.tuner-privacy { display:flex; align-items:center; justify-content:center; gap:5px; color:#989da9; font-size:11px; margin:15px 0 0; }
+.tuner-privacy svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:1.2; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+@media(max-width:480px) { #tuner-dialog { padding:22px 20px 18px; border-radius:22px; } .tuner-heading h2 { font-size:23px; } .tuner-strings { gap:6px; } .tuner-strings button { height:66px; border-radius:11px; } .tuner-strings strong { font-size:21px; } #tuner-note { font-size:72px; } .tuner-instrument { gap:8px; padding:14px 0; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); } .tuner-guitar { height:270px; } #tuner-readout { padding:0; } #tuner-direction { font-size:13px; } .tuner-footer { margin-top:22px; padding-top:14px; } .workspace-tools { gap:12px; } }
+@media(max-width:350px) { #tuner-dialog { padding-inline:14px; } #tuner-note { font-size:64px; } .tuner-strings { gap:4px; } }
+
 /* Quiet end-of-session confirmation and learner-authored goals. */
 .finish-page { max-width: 660px; margin: 24px auto 64px; }
 .finish-page h1 { font-size: clamp(28px, 5vw, 40px); margin-bottom: 12px; }

@@ -1,6 +1,6 @@
 # Product Requirements Document — EGuitarOmitrix
 
-- Version: 0.5
+- Version: 0.6
 - Date: 2026-10-18, Asia/Shanghai
 - Status: Immersive timed practice and effort review authorized; automatic planning remains deferred
 - Owner: intSheep
@@ -313,3 +313,11 @@ Show today's observed time and remaining prescribed duration for the selected le
 Extend FR-011–016 with a flat lesson/version overview, cumulative practice-time chart, independent confirmed stable-BPM observations, and a dated proficiency self-report timeline. Exact records are available in a paginated accessible table. Filters distinguish continued practice, explicitly mastered, and unassessed groups using the latest non-null self-report. Time and inactivity never establish mastery or regression. Historical assignment versions remain separate and selectable.
 
 Only BPM explicitly tagged as self-reported stable is plotted. Metronome settings, targets and untyped legacy BPM do not become stable-speed evidence. Missing observations remain unknown; the latest confirmed value retains its original date. Passage and subdivision are not recorded, so BPM observations have no connecting line or inferred improvement delta. Edits, deletion and restoration derive new views without changing the storage schema.
+
+### Local microphone tuner (2026-10-18, issue #37)
+
+FR-020 (P1): the owner authorizes an explicit browser-local standard six-string tuner at A4=440 Hz. Provide automatic nearest-string detection or manual target selection, detected note/frequency/cents, a relative input-level indication and microphone/USB input selection. Show unknown readings until a stable signal is available. The display's ±5-cent center tolerance is not a claim about hardware accuracy. Preserve larger numeric deviations even when the indicator reaches its visible limit.
+
+Opening the tuner pauses practice, metronome and score playback. Start/cancel/stop and close controls remain available across permission and capture states. Stop capture on close, Escape, navigation, background, device loss and audio interruption, including late permission grants. Tuning never writes a practice log, proficiency result or audio recording and never uploads audio. Permission, missing/busy device and weak/unstable signal states must be recoverable. Localhost or HTTPS is required. Custom tunings, calibration controls, polyphonic grading and native helpers remain outside this slice.
+
+Acceptance uses synthetic signal tests for all six strings, detuning, common sample rates, harmonics and rejected signals; isolated browser tests for capture, lifecycle, input switching and responsive layouts. Physical guitar and microphone accuracy remains a separate hardware acceptance step. See [tuner implementation and limitations](../engineering/tuner.md).
