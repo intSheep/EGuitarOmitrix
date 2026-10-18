@@ -120,3 +120,12 @@ Native GP8 opening, subjective listening and complete frame-by-frame video revie
 - `npm run build` passes. Finish/resume screenshots were visually inspected at phone width; no horizontal page overflow was observed. Tests use fresh synthetic browser profiles, never personal history.
 
 The reload check waits for the draft write to commit before reloading, as a business-state synchronization boundary. This does not promise survival of a browser/process kill during an unfinished IndexedDB write. No microphone grading, score-player tempo telemetry, external GP telemetry, automatic promotion or scheduled notification is implemented or claimed.
+
+## Instructor-linked daily progress (2026-10-18, issue #33)
+
+- 35 unit tests pass. Added coverage for multiple same-day sessions, draft/save deduplication, deletions, other lessons/assignment versions, local-midnight splitting, excess time, missed-day non-carryover, absent evidence and explicitly unknown dose/BPM. Real metadata regressions cover P003 fixed 40 BPM, P017 percentage/per-piece instructions, P070 unknown final BPM, P117 unknown daily duration and P137 unknown absolute BPM.
+- `scripts/verify-daily-progress.mjs` passes in isolated Chromium at 1440 and 390 px: synthetic two-minute practice against a five-minute requirement shows three remaining, yesterday's forty minutes do not change the target, live time increments and pause holds, saving does not double count, and unknown dose has no progress denominator. No page errors/overflow observed. Source and phone screenshots were inspected.
+- Existing `scripts/verify-guidance.mjs` passes at 1440/768/390, including fixed-tempo restrictions, finish confirmation, recoverable drafts, failed-save retry, goal-import rollback and same-lesson resume. Production build passes.
+- The initial browser assertion used a fixed 2.2-second wait and raced the one-second display tick. It now waits for the expected observed progress value, not an arbitrary sleep.
+
+This change consumes existing evidence-linked assignment metadata; it is not a fresh audio audit of the whole course. Daily duration remains nullable where previously unresolved. Daily completion changes no saved proficiency state. No data migration or personal record changes were needed.

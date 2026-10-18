@@ -1,3 +1,4 @@
+import { teacherPrescription } from "./prescription.js";
 // Learner plans and self-reports never rewrite instructor prescriptions.
 export const FINISH_OUTCOMES = { learning: '还不熟', steady: '基本顺畅', mastered: '已掌握' };
 export const emptyGoals = () => ({ weeklySessions: null, lessons: {} });
@@ -30,8 +31,9 @@ export function mergeGoals(existing, incoming) {
 export function resumeGuidance(logs, id, version, assignment) {
   const last = logs.filter(l=>!l.deletedAt && l.entryId===id && l.assignmentVersion===version)
     .sort((a,b)=>Date.parse(b.practicedAt)-Date.parse(a.practicedAt))[0];
-  const forbidden = /不用|不使用|不需要|不跟节拍器/.test(assignment?.tempo || '');
-  const fixed = /固定/.test(assignment?.tempo || '') ? Number(assignment.tempo.match(/\d+/)?.[0]) || null : null;
+  const prescription = teacherPrescription(assignment);
+  const forbidden = prescription.noMetronome;
+  const fixed = prescription.fixedBpm;
   const stable = last?.bpmBasis === 'self-reported-stable' ? last.bpm : null;
   const usable = fixed || (stable >= 20 && stable <= 300 ? stable : null);
   return {last, bpm: forbidden ? null : usable, fixed, forbidden,

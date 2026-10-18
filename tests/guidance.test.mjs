@@ -19,8 +19,8 @@ test('resume keeps versions separate, honors fixed/no-metronome rules and ignore
  assert.equal(resumeGuidance([l],'123','v1',{}).bpm,70);
  assert.equal(resumeGuidance([l],'123','v2',{}).last,undefined);
  assert.equal(resumeGuidance([{...l,deletedAt:'2026-01-02'}],'123','v1',{}).last,undefined);
- assert.equal(resumeGuidance([l],'123','v1',{tempo:'固定 40 BPM，不加速'}).bpm,40);
- assert.equal(resumeGuidance([l],'123','v1',{tempo:'不用节拍器'}).bpm,null);
+ assert.equal(resumeGuidance([l],'123','v1',{tempo:'固定 40 BPM，不加速',evidence:{sha256:'a'.repeat(64),from:0,to:10}}).bpm,40);
+ assert.equal(resumeGuidance([l],'123','v1',{tempo:'不用节拍器',evidence:{sha256:'a'.repeat(64),from:0,to:10}}).bpm,null);
  assert.equal(resumeGuidance([{...l,bpmBasis:undefined}],'123','v1',{}).bpm,null);
 });
 test('nullable learner goals and backup versions preserve old records and refuse goal conflicts',()=>{
