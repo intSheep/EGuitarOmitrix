@@ -73,6 +73,35 @@ try {
     await p.locator("#score-dialog").waitFor({ state: "hidden" });
     await context.close();
   }
+  const extra = await browser.newContext();
+  const p = await extra.newPage();
+  await p.goto(`${base}/#practice?stage=1`);
+  await p.locator("[data-start]").click();
+  await p.locator("[data-score]").click();
+  await p.waitForFunction(() =>
+    document.querySelector("#score-status").textContent.includes("还没有谱"),
+  );
+  await p
+    .locator("#score-file")
+    .setInputFiles("/tmp/score-test-35754410769.gp");
+  await p.waitForFunction(
+    () => !document.querySelector("#score-play").disabled,
+  );
+  assert.match(await p.locator("#score-status").innerText(), /4 小节/);
+  await p
+    .locator("#score-file")
+    .setInputFiles({
+      name: "invalid.musicxml",
+      mimeType: "application/xml",
+      buffer: Buffer.from("not a score"),
+    });
+  await p.waitForFunction(() =>
+    /失败|无法|不支持/.test(
+      document.querySelector("#score-status").textContent,
+    ),
+  );
+  assert.equal(await p.locator("#score-gp").isDisabled(), true);
+  await extra.close();
   assert.deepEqual(errors, []);
   console.log(
     "PASS: both pilot scores render, playback toggles, BPM/loop controls, source pages, GP download and reimport, responsive overlay, close cleanup.",
