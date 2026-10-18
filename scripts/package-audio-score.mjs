@@ -1,9 +1,11 @@
+import { loadScore } from './load-score.mjs';
 // Local-only GP packaging. Sync points must be supplied from reviewed evidence.
 import { readFile, writeFile, mkdir, rm, stat } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { scoreSignature } from './score-signature.mjs';
 import * as a from '@coderline/alphatab';
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 export function validateSync(score, points, durationMs) {
@@ -32,14 +34,7 @@ export function embedAudio(score, audio, points, durationMs) {
   const actual = restored.exportFlatSyncPoints();
   if (actual.length !== points.length || points.some((p,i) => ['barIndex','barPosition','barOccurence'].some(k => p[k] !== actual[i][k]) || Math.abs(p.millisecondOffset - actual[i].millisecondOffset) > 1)) throw Error('Sync points changed in round trip');
   // GP container uses 44.1 kHz frame units; allow less than one millisecond rounding.
-  const notes = s => JSON.stringify(s.tracks.map(t => t.staves.map(st => ({
-    tuning: st.tuning,
-    bars: st.bars.map(b => b.voices.map(v => v.beats.map(x => ({
-      duration: x.duration, dots: x.dots,
-      notes: x.notes.map(n => [n.string,n.fret,n.realValue,n.isTieDestination])
-    }))))
-  }))));
-  if (notes(score) !== notes(restored)) throw Error('Note/rhythm/tuning changed in round trip');
+  if (scoreSignature(score) !== scoreSignature(restored)) throw Error('Musical notation changed in round trip');
   return { bytes, restored };
 }
 export async function packageAudioScore(configPath, outputDir) {
@@ -53,7 +48,7 @@ export async function packageAudioScore(configPath, outputDir) {
   const sourceDuration = Number(probe.format.duration), start = config.trimStartSeconds, duration = config.durationSeconds;
   if (!Number.isFinite(start) || start < 0 || !Number.isFinite(duration) || duration <= 0 || start + duration > sourceDuration + 0.01) throw Error('Invalid audio trim window');
   const scoreBytes = new Uint8Array(await readFile(scorePath));
-  const score = a.importer.ScoreLoader.loadScoreFromBytes(scoreBytes);
+  const score = loadScore(scoreBytes);
   validateSync(score,config.syncPoints,duration*1000);
   const dest = resolve(outputDir);
   await mkdir(dest); // exclusive: never replace an existing export or directory

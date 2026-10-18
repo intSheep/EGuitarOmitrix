@@ -86,3 +86,7 @@ The actual P073 export is a demonstration-audio **candidate**, not a verified P0
 ## 2026-10-18 — Further pure-backing candidates (#24)
 
 P018, P020 and P021 passed MusicXML 4.0 schema validation, GP note/rhythm/audio/sync round trips, and isolated Chromium audio playback/rate/pause/close/download checks. Actual rendered staff notation was inspected. 22 tests passed, including staff-only rest/dotted-duration round trips and rejection of invented technical fields. Owner listening is pending for these three files; the P072 6.54-second version is separately owner-accepted. See [batch evidence and remaining queue](../research/score-batch-two.md). Source audio and transcriptions remain local/ignored.
+
+## 2026-10-18 — Remaining backing-score pass (#26)
+
+All 19 canonical embedded-backing GP files pass browser decoding/playback/rate/pause/close/download checks, including corrected P104/P139 dead-note exports. 25 tests pass, including synthetic chord ties, tuplets, repeats, technique endpoints, grace notes, bends, dead notes and staccato. Production build passes. Local MusicXML source/published copies pass schema validation. P018/P020/P021 are now owner-accepted; the earlier pending statement is superseded. Fifteen new backing alignments remain candidates. GP8 native inspection was not available. See [delivery and coverage limits](../research/remaining-score-delivery.md). All media and prepared notation remain ignored.
