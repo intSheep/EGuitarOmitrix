@@ -1,0 +1,33 @@
+name: Feature or content task
+description: A bounded deliverable tied to the PRD
+labels: ["type:feature", "status:backlog"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and intended outcome
+    validations:
+      required: true
+  - type: input
+    id: requirements
+    attributes:
+      label: PRD requirement IDs
+      placeholder: FR-007, FR-008, NFR-004
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and exclusions
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and validation evidence
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and milestone
