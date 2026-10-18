@@ -90,3 +90,11 @@ P018, P020 and P021 passed MusicXML 4.0 schema validation, GP note/rhythm/audio/
 ## 2026-10-18 — Remaining backing-score pass (#26)
 
 All 19 canonical embedded-backing GP files pass browser decoding/playback/rate/pause/close/download checks, including corrected P104/P139 dead-note exports. 25 tests pass, including synthetic chord ties, tuplets, repeats, technique endpoints, grace notes, bends, dead notes and staccato. Production build passes. Local MusicXML source/published copies pass schema validation. P018/P020/P021 are now owner-accepted; the earlier pending statement is superseded. Fifteen new backing alignments remain candidates. GP8 native inspection was not available. See [delivery and coverage limits](../research/remaining-score-delivery.md). All media and prepared notation remain ignored.
+
+## 2026-10-18 — C-major position quick reference (#28)
+
+- 26 local unit tests passed, including pitch/degree/root consistency for all five standard-tuning reference patterns.
+- `npm run build` passed.
+- `scripts/verify-position-reference.mjs` passed in isolated 1440, 768 and 390 px Chromium contexts: all five selections, note-name toggle, no horizontal overflow, Escape dismissal, focus restoration from the focus page and nested score dialog, and continued practice timing.
+- Inspected the 390 px screenshot. The white panel and blue active position follow the retained Stitch direction. Course scores and private learner records were not committed or used as test records.
+- This validates the reference feature only; remaining course-score transcription and GP8 checks remain tracked under #26.

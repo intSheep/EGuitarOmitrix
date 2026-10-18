@@ -1,3 +1,4 @@
+import { showPositionReference } from "./position-reference.js";
 let sdk,
   api,
   generation = 0,
@@ -51,7 +52,8 @@ export async function showScore(entryId, title) {
   }
   dispose();
   const token = generation;
-  dialog.innerHTML = `<header class="score-heading"><h2 id="score-title">${esc(title)}</h2><button class="button secondary" id="score-close">关闭乐谱</button></header><div class="score-controls"><label class="button secondary score-file">载入本地谱<input id="score-file" type="file" accept=".gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.xml,.mxl"></label><button class="button primary" id="score-play" disabled>播放</button><button class="button secondary" id="score-stop" disabled>回到开头</button><label>BPM <input id="score-bpm" type="number" min="20" max="300" disabled></label><label><input id="score-loop" type="checkbox">循环</label><button class="button secondary" id="score-gp" disabled>下载 GP 文件</button><button class="button secondary" id="score-xml" hidden>下载 MusicXML</button><button class="button secondary" id="score-source" hidden>原谱画面</button></div><p id="score-status" role="status">正在加载乐谱…</p><div id="score-render"></div><div id="score-images" hidden></div>`;
+  dialog.innerHTML = `<header class="score-heading"><h2 id="score-title">${esc(title)}</h2><button class="button secondary" id="score-close">关闭乐谱</button></header><div class="score-controls"><button class="button secondary" id="score-position">把位速查</button><label class="button secondary score-file">载入本地谱<input id="score-file" type="file" accept=".gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.xml,.mxl"></label><button class="button primary" id="score-play" disabled>播放</button><button class="button secondary" id="score-stop" disabled>回到开头</button><label>BPM <input id="score-bpm" type="number" min="20" max="300" disabled></label><label><input id="score-loop" type="checkbox">循环</label><button class="button secondary" id="score-gp" disabled>下载 GP 文件</button><button class="button secondary" id="score-xml" hidden>下载 MusicXML</button><button class="button secondary" id="score-source" hidden>原谱画面</button></div><p id="score-status" role="status">正在加载乐谱…</p><div id="score-render"></div><div id="score-images" hidden></div>`;
+  dialog.querySelector("#score-position").onclick = showPositionReference;
   dialog.querySelector("#score-close").onclick = () => dialog.close();
   if (!dialog.open) dialog.showModal();
   const status = dialog.querySelector("#score-status");
