@@ -1,0 +1,46 @@
+# Local course content and personal records
+/data/
+/imports/
+/exports/
+/backups/
+/recordings/
+/private/
+*.mp4
+*.mkv
+*.mov
+*.mp3
+*.wav
+*.flac
+*.m4s
+*.srt
+*.vtt
+*.gp
+*.gpx
+*.gp3
+*.gp4
+*.gp5
+*.musicxml
+*.mxl
+*.mid
+*.midi
+*.zip
+*.sqlite*
+*.db
+
+# Secrets and machine-specific state
+.env
+.env.*
+!.env.example
+*cookies*
+*credentials*
+.DS_Store
+Thumbs.db
+
+# Future build outputs
+node_modules/
+dist/
+build/
+coverage/
+.venv/
+__pycache__/
+*.pyc
