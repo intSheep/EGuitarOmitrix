@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#087f8c">
+  <meta name="description" content="电吉他练习工作台。查找课程练习，打开对应的 B站讲解、伴奏和示范。">
+  <title>EGuitarOmitrix · 练习台</title>
+  <link rel="icon" href="./assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a href="#main" class="skip-link">跳到主要内容</a>
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon-library" aria-hidden="true">
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-2H4zM20 4h-4a3 3 0 0 0-3 3M13 21a4 4 0 0 1 4-2h3V4"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 10 14M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-strings" viewBox="0 0 24 24"><path d="M6 3v18M12 3v18M18 3v18M3 8h18M3 16h18"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2 6-6 2 2-6z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  </svg>
+  <header class="app-header">
+    <a class="brand" href="#practice" aria-label="EGuitarOmitrix 首页">
+      <img src="./assets/mark.svg" alt="" width="32" height="32">
+      <span>EGuitarOmitrix</span>
+    </a>
+    <nav class="navigation" aria-label="主导航">
+      <a href="#practice" data-nav="practice"><svg class="icon"><use href="#i-strings"/></svg><span>练习台</span></a>
+      <a href="#catalog" data-nav="catalog"><svg class="icon"><use href="#i-book"/></svg><span>课程目录</span></a>
+      <a href="#plan" data-nav="plan"><svg class="icon"><use href="#i-compass"/></svg><span>功能计划</span></a>
+    </nav>
+    <a class="source-link" href="https://www.bilibili.com/video/BV1FT411Z7iu/" target="_blank" rel="noopener noreferrer">原课程 <svg class="icon"><use href="#i-external"/></svg></a>
+  </header>
+  <div class="workspace">
+    <main id="main" tabindex="-1">
+      <div id="app" aria-busy="true"><div class="loading-state"><p>正在载入课程目录…</p></div></div>
+      <noscript><p>请启用 JavaScript 浏览课程，或<a href="https://www.bilibili.com/video/BV1FT411Z7iu/" target="_blank" rel="noopener noreferrer">直接前往 B站原课程</a>。</p></noscript>
+    </main>
+    <footer class="footer"><span>电吉他入门课程 · BV1FT411Z7iu</span><span>练习记录与乐谱跟练将在后续阶段提供</span></footer>
+  </div>
+  <dialog id="lesson-dialog" aria-labelledby="lesson-dialog-title">
+    <div id="dialog-content"></div>
+  </dialog>
+  <div id="notice" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

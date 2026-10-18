@@ -1,0 +1,26 @@
+name: Research or decision
+description: Investigate feasibility without authorizing implementation
+labels: ["type:research", "priority:research", "status:backlog"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question and requirement IDs
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Allowed investigation and implementation exclusions
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Required evidence and decision criteria
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Inputs, dependencies, and milestone

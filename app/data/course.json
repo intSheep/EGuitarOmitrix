@@ -1,0 +1,1803 @@
+{
+  "schemaVersion": 1,
+  "bvid": "BV1FT411Z7iu",
+  "title": "电吉他入门课程",
+  "observedAt": "2026-10-18",
+  "manifestSha256": "f1ac0f444907001ed04492f1a88e6c92addf354177cff245870fa6684b6b3130",
+  "entries": [
+    {
+      "id": "36009740741",
+      "page": 1,
+      "title": "准备篇",
+      "durationSeconds": 120,
+      "stage": 0,
+      "kind": "preparation",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35727607830",
+      "page": 2,
+      "title": "W1-INTRO",
+      "durationSeconds": 33,
+      "stage": 1,
+      "kind": "intro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36374643242",
+      "page": 3,
+      "title": "W1-EX1 右手空弦下拨(含六线谱介绍)",
+      "durationSeconds": 896,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36374710788",
+      "page": 4,
+      "title": "W1-EX2 左手按弦练习(含乐理常识&调音)",
+      "durationSeconds": 784,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        2
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36374773897",
+      "page": 5,
+      "title": "W1-EX3 1&2指纵向爬格子",
+      "durationSeconds": 336,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        3
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36374775237",
+      "page": 6,
+      "title": "W1-EX4 1&3指纵向爬格子",
+      "durationSeconds": 194,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        4
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36374776025",
+      "page": 7,
+      "title": "W1-EX5 1&2指全指板爬格子",
+      "durationSeconds": 620,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36374777796",
+      "page": 8,
+      "title": "W1-EX6 1&3指全指板爬格子",
+      "durationSeconds": 479,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35965306083",
+      "page": 9,
+      "title": "(伴奏)W1-EX5 &EX6 全指板爬格子 50",
+      "durationSeconds": 182,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        5,
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35965306319",
+      "page": 10,
+      "title": "(伴奏)W1-EX5 &EX6 全指板爬格子 60",
+      "durationSeconds": 182,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        5,
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35965306500",
+      "page": 11,
+      "title": "(伴奏)W1-EX5 &EX6 全指板爬格子 70",
+      "durationSeconds": 183,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        5,
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35965306644",
+      "page": 12,
+      "title": "(伴奏)W1-EX5 &EX6 全指板爬格子 80",
+      "durationSeconds": 185,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        5,
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35965306851",
+      "page": 13,
+      "title": "(伴奏)W1-EX5 &EX6 全指板爬格子 90",
+      "durationSeconds": 185,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        5,
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35965307095",
+      "page": 14,
+      "title": "(伴奏)W1-EX5 &EX6 全指板爬格子 100",
+      "durationSeconds": 186,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        5,
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "36374841474",
+      "page": 15,
+      "title": "W1-EX7 第五把位C调音阶",
+      "durationSeconds": 538,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        7
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36374842320",
+      "page": 16,
+      "title": "W1-EX8 全&二分&四分音符节奏转换",
+      "durationSeconds": 228,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36374843007",
+      "page": 17,
+      "title": "W1-EX9 C调简谱视奏(含简谱介绍)",
+      "durationSeconds": 586,
+      "stage": 1,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35119172842",
+      "page": 18,
+      "title": "(伴奏)W1-EX9-No.4 小星星",
+      "durationSeconds": 38,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35119172807",
+      "page": 19,
+      "title": "(示范)W1-EX9-No.4 小星星",
+      "durationSeconds": 36,
+      "stage": 1,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "1420756479",
+      "page": 20,
+      "title": "(伴奏)W1-EX9-No.5 森林之海  65",
+      "durationSeconds": 68,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "1420756994",
+      "page": 21,
+      "title": "(伴奏)W1-EX9-No.5 森林之海  80",
+      "durationSeconds": 56,
+      "stage": 1,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35112812906",
+      "page": 22,
+      "title": "(示范)W1-EX9-No.5 森林之海  80",
+      "durationSeconds": 53,
+      "stage": 1,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35727343925",
+      "page": 23,
+      "title": "W1-OUTRO",
+      "durationSeconds": 12,
+      "stage": 1,
+      "kind": "outro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35727412600",
+      "page": 24,
+      "title": "W2-INTRO",
+      "durationSeconds": 7,
+      "stage": 2,
+      "kind": "intro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35754410769",
+      "page": 25,
+      "title": "W2-EX1 单弦交替拨弦",
+      "durationSeconds": 297,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1402569287",
+      "page": 26,
+      "title": "(跟练)W2-EX1 单弦交替拨弦",
+      "durationSeconds": 412,
+      "stage": 2,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35766863905",
+      "page": 27,
+      "title": "W2-EX2 多弦交替拨弦",
+      "durationSeconds": 165,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        2
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "28432336405",
+      "page": 28,
+      "title": "(跟练)W2-EX2 多弦交替拨弦",
+      "durationSeconds": 344,
+      "stage": 2,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        2
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "36375627364",
+      "page": 29,
+      "title": "W2-EX3 2&3指全指板爬格子",
+      "durationSeconds": 306,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        3
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35768895337",
+      "page": 30,
+      "title": "W2-EX4 4&1指双弦爬格子",
+      "durationSeconds": 221,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        4
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35773678164",
+      "page": 31,
+      "title": "W2-EX5 第二把位C调音阶",
+      "durationSeconds": 278,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35915894409",
+      "page": 32,
+      "title": "W2-EX6 大&小二度模唱",
+      "durationSeconds": 459,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35925003923",
+      "page": 33,
+      "title": "W2-EX7 二&四&八分音符节奏转换",
+      "durationSeconds": 243,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        7
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35935947302",
+      "page": 34,
+      "title": "W2-EX8 第二把位简谱视奏(含拍号介绍)",
+      "durationSeconds": 512,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35927689172",
+      "page": 35,
+      "title": "W2-EX9 周杰伦-青花瓷(含折指技巧)",
+      "durationSeconds": 506,
+      "stage": 2,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1411136983",
+      "page": 36,
+      "title": "(跟练)W2-EX9 周杰伦-青花瓷",
+      "durationSeconds": 414,
+      "stage": 2,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "1404358751",
+      "page": 37,
+      "title": "(伴奏)W2-EX9 周杰伦-青花瓷  60",
+      "durationSeconds": 83,
+      "stage": 2,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "1404367368",
+      "page": 38,
+      "title": "(伴奏)W2-EX9 周杰伦-青花瓷  80",
+      "durationSeconds": 63,
+      "stage": 2,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35112946937",
+      "page": 39,
+      "title": "(示范)W2-EX9 周杰伦-青花瓷  80",
+      "durationSeconds": 60,
+      "stage": 2,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35727543639",
+      "page": 40,
+      "title": "W2-OUTRO",
+      "durationSeconds": 14,
+      "stage": 2,
+      "kind": "outro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35766667521",
+      "page": 41,
+      "title": "W3-INTRO",
+      "durationSeconds": 25,
+      "stage": 3,
+      "kind": "intro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35954494947",
+      "page": 42,
+      "title": "W3-EX1 单弦含16分音符的交替拨弦(含音符时值)",
+      "durationSeconds": 308,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "28485486222",
+      "page": 43,
+      "title": "(跟练)W3-EX1 单弦含16分音符的交替拨弦",
+      "durationSeconds": 414,
+      "stage": 3,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35124217171",
+      "page": 44,
+      "title": "W3-EX2 滑弦技巧练习",
+      "durationSeconds": 289,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        2
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35940010914",
+      "page": 45,
+      "title": "W3-EX3 4&1指全指板爬格子",
+      "durationSeconds": 471,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        3
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35641164260",
+      "page": 46,
+      "title": "W3-EX4 双弦保留指爬格子",
+      "durationSeconds": 232,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        4
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35985557871",
+      "page": 47,
+      "title": "W3-EX5 第一把位音阶及闷音练习",
+      "durationSeconds": 536,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35987328051",
+      "page": 48,
+      "title": "W3-EX6 三度模唱练习",
+      "durationSeconds": 176,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35991388833",
+      "page": 49,
+      "title": "W3-EX7 音阶串连及反拍练习(含休止符)",
+      "durationSeconds": 365,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        7
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1412466716",
+      "page": 50,
+      "title": "(跟练)W3-EX7 音阶串连及反拍练习",
+      "durationSeconds": 237,
+      "stage": 3,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        7
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "36612280319",
+      "page": 51,
+      "title": "W3-EX8 1&2把位简谱视奏",
+      "durationSeconds": 1022,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36612738653",
+      "page": 52,
+      "title": "(伴奏)W3-EX8-No.3 都选C",
+      "durationSeconds": 65,
+      "stage": 3,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "36641639905",
+      "page": 53,
+      "title": "(示范)W3-EX8-No.3 都选C",
+      "durationSeconds": 62,
+      "stage": 3,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "36612738728",
+      "page": 54,
+      "title": "(伴奏)W3-EX8-No.5 虫儿飞",
+      "durationSeconds": 86,
+      "stage": 3,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "36641640429",
+      "page": 55,
+      "title": "(示范)W3-EX8-No.5 虫儿飞",
+      "durationSeconds": 86,
+      "stage": 3,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "36374056410",
+      "page": 56,
+      "title": "W3-EX9 许巍-蓝莲花Solo",
+      "durationSeconds": 305,
+      "stage": 3,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "28525199640",
+      "page": 57,
+      "title": "(跟练)W3-EX9 许巍-蓝莲花Solo",
+      "durationSeconds": 210,
+      "stage": 3,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "28551938165",
+      "page": 58,
+      "title": "(伴奏)W3-EX9 许巍-蓝莲花Solo",
+      "durationSeconds": 31,
+      "stage": 3,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35284844908",
+      "page": 59,
+      "title": "(示范)W3-EX9 许巍-蓝莲花Solo",
+      "durationSeconds": 31,
+      "stage": 3,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35773812395",
+      "page": 60,
+      "title": "W3-OUTRO",
+      "durationSeconds": 19,
+      "stage": 3,
+      "kind": "outro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35742024181",
+      "page": 61,
+      "title": "W4-INTRO",
+      "durationSeconds": 9,
+      "stage": 4,
+      "kind": "intro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35645427377",
+      "page": 62,
+      "title": "W4-EX1 单弦含三连音的交替拨弦",
+      "durationSeconds": 133,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "28493811487",
+      "page": 63,
+      "title": "(跟练)W4-EX1 单弦含三连音的交替拨弦",
+      "durationSeconds": 270,
+      "stage": 4,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35239366341",
+      "page": 64,
+      "title": "W4-EX2 击弦技巧练习",
+      "durationSeconds": 292,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        2
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "25953244586",
+      "page": 65,
+      "title": "W4-EX3 纵向保留指爬格子",
+      "durationSeconds": 131,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        3
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35646671449",
+      "page": 66,
+      "title": "W4-EX4 4&3指原地交替练习",
+      "durationSeconds": 94,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        4
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35160195658",
+      "page": 67,
+      "title": "W4-EX5 第四把位部分音阶及制音拨弦",
+      "durationSeconds": 277,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35164196792",
+      "page": 68,
+      "title": "W4-EX6 相对于do的音程模唱",
+      "durationSeconds": 181,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35868577298",
+      "page": 69,
+      "title": "W4-EX7 八分音符含休止和延音的节奏视奏",
+      "durationSeconds": 547,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        7
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35868051606",
+      "page": 70,
+      "title": "W4-EX8 非C调简谱视奏",
+      "durationSeconds": 851,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35224489557",
+      "page": 71,
+      "title": "W4-EX9 火影忍者-剪影solo",
+      "durationSeconds": 287,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35285239611",
+      "page": 72,
+      "title": "(伴奏)W4-EX9 火影忍者-剪影solo",
+      "durationSeconds": 33,
+      "stage": 4,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35285042898",
+      "page": 73,
+      "title": "(示范)W4-EX9 火影忍者-剪影solo",
+      "durationSeconds": 32,
+      "stage": 4,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35742024260",
+      "page": 74,
+      "title": "W4-OUTRO",
+      "durationSeconds": 27,
+      "stage": 4,
+      "kind": "outro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35742024614",
+      "page": 75,
+      "title": "W5-INTRO",
+      "durationSeconds": 9,
+      "stage": 5,
+      "kind": "intro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35258240947",
+      "page": 76,
+      "title": "W5-EX1 单弦含重音的节奏转换拨弦",
+      "durationSeconds": 183,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35260268933",
+      "page": 77,
+      "title": "(跟练)W5-EX1 单弦含重音的节奏转换拨弦",
+      "durationSeconds": 270,
+      "stage": 5,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35240544496",
+      "page": 78,
+      "title": "W5-EX2 勾弦技巧练习",
+      "durationSeconds": 315,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        2
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35259220913",
+      "page": 79,
+      "title": "W5-EX3 单弦横向爬格子",
+      "durationSeconds": 247,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        3
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35260073728",
+      "page": 80,
+      "title": "W5-EX4 纵向1434保留指爬格子",
+      "durationSeconds": 157,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        4
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35876506785",
+      "page": 81,
+      "title": "W5-EX5 十六分音符少1个音的节奏视奏",
+      "durationSeconds": 520,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35378040456",
+      "page": 82,
+      "title": "W5-EX6 AIR-鸟之诗",
+      "durationSeconds": 578,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35635398418",
+      "page": 83,
+      "title": "W5-EX7 扫弦技巧练习",
+      "durationSeconds": 311,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        7
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35337538838",
+      "page": 84,
+      "title": "W5-EX8 根音在5&6弦上的五和弦",
+      "durationSeconds": 593,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35340420911",
+      "page": 85,
+      "title": "W5-EX9 5&6弦指板音横向记忆练习",
+      "durationSeconds": 85,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35341731236",
+      "page": 86,
+      "title": "W5-EX10 周杰伦-爱的飞行日记",
+      "durationSeconds": 183,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35626027747",
+      "page": 87,
+      "title": "(伴奏)W5-EX10 周杰伦-爱的飞行日记",
+      "durationSeconds": 52,
+      "stage": 5,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35646999945",
+      "page": 88,
+      "title": "(示范)W5-EX10 周杰伦-爱的飞行日记",
+      "durationSeconds": 50,
+      "stage": 5,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35742024760",
+      "page": 89,
+      "title": "W5-OUTRO",
+      "durationSeconds": 16,
+      "stage": 5,
+      "kind": "outro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35742024923",
+      "page": 90,
+      "title": "W6-INTRO",
+      "durationSeconds": 11,
+      "stage": 6,
+      "kind": "intro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35357261911",
+      "page": 91,
+      "title": "W6-EX1 先上拨的单弦节奏转换拨弦",
+      "durationSeconds": 98,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35358247076",
+      "page": 92,
+      "title": "(跟练)W6-EX1 先上拨的单弦节奏转换拨弦",
+      "durationSeconds": 288,
+      "stage": 6,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35402220938",
+      "page": 93,
+      "title": "W6-EX2 揉弦技巧练习",
+      "durationSeconds": 799,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        2
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35402876806",
+      "page": 94,
+      "title": "W6-EX3 单弦手指协调性练习",
+      "durationSeconds": 131,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        3
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35417165011",
+      "page": 95,
+      "title": "W6-EX4 单指连续击勾弦练习",
+      "durationSeconds": 198,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        4
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35868248627",
+      "page": 96,
+      "title": "W6-EX5 16分音符少2个音的节奏视奏(含五线谱介绍)",
+      "durationSeconds": 844,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35505898513",
+      "page": 97,
+      "title": "W6-EX6 Beyond-光辉岁月solo",
+      "durationSeconds": 556,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35964584545",
+      "page": 98,
+      "title": "(伴奏)W6-EX6 Beyond-光辉岁月solo",
+      "durationSeconds": 44,
+      "stage": 6,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "36641702347",
+      "page": 99,
+      "title": "(示范)W6-EX6 Beyond-光辉岁月solo",
+      "durationSeconds": 44,
+      "stage": 6,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35485322399",
+      "page": 100,
+      "title": "W6-EX7 根音在三弦的C调原位三和弦(含和弦乐理)",
+      "durationSeconds": 810,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        7
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35485714822",
+      "page": 101,
+      "title": "W6-EX8 1&2&3弦指板音横向记忆练习",
+      "durationSeconds": 53,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35506751265",
+      "page": 102,
+      "title": "W6-EX9 制音移位扫弦(含斜线记谱法)",
+      "durationSeconds": 220,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35507603753",
+      "page": 103,
+      "title": "W6-EX10轻音少女-Don't say lazy",
+      "durationSeconds": 186,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35787968053",
+      "page": 104,
+      "title": "(伴奏)W6-EX10轻音少女-Don't say lazy",
+      "durationSeconds": 51,
+      "stage": 6,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35890663132",
+      "page": 105,
+      "title": "(示范)W6-EX10轻音少女-Don't say lazy",
+      "durationSeconds": 50,
+      "stage": 6,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35742025076",
+      "page": 106,
+      "title": "W6-OUTRO",
+      "durationSeconds": 12,
+      "stage": 6,
+      "kind": "outro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35742024995",
+      "page": 107,
+      "title": "W7-INTRO",
+      "durationSeconds": 12,
+      "stage": 7,
+      "kind": "intro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35357787770",
+      "page": 108,
+      "title": "W7-EX1 单弦含六连音的节奏转换拨弦",
+      "durationSeconds": 158,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35358314062",
+      "page": 109,
+      "title": "(跟练)W7-EX1 单弦含六连音的节奏转换拨弦",
+      "durationSeconds": 312,
+      "stage": 7,
+      "kind": "followAlong",
+      "legacy": false,
+      "exercises": [
+        1
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35521433344",
+      "page": 110,
+      "title": "W7-EX2 推弦技巧练习",
+      "durationSeconds": 313,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        2
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35525560219",
+      "page": 111,
+      "title": "W7-EX3 多弦手指协调性练习",
+      "durationSeconds": 113,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        3
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35538077168",
+      "page": 112,
+      "title": "W7-EX4 双指连续击勾弦练习",
+      "durationSeconds": 115,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        4
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35546072667",
+      "page": 113,
+      "title": "W7-EX5 夜鹿-花上亡灵solo",
+      "durationSeconds": 458,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35787968448",
+      "page": 114,
+      "title": "(伴奏)W7-EX5 夜鹿-花上亡灵solo",
+      "durationSeconds": 26,
+      "stage": 7,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35890725161",
+      "page": 115,
+      "title": "(示范)W7-EX5 夜鹿-花上亡灵solo",
+      "durationSeconds": 27,
+      "stage": 7,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        5
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "25950756073",
+      "page": 116,
+      "title": "W7-EX6 布鲁斯shuffle节奏扫弦",
+      "durationSeconds": 148,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        6
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35566127014",
+      "page": 117,
+      "title": "W7-EX7 ZZ Top-Tush",
+      "durationSeconds": 507,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        7
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35567698461",
+      "page": 118,
+      "title": "W7-EX8 1&2&3弦指板音强化记忆练习",
+      "durationSeconds": 178,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        8
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35589260821",
+      "page": 119,
+      "title": "W7-EX9 三个音的转位大&小三和弦",
+      "durationSeconds": 658,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "35625765829",
+      "page": 120,
+      "title": "W7-EX10 五月天-温柔",
+      "durationSeconds": 987,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35964584588",
+      "page": 121,
+      "title": "(伴奏)W7-EX10 五月天-温柔",
+      "durationSeconds": 52,
+      "stage": 7,
+      "kind": "backing",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "36641702676",
+      "page": 122,
+      "title": "(示范)W7-EX10 五月天-温柔",
+      "durationSeconds": 52,
+      "stage": 7,
+      "kind": "demo",
+      "legacy": false,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "35742025271",
+      "page": 123,
+      "title": "W7-OUTRO",
+      "durationSeconds": 21,
+      "stage": 7,
+      "kind": "outro",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1230732308",
+      "page": 124,
+      "title": "展望篇",
+      "durationSeconds": 117,
+      "stage": 0,
+      "kind": "outlook",
+      "legacy": false,
+      "exercises": [],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1416879604",
+      "page": 125,
+      "title": "(旧)W4-EX9 Master of puppet(含六线谱节奏符号)",
+      "durationSeconds": 272,
+      "stage": 4,
+      "kind": "lesson",
+      "legacy": true,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1616945976",
+      "page": 126,
+      "title": "(旧)(伴奏)W4-EX9 Master of puppet 120",
+      "durationSeconds": 44,
+      "stage": 4,
+      "kind": "backing",
+      "legacy": true,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "1616980068",
+      "page": 127,
+      "title": "(旧)(示范)W4-EX9 Master of puppet 120",
+      "durationSeconds": 44,
+      "stage": 4,
+      "kind": "demo",
+      "legacy": true,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "28541193021",
+      "page": 128,
+      "title": "(旧)W5-EX9 夏霞Solo(含调性乐理)",
+      "durationSeconds": 381,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": true,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1406898618",
+      "page": 129,
+      "title": "(旧)(伴奏)W5-EX9 夏霞Solo G调 80",
+      "durationSeconds": 34,
+      "stage": 5,
+      "kind": "backing",
+      "legacy": true,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "1617022621",
+      "page": 130,
+      "title": "(旧)(示范)W5-EX9 夏霞Solo G调 80",
+      "durationSeconds": 34,
+      "stage": 5,
+      "kind": "demo",
+      "legacy": true,
+      "exercises": [
+        9
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "28553842478",
+      "page": 131,
+      "title": "(旧)W5-EX11 魔兽世界-亡灵序曲",
+      "durationSeconds": 286,
+      "stage": 5,
+      "kind": "lesson",
+      "legacy": true,
+      "exercises": [
+        11
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1423175202",
+      "page": 132,
+      "title": "(旧)(伴奏)W5-EX11 魔兽世界-亡灵序曲 60",
+      "durationSeconds": 45,
+      "stage": 5,
+      "kind": "backing",
+      "legacy": true,
+      "exercises": [
+        11
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "1617959178",
+      "page": 133,
+      "title": "(旧)(示范)W5-EX11 魔兽世界-亡灵序曲 60",
+      "durationSeconds": 43,
+      "stage": 5,
+      "kind": "demo",
+      "legacy": true,
+      "exercises": [
+        11
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "28540207124",
+      "page": 134,
+      "title": "(旧)W6-EX10 你的名字-梦灯笼",
+      "durationSeconds": 457,
+      "stage": 6,
+      "kind": "lesson",
+      "legacy": true,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "28552070583",
+      "page": 135,
+      "title": "(旧)(伴奏)W6-EX10 你的名字-梦灯笼 bE调 60",
+      "durationSeconds": 50,
+      "stage": 6,
+      "kind": "backing",
+      "legacy": true,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "28552007039",
+      "page": 136,
+      "title": "(旧)(示范)W6-EX10 你的名字-梦灯笼 bE调 60",
+      "durationSeconds": 46,
+      "stage": 6,
+      "kind": "demo",
+      "legacy": true,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "28554365836",
+      "page": 137,
+      "title": "(旧)W7-EX10 孤独摇滚-你没事吧",
+      "durationSeconds": 94,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": true,
+      "exercises": [
+        10
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "28556854592",
+      "page": 138,
+      "title": "(旧)W7-EX12 放克歌曲-Get lucky",
+      "durationSeconds": 236,
+      "stage": 7,
+      "kind": "lesson",
+      "legacy": true,
+      "exercises": [
+        12
+      ],
+      "hasSubtitles": true
+    },
+    {
+      "id": "1421751526",
+      "page": 139,
+      "title": "(旧)(伴奏) W7-EX12 放克歌曲-Get lucky A调 70",
+      "durationSeconds": 62,
+      "stage": 7,
+      "kind": "backing",
+      "legacy": true,
+      "exercises": [
+        12
+      ],
+      "hasSubtitles": false
+    },
+    {
+      "id": "1618027113",
+      "page": 140,
+      "title": "(旧)(示范) W7-EX12 放克歌曲-Get lucky A调 70",
+      "durationSeconds": 61,
+      "stage": 7,
+      "kind": "demo",
+      "legacy": true,
+      "exercises": [
+        12
+      ],
+      "hasSubtitles": false
+    }
+  ]
+}
