@@ -118,7 +118,7 @@ export function mergePreview(existing, incoming) {
   }
   return { additions, duplicates };
 }
-export function openPracticeDB() {
+export function openPracticeDB({ onBlocked = () => {} } = {}) {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, 2);
     req.onupgradeneeded = () => {
@@ -129,8 +129,8 @@ export function openPracticeDB() {
     };
     req.onerror = () =>
       reject(new Error("无法打开本地练习数据库。请检查浏览器存储权限。"));
-    req.onblocked = () =>
-      reject(new Error("数据库被其他标签页占用，请关闭旧标签页后重试。"));
+    // Keep the request pending: IndexedDB resumes it when old connections close.
+    req.onblocked = () => onBlocked();
     req.onsuccess = () => {
       req.result.onversionchange = () => req.result.close();
       resolve(req.result);

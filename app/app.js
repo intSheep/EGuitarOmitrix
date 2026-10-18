@@ -50,6 +50,7 @@ const time = (s) => {
     .toString()
     .padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 };
+let connectionAttempt = null;
 let course,
   assignments,
   db,
@@ -122,7 +123,7 @@ function workspace() {
   const lessons = primaryLessons(course, stage);
   if (e.legacy && e.stage === stage) lessons.push(e);
   if (e.stage !== stage || e.kind !== "lesson") e = lessons[0];
-  return `<div class="page-heading"><h1>练习台</h1><a class="text-link" href="#history">练习回顾</a></div>${storageError ? `<p role="alert">${esc(storageError)}</p>` : ""}<div class="stage-pills">${STAGES.map((s) => `<a class="button secondary" aria-current="${s.id === stage ? "step" : "false"}" href="#practice?stage=${s.id}&lesson=${primaryLessons(course, s.id)[0].id}">W${s.id}</a>`).join("")}</div><div class="practice-layout"><section class="exercise-list"><div class="list-heading"><h2>${esc(STAGES.find((s) => s.id === stage).title)}</h2></div><ul>${lessons.map((l) => `<li class="exercise-row ${l.id === e.id ? "is-selected" : ""}"><a class="exercise-select" href="#practice?stage=${stage}&lesson=${l.id}"><span class="exercise-number">${String(l.exercises[0]).padStart(2, "0")}</span><span class="exercise-label"><strong>${esc(shortTitle(l))}</strong><span>${seconds(l.id) > 0 ? `累计 ${time(seconds(l.id))}` : "尚未练习"}</span></span></a></li>`).join("")}</ul></section><aside class="lesson-detail"><img class="detail-art" src="./assets/fretboard.svg" alt=""><h2>${esc(shortTitle(e))}</h2>${requirements(e)}<div class="single-start"><button class="button primary wide" data-start="${draft?.entryId || e.id}" ${storageError ? "disabled" : ""}>${draft ? "继续未结束的练习" : "开始练习"}</button>${draft && draft.entryId !== e.id ? `<p>${esc(shortTitle(entry(draft.entryId)))}</p>` : ""}</div><button class="button secondary wide" data-material="${e.id}">课程资料</button><section class="effort-mini"><h3>最近七天</h3>${bars()}</section></aside></div>`;
+  return `<div class="page-heading"><h1>练习台</h1><a class="text-link" href="#history">练习回顾</a></div><div class="stage-pills">${STAGES.map((s) => `<a class="button secondary" aria-current="${s.id === stage ? "step" : "false"}" href="#practice?stage=${s.id}&lesson=${primaryLessons(course, s.id)[0].id}">W${s.id}</a>`).join("")}</div><div class="practice-layout"><section class="exercise-list"><div class="list-heading"><h2>${esc(STAGES.find((s) => s.id === stage).title)}</h2></div><ul>${lessons.map((l) => `<li class="exercise-row ${l.id === e.id ? "is-selected" : ""}"><a class="exercise-select" href="#practice?stage=${stage}&lesson=${l.id}"><span class="exercise-number">${String(l.exercises[0]).padStart(2, "0")}</span><span class="exercise-label"><strong>${esc(shortTitle(l))}</strong><span>${seconds(l.id) > 0 ? `累计 ${time(seconds(l.id))}` : "尚未练习"}</span></span></a></li>`).join("")}</ul></section><aside class="lesson-detail"><img class="detail-art" src="./assets/fretboard.svg" alt=""><h2>${esc(shortTitle(e))}</h2>${requirements(e)}<div class="single-start"><button class="button primary wide" data-start="${draft?.entryId || e.id}" ${!db ? "disabled" : ""}>${draft ? "继续未结束的练习" : "开始练习"}</button>${draft && draft.entryId !== e.id ? `<p>${esc(shortTitle(entry(draft.entryId)))}</p>` : ""}</div><button class="button secondary wide" data-material="${e.id}">课程资料</button><section class="effort-mini"><h3>最近七天</h3>${bars()}</section></aside></div>`;
 }
 function focus() {
   if (!draft)
@@ -183,10 +184,10 @@ function catalog() {
     )
     .join(
       "",
-    )}</select><label><input type="checkbox" name="legacy" value="1" ${includeLegacy ? "checked" : ""}>包含旧版</label><button class="button secondary">搜索</button></form><div class="catalog-grid">${entries
+    )}</select><label><input type="checkbox" name="legacy" value="1" ${includeLegacy ? "checked" : ""}>包含旧版</label><button class="button secondary">搜索</button></form><div class="course-directory">${entries
     .map(
       (e) =>
-        `<article class="catalog-card"><span>${KINDS[e.kind]}${e.legacy ? " · 旧版" : ""} · P${e.page}</span><h2>${esc(shortTitle(e))}</h2>${e.kind === "lesson" ? `<a class="button secondary" href="#practice?stage=${e.stage}&lesson=${e.id}">选择练习</a>` : `<button class="button secondary" data-material="${e.id}">查看资料</button>`}</article>`,
+        `<article class="directory-row"><span class="directory-page">P${String(e.page).padStart(3, "0")}</span><div class="directory-title"><h2>${esc(shortTitle(e))}</h2><span>${e.stage ? `W${e.stage} · ` : ""}${KINDS[e.kind]}${e.legacy ? " · 旧版" : ""}</span></div>${e.kind === "lesson" ? `<a class="directory-action" href="#practice?stage=${e.stage}&lesson=${e.id}">选择练习</a>` : `<button class="directory-action" data-material="${e.id}">查看资料</button>`}</article>`,
     )
     .join("")}</div>`;
 }
@@ -202,6 +203,11 @@ function render() {
         : name === "catalog"
           ? catalog()
           : workspace();
+  if (storageError)
+    root.insertAdjacentHTML(
+      "afterbegin",
+      `<section class="storage-banner" role="status"><div><strong>练习记录暂时不可用</strong><p>${esc(storageError)}</p></div>${button("retry-storage", "重试")}</section>`,
+    );
   root.setAttribute("aria-busy", "false");
   document.querySelectorAll("[data-nav]").forEach((a) => {
     if (a.dataset.nav === name) a.setAttribute("aria-current", "page");
@@ -350,6 +356,11 @@ document.addEventListener("click", async (ev) => {
       render();
     }
     switch (el.dataset.action) {
+      case "retry-storage":
+        if (connectionAttempt)
+          notice("仍在等待其他旧版标签页关闭，关闭后会自动恢复。");
+        else await connectStorage();
+        break;
       case "close":
         modal.close();
         break;
@@ -517,18 +528,46 @@ setInterval(async () => {
     notice(e.message);
   }
 }, 1000);
+function connectStorage() {
+  if (connectionAttempt) return connectionAttempt;
+  storageError = "正在连接本地练习记录…";
+  render();
+  connectionAttempt = (async () => {
+    let connection;
+    try {
+      connection = await openPracticeDB({
+        onBlocked: () => {
+          storageError =
+            "请关闭其他打开此应用的旧版标签页。关闭后会自动恢复，无需刷新；你的练习记录不会被清除。";
+          render();
+        },
+      });
+      const savedLogs = await allLogs(connection);
+      const savedDraft = await readDraft(connection);
+      db = connection;
+      logs = savedLogs;
+      draft = savedDraft ? recoverSession(savedDraft) : null;
+      storageError = "";
+      clearTimeout(notice.timer);
+      document.querySelector("#notice").hidden = true;
+    } catch (e) {
+      connection?.close();
+      db = null;
+      storageError = e.message;
+    } finally {
+      connectionAttempt = null;
+      render();
+    }
+  })();
+  return connectionAttempt;
+}
 async function init() {
   try {
     course = validateCourse(await (await fetch("./data/course.json")).json());
     assignments = await (await fetch("./data/assignments.json")).json();
-    try {
-      db = await openPracticeDB();
-      logs = await allLogs(db);
-      const saved = await readDraft(db);
-      draft = saved ? recoverSession(saved) : null;
-    } catch (e) {
-      storageError = e.message;
-    }
+    storageError = "正在连接本地练习记录…";
+    render();
+    await connectStorage();
     render();
   } catch (e) {
     root.innerHTML = "<h1>课程加载失败，请刷新重试</h1>";
