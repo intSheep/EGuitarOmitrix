@@ -2936,3 +2936,44 @@ button:disabled {
 .daily-progress progress { display: block; width: 100%; height: 10px; margin-top: 14px; accent-color: #3f5cf0; }
 .focus-page [data-daily-progress] { width: min(100%, 620px); margin-inline: auto; }
 .finish-page .daily-progress { margin-block: 18px; }
+
+/* Per-lesson review: flat rows and independent evidence charts. */
+.lesson-review { margin: 36px 0; min-width: 0; }
+.lesson-review-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.lesson-review-heading h2 { margin:12px 0; }
+.review-filters { display:flex; flex-wrap:wrap; gap:10px; margin:20px 0; }
+.review-filters a { display:flex; gap:12px; }
+.review-filters [aria-current=page] { background:#3f5cf0; color:white; border-color:#273fae; }
+.lesson-progress-row { display:grid; grid-template-columns:minmax(180px,2fr) minmax(150px,1fr) minmax(150px,1fr) auto; gap:24px; align-items:center; padding:24px 0; border-bottom:1px solid #dce1ea; }
+.lesson-progress-row h3 { margin:0 0 8px; }
+.lesson-progress-row p { margin:8px 0 0; }
+.review-edition,.review-duration span,.review-bpm span,.lesson-metrics span { display:block; color:#526070; font-size:14px; margin-top:6px; }
+.review-duration meter { display:block; width:100%; height:10px; margin-top:12px; accent-color:#3f5cf0; }
+.review-version-label { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin:20px 0; }
+#review-version { max-width:100%; padding:10px; font:inherit; border:1px solid #b9c2d0; border-radius:8px; background:white; }
+.lesson-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; padding:28px 0; border-block:1px solid #dce1ea; }
+.lesson-metrics strong { font-size:clamp(20px,3vw,30px); font-variant-numeric:tabular-nums; }
+.lesson-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:32px; margin:28px 0; }
+.review-chart { width:100%; display:block; overflow:visible; font:13px system-ui,sans-serif; fill:#526070; }
+.chart-axis { stroke:#aeb8c8; fill:none; }
+.chart-grid { stroke:#e9edf3; fill:none; }
+.duration-path { fill:none; stroke:#3f5cf0; stroke-width:3; }
+.observation { fill:#3f5cf0; stroke:white; stroke-width:1.5; }
+.chart-caption { color:#526070; font-size:14px; min-height:40px; }
+.lesson-charts section:first-child h3 { margin-bottom:68px; }
+.proficiency-section { padding:24px 0; border-block:1px solid #dce1ea; }
+.proficiency-timeline { display:flex; overflow-x:auto; padding:12px 0 20px; list-style:none; gap:0; }
+.proficiency-timeline li { flex:0 0 140px; border-top:2px solid #dce1ea; padding-top:16px; }
+.proficiency-timeline a { display:grid; gap:8px; color:inherit; text-decoration:none; position:relative; }
+.proficiency-timeline time { font-size:13px; color:#526070; }
+.proficiency-dot { position:absolute; top:-23px; width:12px; height:12px; border-radius:50%; background:#778296; border:2px solid white; }
+.proficiency-dot.is-mastered { background:#3f5cf0; }
+.lesson-records { margin-top:32px; min-width:0; }
+.record-table-scroll { overflow-x:auto; }
+.lesson-records table { width:100%; border-collapse:collapse; text-align:left; white-space:nowrap; }
+.lesson-records caption { text-align:left; color:#526070; padding:12px 0; }
+.lesson-records th,.lesson-records td { padding:16px 14px; border-bottom:1px solid #e1e5ee; }
+.review-pagination { display:flex; gap:16px; align-items:center; margin-top:20px; }
+.review-empty { padding:32px 0; color:#526070; }
+@media(max-width:1000px) { .lesson-progress-row { grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:16px; } .lesson-progress-row > a { justify-self:start; } }
+@media(max-width:760px) { .lesson-charts { grid-template-columns:minmax(0,1fr); gap:20px; } .lesson-charts section:first-child h3 { margin-bottom:24px; } .lesson-metrics { gap:20px; grid-template-columns:1fr; } .lesson-progress-row { grid-template-columns:minmax(0,1fr); } .review-duration meter { max-width:260px; } }

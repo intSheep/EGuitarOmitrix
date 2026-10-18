@@ -129,3 +129,11 @@ The reload check waits for the draft write to commit before reloading, as a busi
 - The initial browser assertion used a fixed 2.2-second wait and raced the one-second display tick. It now waits for the expected observed progress value, not an arbitrary sleep.
 
 This change consumes existing evidence-linked assignment metadata; it is not a fresh audio audit of the whole course. Daily duration remains nullable where previously unresolved. Daily completion changes no saved proficiency state. No data migration or personal record changes were needed.
+
+### 2026-10-18 — Per-lesson review, issue #35
+
+- `npm test`: 40 tests passed, including version isolation, deletion exclusion, timer precision, stable-BPM provenance, latest-not-maximum semantics, nullable self-reports, categorical legacy labels, real date spacing, single points, escaping and record pagination.
+- `npm run build`: passed.
+- `scripts/verify-lesson-review.mjs`: isolated synthetic browser contexts at 1440/768/390; empty state, status filter, version selection, pagination, single-point chart, result editing and no document overflow passed. Desktop and phone screenshots inspected.
+- `scripts/verify-guidance.mjs`: existing quiet finish/resume, save recovery and fixed-tempo checks passed at all three widths. No personal records were inspected or modified, and no course payload is added to Git.
+- Limits: stable BPM and proficiency remain self-reported; no audio assessment or inferred comparable-speed trend. Exact records supplement the visual charts. No storage migration required.

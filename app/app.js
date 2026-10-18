@@ -1,3 +1,4 @@
+import { lessonReview } from "./review-view.js";
 import { teacherPrescription, todayPractice } from "./prescription.js";
 import { FINISH_OUTCOMES, emptyGoals, optionalNumber, resumeGuidance, mergeGoals } from "./guidance.js";
 import { showPositionReference } from "./position-reference.js";
@@ -160,16 +161,9 @@ function focus() {
   return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><h1>${esc(shortTitle(e))}</h1><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div>${requirements(e)}<div class="tool-dock"><button class="button secondary" data-position-reference>把位速查</button><button class="button secondary" data-score="${e.id}">乐谱</button>${!teacherPrescription(a).noMetronome ? button("metronome", "节拍器") : ""}<button class="button secondary" data-material="${e.id}">课程资料</button></div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></section>`;
 }
 function history() {
-  const all = activeLogs(logs),
-    record = all.find((l) => l.id === route().params.get("session")),
-    days = dailySeconds(logs);
-  const dates = Array.from({ length: 84 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - 83 + i);
-    return dayKey(d);
-  });
-  const filter = route().params.get("day");
-  return `<div class="page-heading"><h1>练习回顾</h1>${button("manage", "备份与管理")}</div>${
+  const all = activeLogs(logs), record = all.find(l=>l.id===route().params.get('session')), days = dailySeconds(logs);
+  const filter=route().params.get('day');
+  const heading = `<div class="page-heading"><h1>练习回顾</h1>${button("manage", "备份与管理")}</div>${
     record
       ? `<section class="completion"><div class="complete-mark">✓</div><h2>本次练习已记录</h2><strong class="session-duration">${time(record.minutes * 60)}</strong><p>${esc(shortTitle(entry(record.entryId)))}</p>${record.note ? `<p>${esc(record.note)}</p>` : ""}${record.nextFocus ? `<p>下次重点：${esc(record.nextFocus)}</p>` : ""}${record.bpm ? `<p>${record.bpm} BPM${record.bpmBasis === "self-reported-stable" ? " · 自评稳定速度" : ""}</p>` : ""}${tempoEvidence(record)}<div class="outcomes">${Object.entries(
           FINISH_OUTCOMES,
@@ -182,13 +176,12 @@ function history() {
             "",
           )}</div>${record.outcome === 'learning' ? `<div class="next-actions"><button class="button secondary" data-material="${record.entryId}">查看老师讲解</button></div>` : ''}<button class="button secondary" data-edit-result="${record.id}">修改本次结果</button><a class="button primary" href="#practice?lesson=${record.entryId}">返回练习台</a></section>`
       : ""
-  }<div class="stat-grid"><article><strong>${time(seconds())}</strong><span>累计练习</span></article><article><strong>${all.length}</strong><span>次练习</span></article><article><strong>${Object.keys(days).length}</strong><span>个练习日</span></article></div><div class="review-grid"><section class="review-panel"><h2>最近十二周</h2><div class="heatmap">${dates.map((d) => `<button class="heat-cell level-${!days[d] ? 0 : days[d] < 300 ? 1 : days[d] < 900 ? 2 : 3}" data-day="${d}" aria-label="${d}，练习 ${time(days[d] || 0)}" title="${d} · ${time(days[d] || 0)}"></button>`).join("")}</div><div class="heat-labels"><span>${dates[0]}</span><span>今天</span></div></section><section class="review-panel"><h2>最近七天</h2>${bars()}</section></div><section class="review-panel"><h2>练过的内容</h2>${[...new Set(all.map((l) => l.entryId))].map((id) => `<a class="effort-row" href="#practice?lesson=${id}"><strong>${esc(shortTitle(entry(id)))}</strong><meter min="0" max="${Math.max(1, seconds())}" value="${seconds(id)}"></meter><span>${time(seconds(id))}</span></a>`).join("") || "<p>结束第一次练习后，这里会留下记录。</p>"}</section><section class="review-panel"><h2>${filter ? esc(filter) : "最近练习"}</h2>${filter ? '<a href="#history">全部记录</a>' : ""}${all
-    .filter((l) => !filter || dailySeconds([l])[filter])
-    .map(
-      (l) =>
-        `<a class="session-row" href="#history?session=${l.id}"><span>${new Date(l.practicedAt).toLocaleString("zh-CN")}<strong>${esc(shortTitle(entry(l.entryId)))}</strong></span><span>${time(l.minutes * 60)}${l.bpm ? ` · ${l.bpm} BPM` : ""}${l.outcome ? ` · ${OUTCOMES[l.outcome]}` : ""}</span></a>`,
-    )
-    .join("")}</section>`;
+  }`;
+
+  const review=lessonReview(logs,course,assignments.items,route().params);
+  if(route().params.has('lesson')) return heading + review;
+  const dates=Array.from({length:84},(_,i)=>{const d=new Date();d.setDate(d.getDate()-83+i);return dayKey(d);});
+  return heading + `<div class="stat-grid"><article><strong>${time(seconds())}</strong><span>全部课程累计</span></article><article><strong>${all.length}</strong><span>次练习</span></article><article><strong>${Object.keys(days).length}</strong><span>个练习日</span></article></div>${review}<div class="review-grid"><section class="review-panel"><h2>最近十二周</h2><div class="heatmap">${dates.map(d=>`<button class="heat-cell level-${!days[d]?0:days[d]<300?1:days[d]<900?2:3}" data-day="${d}" aria-label="${d}，练习 ${time(days[d]||0)}" title="${d} · ${time(days[d]||0)}"></button>`).join('')}</div><div class="heat-labels"><span>${dates[0]}</span><span>今天</span></div></section><section class="review-panel"><h2>最近七天</h2>${bars()}</section></div><section class="review-panel"><h2>${filter?esc(filter):'最近练习'}</h2>${filter?'<a href="#history">全部记录</a>':''}${all.filter(l=>!filter||dailySeconds([l])[filter]).map(l=>`<a class="session-row" href="#history?session=${l.id}"><span>${new Date(l.practicedAt).toLocaleString('zh-CN')}<strong>${esc(shortTitle(entry(l.entryId)))}</strong></span><span>${time(l.minutes*60)}${l.bpm?' · '+l.bpm+' BPM':''}${l.outcome?' · '+OUTCOMES[l.outcome]:''}</span></a>`).join('')}</section>`;
 }
 function catalogLink(changes) {
   const params = new URLSearchParams(route().params);
@@ -529,6 +522,7 @@ document.addEventListener("input", (ev) => {
   }
 });
 document.addEventListener("change", async (ev) => {
+  if(ev.target.id === "review-version") location.hash=ev.target.value;
   if (ev.target.id === "library-legacy")
     location.hash = catalogLink({ legacy: ev.target.checked ? "1" : null });
   try {
