@@ -2893,3 +2893,34 @@ button:disabled {
 #score-dialog [hidden] { display: none !important; }
 #score-choice-label { max-width: 100%; min-width: 0; }
 #score-choice { min-width: 0; max-width: min(100%, 28rem); font: inherit; padding: .55rem; border: 1px solid var(--line, #d5d8df); border-radius: .5rem; }
+
+/* Quiet end-of-session confirmation and learner-authored goals. */
+.finish-page { max-width: 660px; margin: 24px auto 64px; }
+.finish-page h1 { font-size: clamp(28px, 5vw, 40px); margin-bottom: 12px; }
+.finish-time { display: flex; align-items: baseline; gap: 18px; margin: 32px 0; }
+.finish-time strong { font-size: clamp(48px, 10vw, 72px); font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.finish-time span { color: #526070; }
+.finish-page form { display: grid; gap: 18px; margin-top: 28px; }
+.finish-page input[type=number], #goal-form input, #result-form input { width: 100%; box-sizing: border-box; font: inherit; padding: 14px; border: 1px solid #b9c2d0; border-radius: 12px; background: white; color: #101726; }
+.finish-outcomes { border: 0; padding: 0; margin: 10px 0; display: flex; gap: 12px; flex-wrap: wrap; }
+.finish-outcomes legend { margin-bottom: 14px; }
+.finish-outcomes label { position: relative; flex: 1; min-width: 100px; cursor: pointer; }
+.finish-outcomes input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.finish-outcomes span { display: block; border: 1px solid #bac2d0; border-radius: 14px; padding: 18px 12px; text-align: center; font-weight: 700; }
+.finish-outcomes input:checked + span { border: 2px solid #3f5cf0; padding: 17px 11px; color: #243fb9; background: #eef1ff; }
+.finish-outcomes input:focus-visible + span { outline: 3px solid #3f5cf0; outline-offset: 4px; }
+.finish-actions, .next-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.finish-actions > * { flex: 1; }
+#finish-error:empty, #goal-error:empty, #result-error:empty { display: none; }
+#finish-error, #goal-error, #result-error { color: #a11919; }
+.resume-panel { padding: 20px 0; border-top: 1px solid #e1e5ee; display: grid; gap: 12px; }
+.resume-panel h3, .resume-panel p { margin: 0; }
+.resume-facts, .tempo-evidence { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+.tempo-evidence { margin: 18px 0; }
+.tempo-evidence h3 { width: 100%; margin: 0; font-size: 16px; }
+.resume-facts span, .tempo-evidence span { font-variant-numeric: tabular-nums; }
+.resume-panel progress, .finish-page progress { display: block; width: 100%; height: 10px; margin-top: 10px; accent-color: #3f5cf0; }
+.resume-panel .text-link { justify-self: start; border: 0; background: none; padding: 0; font: inherit; cursor: pointer; }
+#goal-form, #result-form { display: grid; gap: 20px; }
+#goal-form label, #result-form > label { display: grid; gap: 8px; }
+@media (max-width: 480px) { .finish-actions { flex-direction: column; } .finish-outcomes { gap: 8px; } .finish-outcomes label { min-width: 85px; } }

@@ -77,3 +77,9 @@ The reference is an independently constructed standard-tuning C-major note map, 
 ### Multi-example score selection
 
 The completed course collection uses the existing score viewer, retaining the restrained controls and white canvas of the approved design and the position-reference Stitch exploration above. A single native **本课乐谱** selector appears only for lessons with multiple prepared items; source-only chord diagrams use the same viewer. No new dashboard, explanatory disclosure arrows, reward UI or fabricated exercise sequence was introduced. Redundant score titles inside the renderer are hidden to avoid clipping long names on phones; titles remain in the selection control and exported files.
+
+## Quiet finish and resume (issue #31)
+
+Stitch project `6723020998384701419`, screen `81c7c0c7db7949b7b393aaed69cfaded` generated the finish/resume/goal exploration. Retained: prominent observed duration, separate stable-BPM input, three equal proficiency options, white/blue tactile controls, and a compact next-visit summary. Rejected: mandatory proficiency, synthetic production data, extra reflection fields, explanatory footer cards, nested summary containers, duplicate navigation, and long qualification copy. The implementation is a dedicated finish page, not an interruption during practice. Goals open only through the learner's explicit settings action. Examples in Stitch are synthetic, not real history.
+
+No proficiency is preselected, and metronome usage never fills the stable-BPM input. The workspace keeps one start/resume button. Targets and teacher prescriptions retain separate headings. Graphical progress represents planned time or weekly session counts, never skill mastery.

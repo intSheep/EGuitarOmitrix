@@ -110,3 +110,13 @@ Requirements FR-018/019, issue #26. Local delivery contains 96 GP scores, two XM
 - `npm run build` passes. Mobile screenshots were inspected; redundant rendered score titles are hidden because the lesson and selected piece are already named in controls.
 
 Native GP8 opening, subjective listening and complete frame-by-frame video review remain unperformed. Synchronization candidates retain their prior status. Image-only diagrams do not assert duration or practice dosage. Unspecified source tempo is recorded as a playback default in local provenance.
+
+## Quiet practice guidance (2026-10-18, issue #31)
+
+- Stitch screen `81c7c0c7db7949b7b393aaed69cfaded` was generated and inspected before completing the interface; retained/rejected decisions are recorded in the design rationale.
+- 32 unit tests pass. New coverage checks metronome time accounting across BPM changes/pause/sleep, unknown stable BPM, same-version resume, fixed/no-metronome constraints, nullable goals, old/new backup validation and conflicting goal rejection.
+- `scripts/verify-guidance.mjs` passes in isolated Chromium contexts at 1440, 768 and 390 px: goal setup, no practice-time dialogs, observed metronome usage, no preselected proficiency/BPM, persisted confirmation recovery, save and same-lesson resume. P003 retains its teacher-fixed 40 BPM even after a synthetic self-report of 35 BPM and personal target of 80 BPM. A synthetic quota failure retains inputs/draft and retries without a duplicate result. Conflicting goal import rolls back log additions; stale goal updates are rejected.
+- `scripts/verify-practice.mjs` passes after adapting its finish action to the confirmation screen: timing pause/reload, cross-tab lock, one video launch, atomic finish failure/retry, result revision, backup/import, deletion/restoration, responsive views, reduced motion, blocked storage, v1 database migration and hidden-page pause.
+- `npm run build` passes. Finish/resume screenshots were visually inspected at phone width; no horizontal page overflow was observed. Tests use fresh synthetic browser profiles, never personal history.
+
+The reload check waits for the draft write to commit before reloading, as a business-state synchronization boundary. This does not promise survival of a browser/process kill during an unfinished IndexedDB write. No microphone grading, score-player tempo telemetry, external GP telemetry, automatic promotion or scheduled notification is implemented or claimed.

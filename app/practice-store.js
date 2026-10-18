@@ -1,7 +1,9 @@
+import { emptyGoals, validateGoals, mergeGoals } from "./guidance.js";
 export const OUTCOMES = {
   learning: "还不熟",
   slow: "能慢速完成",
-  steady: "基本稳定",
+  steady: "基本顺畅",
+  mastered: "已掌握",
   review: "可以复习",
 };
 export const DB_NAME = "eguitar-practice-v1";
@@ -60,6 +62,11 @@ export function validateLog(log) {
     if (Math.abs(sum / 1000 - log.seconds) > 0.001)
       throw new Error("计时总量不一致");
   }
+  if (log.bpmBasis !== undefined && log.bpmBasis !== 'self-reported-stable') throw Error('BPM 来源无效');
+  if (log.tempoUsage !== undefined) {
+    if (!Array.isArray(log.tempoUsage) || log.tempoUsage.length > 281 || log.tempoUsage.some(x => !x || !Number.isInteger(x.bpm) || x.bpm < 20 || x.bpm > 300 || !Number.isFinite(x.seconds) || x.seconds <= 0) || new Set(log.tempoUsage.map(x=>x.bpm)).size !== log.tempoUsage.length || log.tempoUsage.reduce((n,x)=>n+x.seconds,0) > log.minutes * 60 + .001) throw Error('节拍器使用记录无效');
+  }
+  if (log.goal != null) validateGoals({weeklySessions:null,lessons:{[log.entryId]:log.goal}});
   return log;
 }
 export function activeLogs(logs) {
@@ -76,12 +83,13 @@ export function latestLog(logs, entryId) {
 }
 export function validateBackup(value, entryIds) {
   if (
-    value?.schemaVersion !== 1 ||
+    ![1, 2].includes(value?.schemaVersion) ||
     value.app !== "EGuitarOmitrix" ||
     !Array.isArray(value.logs) ||
     value.logs.length > 100000
   )
     throw new Error("备份格式或版本不支持，现有记录未修改。");
+  if (value.schemaVersion === 2) validateGoals(value.goals, entryIds);
   const ids = new Set();
   for (const log of value.logs) {
     validateLog(log);
@@ -177,9 +185,9 @@ export function saveLog(db, log, expectedUpdatedAt = null) {
       );
   });
 }
-export function importLogs(db, logs) {
+export function importLogs(db, logs, goals = null) {
   return new Promise((resolve, reject) => {
-    const tx = db.transaction("logs", "readwrite"),
+    const tx = db.transaction(["logs", "session"], "readwrite"),
       store = tx.objectStore("logs");
     let failure;
     const req = store.getAll();
@@ -187,6 +195,13 @@ export function importLogs(db, logs) {
       try {
         const { additions } = mergePreview(req.result, logs);
         additions.forEach((l) => store.add(l));
+        if (goals) {
+          const request = tx.objectStore('session').get('goals');
+          request.onsuccess = () => {
+            try { tx.objectStore('session').put(mergeGoals(request.result || emptyGoals(), goals), 'goals'); }
+            catch(e) { failure = e; tx.abort(); }
+          };
+        }
       } catch (e) {
         failure = e;
         tx.abort();
@@ -231,8 +246,10 @@ export function finishDraft(db, log) {
         tx.abort();
         return;
       }
-      store.add(log);
-      tx.objectStore("session").delete("active");
+      try {
+        store.add(log);
+        tx.objectStore("session").delete("active");
+      } catch { tx.abort(); }
     };
     tx.oncomplete = resolve;
     tx.onerror = () => reject(new Error("保存失败，本次练习仍保留，请重试"));
@@ -244,5 +261,21 @@ export function finishDraft(db, log) {
             : "保存失败，本次练习仍保留，请重试",
         ),
       );
+  });
+}
+
+export function readGoals(db) {
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction('session'),r=tx.objectStore('session').get('goals');
+    tx.oncomplete=()=>resolve(r.result || emptyGoals()); tx.onabort=()=>reject(tx.error);
+  });
+}
+export function saveGoals(db, goals, expected) {
+  validateGoals(goals);
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction('session','readwrite'),store=tx.objectStore('session'),r=store.get('goals');
+    let conflict=false;
+    r.onsuccess=()=>{ if(JSON.stringify(r.result || emptyGoals())!==JSON.stringify(expected)){conflict=true;tx.abort();}else store.put(goals,'goals'); };
+    tx.oncomplete=resolve;tx.onabort=()=>reject(Error(conflict?'目标已在另一窗口更改，请重新打开':'目标保存失败，请重试'));
   });
 }
