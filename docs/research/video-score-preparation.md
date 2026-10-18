@@ -12,9 +12,9 @@ Date: 2026-10-18 (Asia/Shanghai). Owner authorization supersedes the earlier res
 - [alphaTab](https://alphatab.net/docs/introduction/) imports MusicXML and GP and provides rendering and synthesized playback. Installed `@coderline/alphatab` 1.8.4, MPL-2.0, pinned in the lockfile. It can [export GP](https://alphatab.net/docs/guides/exporter/). Runtime, fonts, soundfont and their license files are copied locally by the asset-preparation script; no CDN or course upload is used.
 - [GP8 supports MusicXML import](https://www.guitar-pro.com/docs/gp8/import-export/import). Native GP8 opening was not tested. Browser downloads are offered; no `guitarpro://` protocol, OS file association change or launch helper was invented.
 
-## Actual pilot and coverage
+## Initial pilot and historical coverage
 
-The existing package has 60 local videos, not the complete teaching catalog. `score-inventory.py` maps all 72 teaching entries: 29 have a local lesson/supporting video and 43 lack one. Availability is not proof that the video contains a readable complete score. The machine-local inventory is `private/score-work/inventory.json`.
+At the initial pilot, the package had 60 local videos, not the complete teaching catalog. `score-inventory.py` maps all 72 teaching entries: 29 have a local lesson/supporting video and 43 lack one. Availability is not proof that the video contains a readable complete score. The machine-local inventory is `private/score-work/inventory.json`.
 
 | Source | Lesson destination | Transcription | Evidence |
 | --- | --- | --- | --- |
@@ -30,7 +30,7 @@ Files are under ignored `app/local-scores/p026/` and `p073/`, with MusicXML, GP 
 1. Inventory local source availability. Missing videos remain missing, never reconstructed from subtitles.
 2. Extract bounded candidate frames; crop the score area and inspect source transitions. Keep raw sources unchanged. Increase sampling around transitions where necessary.
 3. For static pages, identify the complete visible measure set. For scrolling pages, compare measure numbers and overlapping notes; omit duplicate measures. Do not infer off-screen bars.
-4. Enter a reviewed transcription JSON: explicit tempo, tuning, source, meter and per-note string, fret, duration, ties and techniques. The current writer intentionally accepts only complete monophonic 4/4 measures and supported durations; it refuses unsupported subdivisions rather than approximating them.
+4. Enter a reviewed transcription JSON: explicit tempo, tuning, source, meter and per-note string, fret, duration, ties and techniques. The writer supports reviewed staff/tab notes, chords, rests, tuplets, supported techniques and 2/4, 3/4 or 4/4 measures. Short measures require explicit indices; it refuses unsupported durations rather than approximating them.
 5. Run `python3 scripts/write-musicxml.py notes.json new-score.musicxml`. It validates bar totals, string/fret bounds and ties. Validate MusicXML against the W3C 4.0 XSD for release candidates.
 6. Run `node scripts/convert-score.mjs new-score.musicxml new-score.gp`. It reimports the export and checks meter, tuning, pitches, strings/frets, durations and tie destinations. This is library validation, not a GP8 desktop test.
 7. Link only inspected assets in the local index; compare the rendered score with source images, then check playback. Native GP8 import and listening remain final musical acceptance steps.
@@ -54,4 +54,24 @@ Constant-tempo scores map requested BPM to `requested / original` playback speed
 
 Both pilots pass W3C MusicXML 4.0 schema validation, note/rhythm comparison after regeneration, and GP export/reimport checks. Isolated Chromium rendered both, toggled playback, changed BPM, looped, showed source frames, downloaded GP and reimported it, and checked mobile overflow. Headless state testing is not a subjective audio-quality check or a native GP8 acceptance test.
 
-The remaining 70 teaching entries have not been transcribed. Acquire the 43 missing source videos or original scores, inspect the available remaining sources, and expand coverage incrementally. Do not present two pilots or candidate extraction as full-course conversion.
+The initial two-pilot boundary has been superseded by the preparation pass below. Preserve the distinction between source availability, identified-example coverage and exhaustive video review.
+
+
+## Remaining-course preparation pass (issue #26)
+
+All 140 source videos are now available locally. Uniform survey frames and targeted additional frames were used to inspect the identified notation, including multi-page sight-reading, rhythmic examples, chord inversions, strumming, bends, vibrato and hammer/pull exercises. This is not an assertion that every video frame was reviewed.
+
+The local collection now contains 120 artifact sets: 96 GP scores (19 with pure backing audio and 77 notation-only), two MusicXML-only scores, 16 source-image reference sets and six independent backing MP3 sets. This adds 56 GP scores to the previous 40. The 114 score/reference sets are indexed by lesson, edition and related exercise. Multi-example lessons use the viewer's **本课乐谱** selector. Prepared GP bytes are preferred over reimporting XML, preserving embedded audio and reviewed techniques. Downloads return the original GP bytes.
+
+P049 and P067 end with deliberately short measures. MusicXML preserves them, but the installed GP exporter loses non-initial anacrusis flags. The semantic comparison now detects this; these two files remain XML-only, with GP download disabled. No rests were invented to pad the source. P085 is random fifth/sixth-string note recall and has no fixed rhythmic sequence. Chord/fretboard diagrams without rhythmic instructions remain images. Shared pieces such as P051 No.3/No.5 use their existing P052/P054 score assets rather than duplicate transcriptions.
+
+Source page/timestamp evidence and transcription decisions remain in local manifests. Some numbered-notation examples have no source tempo: their 60 BPM value is explicitly a player default, not a teacher prescription. Standard guitar tuning remains a preparation assumption unless independently established. Staff-only scores do not invent string/fret choices.
+
+Rebuild local metadata and the downloadable bundle with:
+
+```sh
+python3 scripts/index-local-scores.py
+python3 scripts/bundle-local-scores.py
+```
+
+The bundle includes per-file SHA-256 values, source images, manifests, `COLLECTION.md`, `collection.json` and per-page `coverage.json`. Trial directories are excluded. All payloads remain ignored. The four previously accepted GP files (P018, P020, P021, P072) retain their recorded hashes. Native GP8 rendering and listening have not been performed for this new batch; no additional listening acceptance is implied.

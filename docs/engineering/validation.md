@@ -98,3 +98,15 @@ All 19 canonical embedded-backing GP files pass browser decoding/playback/rate/p
 - `scripts/verify-position-reference.mjs` passed in isolated 1440, 768 and 390 px Chromium contexts: all five selections, note-name toggle, no horizontal overflow, Escape dismissal, focus restoration from the focus page and nested score dialog, and continued practice timing.
 - Inspected the 390 px screenshot. The white panel and blue active position follow the retained Stitch direction. Course scores and private learner records were not committed or used as test records.
 - This validates the reference feature only; remaining course-score transcription and GP8 checks remain tracked under #26.
+
+## Remaining examples and multi-score viewer (2026-10-18)
+
+Requirements FR-018/019, issue #26. Local delivery contains 96 GP scores, two XML-only scores, 16 reference-image sets and six standalone backing files. The local bundle is 208,618,571 bytes before any later source correction; it is not committed.
+
+- 29 Node tests pass, including explicit short-measure validation, refusal to write a GP that loses the final short measure, triplet rests, edition-aware multi-example indexing, trial exclusion and natural image ordering.
+- All 96 canonical GP files parse and survive GP export/reimport with the musical-field signature unchanged. All 97 canonical MusicXML files pass the MusicXML 4.0 schema. This does not establish source transcription perfection or native GP8 rendering fidelity.
+- Existing accepted P018/P020/P021/P072 GP hashes match their recorded manifests. Index references resolve; ZIP integrity check passes.
+- Isolated Chromium at 1440 and 390 px passes multi-piece selection (P070), XML-only short-bar playback/download restrictions (P049), image-only references (P101), and embedded backing selection (P072). GP download is byte-identical to the prepared P072 file. A delayed index fetch does not overwrite a manually loaded score. No personal history was used or changed.
+- `npm run build` passes. Mobile screenshots were inspected; redundant rendered score titles are hidden because the lesson and selected piece are already named in controls.
+
+Native GP8 opening, subjective listening and complete frame-by-frame video review remain unperformed. Synchronization candidates retain their prior status. Image-only diagrams do not assert duration or practice dosage. Unspecified source tempo is recorded as a playback default in local provenance.

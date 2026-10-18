@@ -148,3 +148,35 @@ test('grace slides, bends, dead notes and staccato survive GP export',async()=>{
   assert.equal(beats[4].notes[0].slideOutType,a.model.SlideOutType.OutDown);
  } finally {await rm(dir,{recursive:true});}
 });
+
+test('explicit short final bars survive XML but unsafe GP conversion is refused', async () => {
+ const dir=await mkdtemp(join(tmpdir(),'eguitar-short-'));
+ try {
+  const input=join(dir,'source.json'),xml=join(dir,'score.musicxml'),gp=join(dir,'score.gp');
+  await writeFile(input,JSON.stringify({...fixture,bars:[fixture.bars[0],[{string:1,fret:2,quarters:2}]],incompleteMeasures:[2]}));
+  const r=spawnSync('python3',['scripts/write-musicxml.py',input,xml],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
+  const score=a.importer.ScoreLoader.loadScoreFromBytes(new Uint8Array(await readFile(xml)));
+  assert.equal(score.masterBars[1].isAnacrusis,true);
+  const converted=spawnSync(process.execPath,['scripts/convert-score.mjs',xml,gp],{encoding:'utf8'});
+  assert.notEqual(converted.status,0);assert.match(converted.stderr,/Round-trip/);
+  await assert.rejects(readFile(gp),{code:'ENOENT'});
+  for(const invalid of [[0],[3],[true],[1,1],'2']) {
+   await writeFile(input,JSON.stringify({...fixture,incompleteMeasures:invalid}));
+   assert.notEqual(spawnSync('python3',['scripts/write-musicxml.py',input,join(dir,'invalid.xml')]).status,0);
+  }
+ } finally {await rm(dir,{recursive:true});}
+});
+
+test('triplet rests retain timing through GP round trip',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'eguitar-rest-tuplet-'));
+ try {
+  const input=join(dir,'source.json'),xml=join(dir,'score.musicxml');
+  const beats=Array.from({length:12},(_,i)=>i%3===1?{rest:true,quarters:'1/3',tuplet:[3,2]}:{string:1,fret:0,quarters:'1/3',tuplet:[3,2]});
+  await writeFile(input,JSON.stringify({...fixture,bars:[beats]}));
+  const r=spawnSync('python3',['scripts/write-musicxml.py',input,xml],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
+  const score=a.importer.ScoreLoader.loadScoreFromBytes(new Uint8Array(await readFile(xml)));
+  const back=a.importer.ScoreLoader.loadScoreFromBytes(new a.exporter.Gp7Exporter().export(score));
+  const rests=back.tracks[0].staves[0].bars[0].voices[0].beats.filter(b=>b.isRest);
+  assert.equal(rests.length,4);assert.ok(rests.every(b=>b.tupletNumerator===3&&b.tupletDenominator===2));
+ }finally{await rm(dir,{recursive:true});}
+});
