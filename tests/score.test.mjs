@@ -58,3 +58,33 @@ test("transcription refuses unbalanced measures and orphan ties", async () => {
     await rm(dir, { recursive: true });
   }
 });
+
+test("staff-only transcription preserves rests, octave and dotted durations without fingering", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "eguitar-staff-"));
+  try {
+    const input=join(dir,"notes.json"), xml=join(dir,"score.musicxml");
+    await writeFile(input,JSON.stringify({title:"Synthetic staff",notation:"staff",tempo:80,source:"Synthetic only",bars:[[{rest:true,quarters:4}],[{midi:72,quarters:3},{midi:60,quarters:1}]]}));
+    const result=spawnSync("python3",["scripts/write-musicxml.py",input,xml],{encoding:"utf8"});
+    assert.equal(result.status,0,result.stderr);
+    const content=await readFile(xml,"utf8");
+    assert.doesNotMatch(content,/<technical>|<fret>|<string>|<staff-tuning/);
+    const score=a.importer.ScoreLoader.loadScoreFromBytes(new Uint8Array(await readFile(xml)));
+    const restored=a.importer.ScoreLoader.loadScoreFromBytes(new a.exporter.Gp7Exporter().export(score));
+    const staff=restored.tracks[0].staves[0];
+    assert.ok(staff.bars[0].voices[0].beats[0].isRest);
+    const beats=staff.bars[1].voices[0].beats;
+    assert.equal(beats[0].duration,2);assert.equal(beats[0].dots,1);
+    assert.equal(beats[0].notes[0].realValue,72);assert.equal(beats[1].notes[0].realValue,60);
+  } finally {await rm(dir,{recursive:true});}
+});
+test("staff writer rejects implied fingering, pitched rests and invalid MIDI",async()=>{
+ const dir=await mkdtemp(join(tmpdir(),"eguitar-staff-invalid-"));
+ try {
+  for(const note of [{midi:60,string:2,quarters:4},{rest:true,midi:60,quarters:4},{midi:128,quarters:4}]) {
+   const input=join(dir,"notes.json");
+   await writeFile(input,JSON.stringify({title:"Synthetic invalid",notation:"staff",tempo:80,source:"Synthetic only",bars:[[note]]}));
+   const result=spawnSync("python3",["scripts/write-musicxml.py",input,join(dir,"bad.musicxml")],{encoding:"utf8"});
+   assert.notEqual(result.status,0);
+  }
+ } finally {await rm(dir,{recursive:true});}
+});

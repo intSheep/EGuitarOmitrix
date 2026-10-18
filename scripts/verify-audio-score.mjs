@@ -23,6 +23,7 @@ try {
  await page.waitForFunction(()=>document.querySelector('#score-status')?.textContent.includes('内嵌音频') && !document.querySelector('#score-play').disabled);
  await page.locator('#score-play').click();
  await page.waitForFunction(()=>window.__testAudio && !window.__testAudio.paused && window.__testAudio.currentTime>0);
+ if(process.env.EGUITAR_QA_SCREENSHOT) await page.screenshot({path:process.env.EGUITAR_QA_SCREENSHOT,fullPage:true});
  const time=await page.evaluate(()=>window.__testAudio.currentTime);
  await page.waitForFunction(t=>window.__testAudio.currentTime>t+.2,time);
  await page.locator('#score-bpm').fill('50');await page.locator('#score-bpm').dispatchEvent('change');
