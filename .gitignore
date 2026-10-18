@@ -44,3 +44,7 @@ coverage/
 .venv/
 __pycache__/
 *.pyc
+
+# Generated, local-only score media and third-party runtime
+/app/local-scores/
+/app/vendor/

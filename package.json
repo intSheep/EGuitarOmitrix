@@ -3,11 +3,19 @@
   "private": true,
   "version": "0.2.0",
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "start": "node scripts/serve.mjs",
     "test": "node --test tests/*.test.mjs",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "predev": "node scripts/prepare-score-assets.mjs",
+    "prestart": "node scripts/prepare-score-assets.mjs",
+    "prebuild": "node scripts/prepare-score-assets.mjs"
+  },
+  "dependencies": {
+    "@coderline/alphatab": "1.8.4"
   }
 }

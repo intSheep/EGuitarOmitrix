@@ -1,3 +1,4 @@
+import { showScore, pauseScore, closeScore } from "./score-viewer.js";
 import {
   STAGES,
   KINDS,
@@ -130,7 +131,7 @@ function focus() {
     return `<h1>选择一个练习开始</h1><a class="button primary" href="#practice">返回练习台</a>`;
   const e = entry(draft.entryId),
     a = task(e.id);
-  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><h1>${esc(shortTitle(e))}</h1><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div>${requirements(e)}<div class="tool-dock">${!/不用|不使用|不需要|不跟节拍器/.test(a?.tempo || "") ? button("metronome", "节拍器") : ""}<button class="button secondary" data-material="${e.id}">课程资料</button></div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${Number(a?.tempo?.match(/\d+/)?.[0]) || 60}" ${/固定/.test(a?.tempo || "") ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></section>`;
+  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><h1>${esc(shortTitle(e))}</h1><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div>${requirements(e)}<div class="tool-dock"><button class="button secondary" data-score="${e.id}">乐谱</button>${!/不用|不使用|不需要|不跟节拍器/.test(a?.tempo || "") ? button("metronome", "节拍器") : ""}<button class="button secondary" data-material="${e.id}">课程资料</button></div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${Number(a?.tempo?.match(/\d+/)?.[0]) || 60}" ${/固定/.test(a?.tempo || "") ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></section>`;
 }
 function history() {
   const all = activeLogs(logs),
@@ -258,6 +259,7 @@ function persist() {
   return saveQueue;
 }
 async function pause(reason = "已暂停") {
+  pauseScore();
   metro.stop();
   const mb = document.querySelector('[data-action="metro-toggle"]');
   if (mb) mb.textContent = "播放节拍";
@@ -348,6 +350,10 @@ document.addEventListener("click", async (ev) => {
       return;
     }
     if (el.dataset.material) materials(el.dataset.material);
+    if (el.dataset.score) {
+      metro.stop();
+      await showScore(el.dataset.score, shortTitle(entry(el.dataset.score)));
+    }
     if (el.dataset.day) location.hash = `history?day=${el.dataset.day}`;
     if (el.dataset.outcome) {
       const l = logs.find((l) => l.id === el.dataset.log);
@@ -520,6 +526,7 @@ modal.addEventListener(
   () => lastTrigger?.isConnected && lastTrigger.focus(),
 );
 window.addEventListener("hashchange", async () => {
+  closeScore();
   if (route().name !== "focus") {
     try {
       await pause();

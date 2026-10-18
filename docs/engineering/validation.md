@@ -67,3 +67,12 @@ The restricted command sandbox did not expose the same live filesystem/socket be
 ## 2026-10-18 — Grouped course library (#18)
 
 Stitch output and implemented desktop/mobile screenshots inspected. `verify-catalog.mjs` passed for chapter grouping, stage/type/search/legacy filters, zero-result reset, overview stage zero, exact exercise and material actions, and 820/390 px overflow checks. `verify-storage-recovery.mjs` passed against the new catalog. All 16 unit tests and static build passed. Browser contexts were isolated and contained no user records.
+
+## 2026-10-18 — Video score preparation and embedded playback (#20)
+
+- Installed and ran pinned video-frames skill `f0d30f9dc8274aa664ba68b528cd3b6d13dd3509`; inspected the script first. FFmpeg/Pillow candidate extraction produced one candidate group for the static P026 region and four for scrolling P073 (candidate groups are heuristic, not page counts).
+- P026: 4 measures; P073: 10 measures. Rebuilt XML validates against W3C MusicXML 4.0 XSD using a local-only resolver. Compared original/rebuilt note/rhythm signatures; GP export/reimport preserves checked bar, duration, pitch, string/fret and tie fields.
+- `npm test`: 18 tests passed. `npm run build` and whitespace checks passed.
+- `verify-scores.mjs`: both actual local pilots render, playback state toggles, BPM and loop controls work, source-frame views open, downloaded GP reimports with expected measure counts, and 390 px overlay avoids overflow. Screenshots inspected. Tests use isolated browser storage.
+- Existing `verify-practice.mjs` passed after integrating score controls; learner data was not accessed. Live preview restarted to load ES-module/font/audio resource types.
+- Not verified: native Windows Guitar Pro 8 import, subjective physical audio output, full-score technique equivalence across all importers. Remaining 70 teaching entries are not transcribed. Standard tuning is assumed in the two pilots and documented in local manifests. No course score/media files were committed.

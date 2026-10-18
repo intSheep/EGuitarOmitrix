@@ -48,3 +48,7 @@ Agents should start with [AGENTS.md](AGENTS.md).
 
 - [Focus session storage decision](docs/decisions/0003-focus-practice.md)
 - [Focus and summary Stitch design](docs/design/focus-practice.md)
+
+## Local score pilot
+
+Run `npm install` before starting; `npm start` prepares the pinned alphaTab runtime locally. In focus mode choose **乐谱** to view/play a prepared score or open a local MusicXML/GP file. The two machine-local pilots cover P025 (from P026) and P071 (from P073); course assets are intentionally ignored by Git. New clones can load their own local files. See [video score preparation](docs/research/video-score-preparation.md) for tools, provenance, assumptions and coverage. GP downloads are available; native GP8 launch is not integrated.

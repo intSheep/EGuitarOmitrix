@@ -2775,3 +2775,104 @@ button:disabled {
     column-gap: 10px;
   }
 }
+#score-dialog {
+  width: min(1200px, 96vw);
+  max-width: 96vw;
+  height: 90dvh;
+  max-height: 90dvh;
+  border: 1px solid #e1e5ee;
+  border-radius: 20px;
+  padding: 24px;
+  overflow: auto;
+}
+.score-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+.score-heading h2 {
+  font-size: 22px;
+}
+.score-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.score-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.score-controls input[type="number"] {
+  width: 75px;
+  padding: 9px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+.score-file {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.score-file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+}
+#score-status {
+  margin: 16px 0;
+  color: #606a7e;
+}
+#score-images img {
+  width: 100%;
+  height: auto;
+}
+#score-images figure {
+  margin: 20px 0;
+}
+#score-render {
+  min-height: 160px;
+}
+.at-cursor-bar {
+  background: rgba(63, 92, 240, 0.12);
+}
+.at-cursor-beat {
+  background: #3f5cf0;
+  width: 3px;
+}
+.at-selection div {
+  background: rgba(63, 92, 240, 0.15);
+}
+@media (max-width: 760px) {
+  #score-dialog {
+    padding: 16px;
+  }
+  .score-heading h2 {
+    font-size: 18px;
+  }
+  .score-controls {
+    gap: 9px;
+  }
+  .score-controls .button {
+    font-size: 13px;
+    padding: 9px;
+  }
+}
+#score-dialog .score-heading {
+  position: sticky;
+  top: -24px;
+  z-index: 3;
+  background: #fff;
+  padding: 12px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+@media (max-width: 760px) {
+  #score-dialog .score-heading {
+    top: -16px;
+  }
+}

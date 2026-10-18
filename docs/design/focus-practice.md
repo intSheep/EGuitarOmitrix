@@ -21,3 +21,7 @@ Stitch screen `831dc4c3a4514668b5acb3d8b8a11335` explores the flat catalog and s
 ## Course library redesign — issue #18
 
 The owner rejected the flat catalog as still visually weak. Stitch screen `6880fcce19534004ba0e96d26112c34c` was generated and its screenshot inspected. Retained: named stage navigation, grouped chapter headings/counts, compact search, direct content-type filters, identifiable media rows and a single row action. Removed unsolicited tip panels, fabricated progress, settings/avatar actions and pagination. The implementation uses whole-row actions instead of tiny distant targets. Mobile stage navigation becomes a horizontal strip; the content remains a flat list without nested cards. Search, legacy opt-in, material launching and exercise selection remain functional. Stage-zero preparation/outlook entries are grouped as the course overview.
+
+## Embedded score overlay — issue #20
+
+Stitch screen `2a0fbb0207eb4294a0ae876021df9021` was generated for the score overlay. Retained the large white notation canvas, compact blue/neutral playback tools, local file input, source-frame toggle and download actions. No score asset is fabricated as an empty-state placeholder. Actual alphaTab-rendered desktop/mobile screenshots were inspected; the notation layout is supplied by the library, not the design mockup.
