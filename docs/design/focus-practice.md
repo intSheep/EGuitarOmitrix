@@ -17,3 +17,7 @@ Motion: a nine-second pale ambient pulse runs only while timing, disabled under 
 ## Catalog refinement — issue #14
 
 Stitch screen `831dc4c3a4514668b5acb3d8b8a11335` explores the flat catalog and storage notice. Retained the white canvas, compact filter toolbar, page identifiers, divider-separated full-width rows and one unboxed action. No enclosing card or card grid. Desktop and mobile implementation screenshots were inspected. The attached user image was unavailable; the change follows the explicit request to remove nested containers.
+
+## Course library redesign — issue #18
+
+The owner rejected the flat catalog as still visually weak. Stitch screen `6880fcce19534004ba0e96d26112c34c` was generated and its screenshot inspected. Retained: named stage navigation, grouped chapter headings/counts, compact search, direct content-type filters, identifiable media rows and a single row action. Removed unsolicited tip panels, fabricated progress, settings/avatar actions and pagination. The implementation uses whole-row actions instead of tiny distant targets. Mobile stage navigation becomes a horizontal strip; the content remains a flat list without nested cards. Search, legacy opt-in, material launching and exercise selection remain functional. Stage-zero preparation/outlook entries are grouped as the course overview.
