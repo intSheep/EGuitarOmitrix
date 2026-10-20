@@ -237,7 +237,7 @@ The learner owns practice records. Content revisions own source evidence and tas
 ## 11. UX and nonfunctional requirements
 
 - NFR-001: Target current Windows Chrome/Edge and responsive layouts at 390 px and desktop widths; exact tested versions are recorded when implementation exists.
-- NFR-002: The workspace has one start action. The focus page records elapsed practice automatically; self-report after completion is optional. Source videos share one material picker and launch action. Avoid promotional headlines and decorative game navigation.
+- NFR-002: The workspace has one start action. The focus page records elapsed practice automatically; self-report after completion is optional. Source videos use directly clickable material rows; viewing time is confirmed separately on return. Avoid promotional headlines and decorative game navigation.
 - NFR-003: Keyboard access, visible focus, text labels for statuses, and readable notation-independent task text are required. Color alone must not convey review or progress state.
 - NFR-004: A failed save, unavailable storage, or quota error must remain visible and offer a safe retry/export; no success toast before persistence succeeds.
 - NFR-005: Schema upgrades validate and retain a recoverable prior snapshot. Future schema versions fail safely on older clients.
@@ -284,7 +284,7 @@ See [roadmap](roadmap.md), [Stitch brief](../design/stitch-brief.md), and [Agent
 
 ## 15. Focus slice acceptance (v0.4)
 
-The latest owner request supersedes earlier manual logging and disclosure-based layouts. Use one start action, automatic observed time, pause/resume, a recoverable paused draft and transactional finish. Hide global navigation during focus. Pause on video launch, hidden pages and interruptions. One material dialog contains the video selector and launch control. Use source-backed task summaries without extraction-status badges; unknown numeric targets remain unknown. Do not infer mastery from time or metronome settings. Show real accumulated time, exercise history, daily bars and an 84-day activity calendar. Retain older manual logs and backups. See [ADR 0003](../decisions/0003-focus-practice.md) and [Stitch decisions](../design/focus-practice.md).
+The latest owner request supersedes earlier manual logging and disclosure-based layouts. Use one start action, automatic observed time, pause/resume, a recoverable paused draft and transactional finish. Hide global navigation during focus. Pause on video launch, hidden pages and interruptions. One material dialog contains directly clickable source rows (superseded by FR-021 on 2026-10-20). Use source-backed task summaries without extraction-status badges; unknown numeric targets remain unknown. Do not infer mastery from time or metronome settings. Show real accumulated time, exercise history, daily bars and an 84-day activity calendar. Retain older manual logs and backups. See [ADR 0003](../decisions/0003-focus-practice.md) and [Stitch decisions](../design/focus-practice.md).
 
 ## 16. Owner-authorized score pilot (v0.5)
 
@@ -324,3 +324,34 @@ Acceptance uses synthetic signal tests for all six strings, detuning, common sam
 
 
 Owner refinement for FR-020: replace the rejected toy-like vertical vector with a theme-matched horizontal electric-guitar illustration of conventional full-size proportions, headstock left and body right, with three tuning machines on each side. The string row is a noninteractive detection indicator. Plucking near an open-string pitch automatically identifies the nearest target and gives direct physical guidance: a flat note requires increasing tension (tighten), a sharp note requires reducing tension (loosen). Do not prescribe clockwise/counterclockwise rotation without knowing the instrument's winding. Report “near string” rather than claiming acoustic input establishes the exact physical string/fret used. Preserve the original secure-context, capture lifecycle and no-recording boundaries.
+
+## 17. Direct materials and separate viewing time (2026-10-20)
+
+The owner authorizes FR-021, issue #41: replace select-then-open with direct
+resource rows, and count viewing as a separate learning activity. Opening an exact
+source pauses practice while an independent viewing interval continues outside
+the app. On return, freeze the candidate duration and let the learner confirm,
+reduce or discard it. Refresh/interruption retains a pending review and never
+silently adds unattended time.
+
+Learning totals show practice and confirmed viewing separately. Viewing does not
+satisfy instructor practice duration, add a practiced day/session, change BPM,
+infer proficiency or alter the next-practice cursor. Preserve all existing records,
+provide reversible deletion, and include viewing records in versioned atomic
+backup import/export with schema 1/2 compatibility. External playback state is
+unobservable; the UI must describe confirmed elapsed time without claiming verified
+playback. See [ADR 0005](../decisions/0005-separate-viewing-time.md).
+
+### FR-022 — Continuous practice surface and floating clock
+
+The owner authorizes a single central practice surface for the right-hand tools.
+Score, C-major position reference, metronome and course resources replace the large
+clock inside that surface without navigation or modal interruption. Keep active
+practice timing continuous and preserve explicit pauses. The clock becomes a
+small draggable floating control; clicking it returns to the primary clock.
+Support pointer/touch dragging, keyboard movement, viewport bounds and reduced
+motion. Use a liquid-like shape transition from the selected tool and clock.
+Pause/finish controls remain available. The tuner uses the same surface while
+retaining FR-020's required timer/audio pause and microphone cleanup. External
+lesson viewing retains FR-021's separately confirmed time. Closing, replacing or
+leaving a tool releases its audio/capture resources without ending the session.

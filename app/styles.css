@@ -861,7 +861,7 @@ dialog::backdrop {
   top: -21px;
   right: -15px;
 }
-html:has(dialog[open]) {
+html:has(dialog:modal) {
   overflow: hidden;
 }
 .toast {
@@ -3031,3 +3031,99 @@ button:disabled {
 .review-empty { padding:32px 0; color:#526070; }
 @media(max-width:1000px) { .lesson-progress-row { grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:16px; } .lesson-progress-row > a { justify-self:start; } }
 @media(max-width:760px) { .lesson-charts { grid-template-columns:minmax(0,1fr); gap:20px; } .lesson-charts section:first-child h3 { margin-bottom:24px; } .lesson-metrics { gap:20px; grid-template-columns:1fr; } .lesson-progress-row { grid-template-columns:minmax(0,1fr); } .review-duration meter { max-width:260px; } }
+
+/* Focus tools stay alongside the timer, independent of requirement length. */
+.focus-layout { display: grid; grid-template-columns: minmax(0, 1fr) 208px; gap: 48px; align-items: start; }
+.focus-main { min-width: 0; }
+.focus-tools { position: sticky; top: 24px; padding: 18px 12px; border: 1px solid #e1e4ec; border-radius: 22px; background: #fff; text-align: left; }
+.focus-tools h2 { margin: 0 12px 14px; font-size: 13px; color: #626a7c; letter-spacing: .08em; }
+.focus-tools .tool-dock { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; }
+.focus-tool { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 56px; padding: 10px 14px; border: 1px solid transparent; border-radius: 14px; background: #f6f7fb; color: #242936; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.focus-tool svg { flex: 0 0 26px; width: 26px; height: 26px; color: #3f5cf0; }
+.focus-tool:hover { background: #edf0ff; border-color: #c8d1fc; }
+.focus-tool:active { transform: translateY(1px); }
+.focus-tools #metro-panel { margin: 14px 0 0; padding: 14px 8px; border-radius: 14px; }
+.focus-tools #metro-panel:not([hidden]) { gap: 14px; }
+.focus-tools #metro-panel .button { width: 100%; padding-inline: 8px; }
+.focus-page .focus-top { margin-bottom: 24px; }
+.focus-main .timer-orbit { width: clamp(220px, 36vh, 300px); height: clamp(220px, 36vh, 300px); margin: 24px auto; }
+@media (max-width: 760px) {
+  .focus-layout { display: flex; flex-direction: column; gap: 22px; }
+  .focus-main { width: 100%; }
+  .focus-tools { position: static; order: -1; width: 100%; padding: 10px; border-radius: 18px; }
+  .focus-tools h2 { display: none; }
+  .focus-tools .tool-dock { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .focus-tool { flex-direction: column; justify-content: center; gap: 7px; min-height: 66px; padding: 8px 2px; font-size: 11px; white-space: nowrap; border-radius: 10px; }
+  .focus-tool svg { flex-basis: 23px; width: 23px; height: 23px; }
+  .focus-tools #metro-panel:not([hidden]) { flex-wrap: wrap; }
+  .focus-tools #metro-panel .button { width: auto; }
+  .focus-page .focus-top { margin-bottom: 18px; }
+  .focus-main h1 { margin-top: 0; }
+}
+
+
+/* Direct source actions and learner-confirmed viewing time. */
+.material-hint, .material-row small { color: var(--muted, #61646c); }
+.material-list { display: grid; gap: 10px; margin: 20px 0; }
+.material-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 18px; border: 2px solid #e0e2e9; border-radius: 16px; color: inherit; text-decoration: none; }
+.material-row:hover, .material-row:focus-visible { border-color: #3f5cf0; background: #f5f7ff; }
+.material-row > span:first-child { min-width: 0; }
+.material-row strong, .material-row small { display: block; overflow-wrap: anywhere; }
+.material-row small { margin-top: 5px; font-size: 13px; }
+.material-row > span:last-child { color: #3f5cf0; font-size: 23px; }
+.study-panel { position: relative; max-width: 900px; margin: 0 auto 24px; padding: 22px; border: 2px solid #3f5cf0; border-radius: 20px; background: #fff; }
+.study-panel h2 { margin: 0; font-size: 22px; }
+.study-panel p { color: #61646c; overflow-wrap: anywhere; }
+.study-panel [data-watch-clock] { font-size: 32px; font-variant-numeric: tabular-nums; }
+.study-panel input { max-width: 200px; }
+.study-panel label { display: grid; gap: 8px; margin: 12px 0 18px; }
+.study-actions, .study-totals { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.study-totals { margin-bottom: 24px; padding: 18px 0; border-bottom: 1px solid #e0e2e9; }
+.study-history { margin-top: 24px; }
+.study-error { color: #aa2938 !important; }
+@media (max-width: 600px) { .study-panel { padding: 18px; } .study-actions .button { width: 100%; } }
+/* The main practice surface changes tools while one clock keeps running. */
+#focus-clock[hidden], #focus-tool-content[hidden], #focus-requirements[hidden], #floating-timer[hidden] { display: none !important; }
+.focus-page.has-focus-tool { max-width: 1440px; }
+.has-focus-tool .focus-layout { gap: 28px; }
+#focus-tool-content { min-width: 0; min-height: 420px; margin: 24px 0; padding: 24px; border: 1px solid #e1e5ee; border-radius: 24px; background: #fff; text-align: left; }
+#focus-tool-content:focus { outline: none; }
+#focus-tool-content .in-practice { position: static; width: 100%; height: auto; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; overflow: visible; background: transparent; }
+#focus-tool-content .in-practice:not([open]) { display: none; }
+#focus-tool-content .in-practice[open] { display: block; }
+#focus-tool-content #score-render { max-width: 100%; overflow: auto; }
+#focus-tool-content #score-images img { max-width: 100%; }
+#focus-tool-content .score-heading { position: static; padding-top: 0; background: #fff; }
+#focus-tool-content .score-heading h2, #focus-tool-content h2 { font-size: 22px; }
+#focus-tool-content .score-controls { gap: 10px; padding-block: 16px; }
+#focus-tool-content .position-heading, .embedded-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+#focus-tool-content #metro-panel { margin: 40px auto; }
+#focus-tool-content .tool-return { float: right; margin-left: 16px; }
+.has-focus-tool { padding-bottom: 110px; }
+.has-focus-tool .focus-actions { position: fixed; z-index: 12; bottom: 20px; left: calc(50% - 118px); transform: translateX(-50%); margin: 0; padding: 12px; background: #fffffff5; border: 1px solid #e1e5ee; border-radius: 22px; box-shadow: 0 8px 36px #24315d10; }
+.focus-tool[aria-pressed="true"] { color: #3f5cf0; border-color: #c5ceff; background: #edf0ff; }
+#floating-timer { position: fixed; z-index: 15; display: flex; align-items: center; gap: 12px; min-width: 156px; padding: 12px 16px; border: 1px solid #cbd3ff; border-radius: 22px; box-shadow: 0 4px 0 #243cb5, 0 12px 36px #354cbd20; background: #3f5cf0; color: white; cursor: grab; touch-action: none; user-select: none; text-align: left; }
+#floating-timer:active { cursor: grabbing; }
+#floating-timer small, #floating-timer strong { display: block; }
+#floating-timer small { color: #e5eaff; font-size: 11px; font-weight: 500; }
+#floating-timer strong { color: #fff; font-size: 24px; font-variant-numeric: tabular-nums; letter-spacing: -.6px; line-height: 1.2; }
+#floating-timer[data-running="false"] { background: #f4f5fa; color: #4b526b; box-shadow: 0 4px 0 #d5d8e5, 0 12px 30px #354cbd12; border-color: #d5d8e5; }
+#floating-timer[data-running="false"] small, #floating-timer[data-running="false"] strong { color: #4b526b; }
+.floating-grip { font-size: 22px; opacity: .65; }
+.floating-return { margin-left: auto; font-size: 21px; }
+.tool-melt { position: fixed; z-index: 30; pointer-events: none; background: linear-gradient(130deg, #3f5cf0, #a3b2ff 70%, #ebeeff); box-shadow: 0 0 30px #8294ff55; transform-origin: top left; }
+.tool-melt.clock-melt { background: radial-gradient(circle, #d9e0ff, #7188fa); }
+@media (max-width: 760px) {
+  .has-focus-tool .focus-top { margin-bottom: 92px; }
+  .has-focus-tool .focus-layout { gap: 16px; }
+  .has-focus-tool .focus-actions { left: 50%; bottom: 12px; width: calc(100% - 32px); gap: 10px; }
+  .has-focus-tool .focus-actions button { min-width: 0; flex: 1; }
+  #focus-tool-content { padding: 16px; min-height: 340px; margin: 18px 0; border-radius: 20px; }
+  #focus-tool-content .score-heading, #focus-tool-content .position-heading { align-items: flex-start; flex-wrap: wrap; }
+  #focus-tool-content .score-controls { gap: 8px; }
+  #focus-tool-content .score-controls .button { padding: 9px 10px; font-size: 12px; }
+  #focus-tool-content #tuner-dialog .tuner-heading { gap: 12px; }
+  #focus-tool-content #tuner-dialog .tuner-footer { flex-direction: column; align-items: stretch; }
+  #floating-timer { min-width: 146px; padding: 10px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .tool-melt { display: none; } }

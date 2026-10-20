@@ -1,7 +1,10 @@
+import { beginWatch, stopWatch, watchSeconds, confirmWatch, totalWatchSeconds, parseWatchTime } from './study.js';
+import { readStudy, writeWatch, saveWatch, setWatchDeleted } from './study-store.js';
+import { mountFocusStage, unmountFocusStage, openPracticeTool, returnToClock } from './focus-stage.js';
 import { lessonReview } from "./review-view.js";
 import { teacherPrescription, todayPractice } from "./prescription.js";
 import { FINISH_OUTCOMES, emptyGoals, optionalNumber, resumeGuidance, mergeGoals } from "./guidance.js";
-import { showPositionReference } from "./position-reference.js";
+import { showPositionReference, closePositionReference } from "./position-reference.js";
 import { showScore, pauseScore, closeScore } from "./score-viewer.js";
 import {
   STAGES,
@@ -70,6 +73,7 @@ let course,
   storageError = "",
   lastTrigger,
   saveQueue = Promise.resolve();
+let watches = [], watchDraft = null, watchBusy = false, watchAway = false;
 const metro = new Metronome((beat) =>
   document
     .querySelectorAll(".beat-dot")
@@ -159,7 +163,9 @@ function focus() {
     return `<h1>选择一个练习开始</h1><a class="button primary" href="#practice">返回练习台</a>`;
   const e = entry(draft.entryId),
     a = task(e.id);
-  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><h1>${esc(shortTitle(e))}</h1><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div>${requirements(e)}<div class="tool-dock"><button class="button secondary" data-tuner>调音器</button><button class="button secondary" data-position-reference>把位速查</button><button class="button secondary" data-score="${e.id}">乐谱</button>${!teacherPrescription(a).noMetronome ? button("metronome", "节拍器") : ""}<button class="button secondary" data-material="${e.id}">课程资料</button></div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></section>`;
+  const icon = paths => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+  const toolButton = (attribute, label, paths) => `<button class="focus-tool" ${attribute}>${icon(paths)}<span>${label}</span></button>`;
+  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><div class="focus-layout"><div class="focus-main"><h1>${esc(shortTitle(e))}</h1><div id="focus-clock"><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div></div><div id="focus-tool-content" tabindex="-1" hidden></div><button id="floating-timer" type="button" aria-label="返回主计时，拖动或使用方向键移动" hidden><span class="floating-grip" aria-hidden="true">⠿</span><span><small data-floating-state>练习中</small><strong data-floating-time>${time(draft.elapsedMs/1000)}</strong></span><span class="floating-return" aria-hidden="true">↩</span></button><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div><div id="focus-requirements">${requirements(e)}</div></div><aside class="focus-tools" aria-label="练习工具"><h2>练习工具</h2><div class="tool-dock">${toolButton('data-tuner', '调音器', '<path d="M9 3v8a3 3 0 0 0 6 0V3M12 14v7M7 3v7m10-7v7"/>')}${toolButton('data-position-reference', '把位速查', '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v18m6-18v18M4 9h16M4 15h16"/><circle cx="12" cy="12" r="1"/>')}${toolButton(`data-score="${e.id}"`, '乐谱', '<path d="M9 17V5l11-2v12M9 8l11-2"/><ellipse cx="6" cy="17" rx="3" ry="2"/><ellipse cx="17" cy="15" rx="3" ry="2"/>')}${!teacherPrescription(a).noMetronome ? toolButton('data-action="metronome"', '节拍器', '<path d="M9 3h6l5 18H4L9 3ZM12 16l5-10M8 17h8"/>') : ''}${toolButton(`data-material="${e.id}"`, '课程资料', '<rect x="3" y="5" width="18" height="15" rx="2"/><path d="m10 9 5 3-5 3V9ZM7 2v3m10-3v3"/>')}</div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></aside></div></section>`;
 }
 function history() {
   const all = activeLogs(logs), record = all.find(l=>l.id===route().params.get('session')), days = dailySeconds(logs);
@@ -180,9 +186,9 @@ function history() {
   }`;
 
   const review=lessonReview(logs,course,assignments.items,route().params);
-  if(route().params.has('lesson')) return heading + review;
+  if(route().params.has('lesson')) return heading + review + studyHistory(route().params.get('lesson'));
   const dates=Array.from({length:84},(_,i)=>{const d=new Date();d.setDate(d.getDate()-83+i);return dayKey(d);});
-  return heading + `<div class="stat-grid"><article><strong>${time(seconds())}</strong><span>全部课程累计</span></article><article><strong>${all.length}</strong><span>次练习</span></article><article><strong>${Object.keys(days).length}</strong><span>个练习日</span></article></div>${review}<div class="review-grid"><section class="review-panel"><h2>最近十二周</h2><div class="heatmap">${dates.map(d=>`<button class="heat-cell level-${!days[d]?0:days[d]<300?1:days[d]<900?2:3}" data-day="${d}" aria-label="${d}，练习 ${time(days[d]||0)}" title="${d} · ${time(days[d]||0)}"></button>`).join('')}</div><div class="heat-labels"><span>${dates[0]}</span><span>今天</span></div></section><section class="review-panel"><h2>最近七天</h2>${bars()}</section></div><section class="review-panel"><h2>${filter?esc(filter):'最近练习'}</h2>${filter?'<a href="#history">全部记录</a>':''}${all.filter(l=>!filter||dailySeconds([l])[filter]).map(l=>`<a class="session-row" href="#history?session=${l.id}"><span>${new Date(l.practicedAt).toLocaleString('zh-CN')}<strong>${esc(shortTitle(entry(l.entryId)))}</strong></span><span>${time(l.minutes*60)}${l.bpm?' · '+l.bpm+' BPM':''}${l.outcome?' · '+OUTCOMES[l.outcome]:''}</span></a>`).join('')}</section>`;
+  return heading + `<div class="study-totals" aria-label="学习时长"><span>学习合计 <strong>${time(seconds() + totalWatchSeconds(watches))}</strong></span><span>练习 ${time(seconds())}</span><span>看课 ${time(totalWatchSeconds(watches))}</span></div>` + `<div class="stat-grid"><article><strong>${time(seconds())}</strong><span>全部课程累计</span></article><article><strong>${all.length}</strong><span>次练习</span></article><article><strong>${Object.keys(days).length}</strong><span>个练习日</span></article></div>${review}<div class="review-grid"><section class="review-panel"><h2>最近十二周</h2><div class="heatmap">${dates.map(d=>`<button class="heat-cell level-${!days[d]?0:days[d]<300?1:days[d]<900?2:3}" data-day="${d}" aria-label="${d}，练习 ${time(days[d]||0)}" title="${d} · ${time(days[d]||0)}"></button>`).join('')}</div><div class="heat-labels"><span>${dates[0]}</span><span>今天</span></div></section><section class="review-panel"><h2>最近七天</h2>${bars()}</section></div><section class="review-panel"><h2>${filter?esc(filter):'最近练习'}</h2>${filter?'<a href="#history">全部记录</a>':''}${all.filter(l=>!filter||dailySeconds([l])[filter]).map(l=>`<a class="session-row" href="#history?session=${l.id}"><span>${new Date(l.practicedAt).toLocaleString('zh-CN')}<strong>${esc(shortTitle(entry(l.entryId)))}</strong></span><span>${time(l.minutes*60)}${l.bpm?' · '+l.bpm+' BPM':''}${l.outcome?' · '+OUTCOMES[l.outcome]:''}</span></a>`).join('')}</section>` + studyHistory();
 }
 function catalogLink(changes) {
   const params = new URLSearchParams(route().params);
@@ -241,6 +247,8 @@ function catalog() {
 function render() {
   if (!course) return;
   const { name } = route();
+  unmountFocusStage();
+
   document.body.classList.toggle("is-focusing", name === "focus");
   root.innerHTML =
     name === "finish"
@@ -262,13 +270,23 @@ function render() {
     if (a.dataset.nav === name) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   });
+  renderStudyPanel();
   updateClock();
+  if (name === "focus") { mountFocusStage();  }
 }
 function updateClock() {
+  const watchClock = root.querySelector("[data-watch-clock]");
+  if (watchClock && watchDraft) watchClock.textContent = time(watchSeconds(watchDraft));
   document.querySelectorAll('[data-daily-progress]').forEach(node=>{
     const e=entry(node.dataset.dailyProgress);if(e)node.innerHTML=dailyProgress(e);
   });
   if (!draft) return;
+  const floatingValue = document.querySelector('[data-floating-time]');
+  if (floatingValue) floatingValue.textContent = time(draft.elapsedMs / 1000);
+  const floatingState = document.querySelector('[data-floating-state]');
+  if (floatingState) floatingState.textContent = draft.running ? '练习中' : '已暂停';
+  const floating = document.querySelector('#floating-timer');
+  if (floating) floating.dataset.running = String(draft.running);
   const timer = document.querySelector("#timer-value");
   if (timer) timer.textContent = time(draft.elapsedMs / 1000);
   const status = document.querySelector("#timer-state");
@@ -312,6 +330,8 @@ async function claimSession(id, expectedId = null) {
         .catch(reject),
     );
     try {
+      const study = await readStudy(db);
+      if (study.draft) { watchDraft = study.draft; renderStudyPanel(); throw Error('请先确认或不计入这次看课时间'); }
       const saved = await readDraft(db);
       if (expectedId && saved?.id !== expectedId)
         throw new Error("这次练习已在另一窗口结束，请刷新查看");
@@ -326,6 +346,8 @@ async function claimSession(id, expectedId = null) {
   }
 }
 async function start(id, resume = false) {
+  const alreadyFocusing = route().name === 'focus' && !!document.querySelector('#focus-clock');
+  if (watchDraft) throw Error('请先确认或不计入这次看课时间，再继续练习');
   await claimSession(id);
   if (draft.finishing && !resume) { location.hash = "finish"; render(); return; }
   draft.finishing = false;
@@ -338,34 +360,113 @@ async function start(id, resume = false) {
     throw e;
   }
   location.hash = "focus";
-  render();
+  if (alreadyFocusing) updateClock(); else render();
 }
 function openModal(html) {
   lastTrigger = document.activeElement;
   modal.innerHTML = `<button class="dialog-close button secondary" data-action="close">关闭</button>${html}`;
   modal.showModal();
 }
-function materials(id) {
+function materials(id, host = null) {
   const e = entry(id),
     a = task(id);
-  const items = [e, ...relatedEntries(course, e)];
-  openModal(
-    `<h2 id="record-title">课程资料</h2><label>选择视频<select id="material-select">${items.map((v) => `<option value="${v.id}">${KINDS[v.kind]} · P${v.page} · ${esc(shortTitle(v))}</option>`).join("")}${a ? `<option value="source">本课练习要求 · ${time(a.evidence.from)}</option>` : ""}</select></label><a id="video-launch" class="button primary wide" href="${esc(videoUrl(course, e))}" target="_blank" rel="noopener noreferrer">打开视频</a>`,
+  const row = (v, label, start) => `<a ${v.id === e.id && start === undefined ? 'id="video-launch"' : ''} class="material-row" data-watch="${v.id}" href="${esc(videoUrl(course, v, start))}" target="_blank" rel="noopener noreferrer"><span><strong>${esc(label)}</strong><small>P${String(v.page).padStart(3, '0')} · ${esc(shortTitle(v))}${start === undefined ? '' : ` · ${time(start)}`}${v.legacy ? ' · 旧版' : ''}</small></span><span aria-hidden="true">↗</span></a>`;
+  const related = relatedEntries(course, e);
+  const show = host ? html => { host.innerHTML = `<button class="button secondary tool-return" data-action="return-clock">返回计时</button>${html}`; } : openModal;
+  show(
+    `<h2 id="record-title">课程资料</h2><p class="material-hint">点击直接打开。看课单独计时，返回后确认。</p><div class="material-list">${row(e, e.kind === 'lesson' ? '老师讲解' : KINDS[e.kind])}${a?.evidence ? row(e, '本课练习要求', a.evidence.from) : ''}</div>${related.length ? `<h3>示范与练习素材</h3><div class="material-list">${related.map(v => row(v, KINDS[v.kind])).join('')}</div>` : ''}${!db ? '<p>本地存储暂不可用，仍可打开视频，本次不记录看课时间。</p>' : ''}`,
   );
-  modal.dataset.entry = id;
+}
+function showPracticeReference(trigger) {
+  return openPracticeTool('position', trigger, host => showPositionReference({host, onClose:returnToClock}), closePositionReference);
+}
+function showPracticeMaterials(id, trigger) {
+  return openPracticeTool('materials', trigger, host => materials(id,host));
+}
+function studyPanel() {
+  if (!watchDraft) return '';
+  const stopped = watchDraft.endedAt !== null, elapsed = watchSeconds(watchDraft);
+  return `<section class="study-panel" aria-label="看课计时"><div><h2>${stopped ? '确认这次看课时间' : '看课计时中'}</h2><p>${esc(shortTitle(entry(watchDraft.entryId)))}</p><strong data-watch-clock role="timer" aria-label="看课时间">${time(elapsed)}</strong></div>${stopped ? `<form id="watch-form"><p>${watchDraft.interrupted ? '这是中断前至本次返回的间隔，休息或离开时间请扣除。' : '视频在外部页面播放，暂停或离开时间请扣除。'}</p><label>实际看课时长（分:秒）<input name="watchDuration" type="text" pattern="[0-9]{1,4}:[0-5][0-9]" value="${time(Math.min(86400, elapsed))}" required></label><p class="study-error" role="alert"></p><div class="study-actions"><button class="button primary" type="submit">保存看课时间</button><button class="button secondary" type="button" data-action="watch-discard">不计入</button></div></form>` : `<p>看课时间会单独保存，返回后可调整。</p>${button('watch-stop', '结束看课计时')}`}</section>`;
+}
+function renderStudyPanel() {
+  root.querySelector('.study-panel')?.remove();
+  root.insertAdjacentHTML('afterbegin', studyPanel());
+}
+function studyHistory(id) {
+  const records = watches.filter(r => !r.deletedAt && (!id || r.entryId === id)).sort((a,b) => b.startedAt - a.startedAt);
+  return `<section class="review-panel study-history"><h2>看课时间</h2><p>累计 <strong>${time(totalWatchSeconds(watches, id))}</strong> · 单独记录</p>${records.length ? records.map(r => `<div class="session-row"><span>${new Date(r.startedAt).toLocaleString('zh-CN')}<strong>P${entry(r.entryId).page} · ${esc(shortTitle(entry(r.entryId)))}</strong></span><span>${time(r.seconds)}</span></div>`).join('') : '<p>暂无看课记录</p>'}</section>`;
+}
+async function acquireActivity() {
+  if (!db) throw Error(storageError || '本地记录暂不可用');
+  if (release) return;
+  if (!navigator.locks) throw Error('请使用支持安全计时的新版浏览器');
+  await new Promise((resolve, reject) => {
+    navigator.locks.request('eguitar-focus', { ifAvailable: true }, async lock => {
+      if (!lock) { reject(Error('另一标签页正在使用练习，请先在那里结束或关闭')); return; }
+      await new Promise(done => { release = done; resolve(); });
+    }).catch(reject);
+  });
+}
+function releaseWatchActivity() { if (!draft) { release?.(); release = null; } }
+async function endWatch(interrupted = false) {
+  if (!watchDraft || watchDraft.endedAt !== null || watchBusy) return;
+  watchBusy = true;
+  try {
+    await acquireActivity();
+    const stored = await readStudy(db);
+    if (JSON.stringify(stored.draft) !== JSON.stringify(watchDraft)) {
+      watchDraft = stored.draft; watches = stored.records;
+      if (!watchDraft) releaseWatchActivity();
+      renderStudyPanel(); return;
+    }
+    const next = { ...stopWatch(watchDraft), interrupted };
+    await writeWatch(db, next, watchDraft);
+    watchDraft = next; watchAway = false;
+    if (draft && !draft.running) draft.reason = '看课已结束，练习已暂停';
+    renderStudyPanel();
+    updateClock();
+  } finally { watchBusy = false; }
+}
+async function launchMaterial(el) {
+  if (watchBusy) return;
+  if (watchDraft) { notice('请先确认或不计入上次看课时间'); modal.close(); renderStudyPanel(); return; }
+  const video = window.open('about:blank', '_blank');
+  if (!video) throw Error('视频未能打开，请允许此网站弹出新标签页后重试');
+  video.opener = null;
+  watchBusy = true;
+  try {
+    await pause('正在看课，练习计时已暂停');
+    if (db && navigator.locks) {
+      await acquireActivity();
+      const next = beginWatch(el.dataset.watch);
+      await writeWatch(db, next, null);
+      watchDraft = next;
+      watchAway = document.hidden || !document.hasFocus();
+    }
+    else notice('当前无法保存看课计时，本次仅打开视频');
+    video.location.replace(el.href);
+    modal.close(); renderStudyPanel();
+  } catch (error) { video.close(); releaseWatchActivity(); throw error; }
+  finally { watchBusy = false; }
 }
 async function manage() {
   logs = await allLogs(db);
+  watches = (await readStudy(db)).records;
   openModal(
     `<h2 id="record-title">备份与管理</h2><p>记录保存在当前浏览器。</p>${button("export", "导出备份")}<label class="import-control">导入备份<input id="import" type="file" accept="application/json"></label><div id="import-preview"></div><h3>记录管理</h3>${logs.map((l) => `<div class="manage-row"><span>${esc(shortTitle(entry(l.entryId)))} · ${time(l.minutes * 60)}</span><button class="button secondary" data-delete="${l.id}">${l.deletedAt ? "恢复" : "删除"}</button></div>`).join("")}`,
   );
+  modal.insertAdjacentHTML('beforeend', `<h3>看课记录管理</h3>${watches.map(r => `<div class="manage-row"><span>${esc(shortTitle(entry(r.entryId)))} · ${time(r.seconds)}</span><button class="button secondary" data-watch-delete="${r.id}">${r.deletedAt ? '恢复' : '删除'}</button></div>`).join('')}`);
 }
 let pendingImport = null;
 document.addEventListener("click", async (ev) => {
   const el = ev.target.closest("button,a");
   if (!el) return;
   try {
-    if (el.id === "video-launch") await pause("查看资料，计时已暂停");
+    if (el.dataset.watch && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey && !ev.altKey) {
+      ev.preventDefault();
+      await launchMaterial(el);
+      return;
+    }
     if (el.dataset.start) {
       if (busy) return;
       busy = true;
@@ -376,22 +477,34 @@ document.addEventListener("click", async (ev) => {
       }
       return;
     }
-    if (el.hasAttribute("data-position-reference")) showPositionReference();
+    if (el.hasAttribute("data-position-reference")) {
+      if (!showPracticeReference(el)) showPositionReference();
+    }
     if (el.hasAttribute("data-tuner")) {
+
       await pause("调音中，计时已暂停");
-      showTuner();
+      if (!openPracticeTool('tuner', el, host => showTuner({host, onClose:returnToClock}), closeTuner)) showTuner();
       return;
     }
     if (el.dataset.editResult) {
       const l=logs.find(l=>l.id===el.dataset.editResult);
       openModal(`<h2 id="record-title">修改本次结果</h2><form id="result-form" data-log="${l.id}" data-updated="${l.updatedAt}"><label>实际稳定 BPM · 选填<input name="bpm" type="number" min="1" max="400" value="${l.bpm ?? ''}"></label><label>熟练程度<select name="outcome"><option value="">未确认</option>${Object.entries(OUTCOMES).map(([k,v])=>`<option value="${k}" ${l.outcome===k?'selected':''}>${v}</option>`).join('')}</select></label><p id="result-error" role="alert"></p><button class="button primary" type="submit">保存修改</button></form>`);
     }
+    if (el.dataset.watchDelete) {
+      const record = watches.find(r => r.id === el.dataset.watchDelete);
+      await setWatchDeleted(db, { ...record, deletedAt: record.deletedAt ? null : new Date().toISOString() }, record.deletedAt);
+      modal.close(); await manage(); render(); return;
+    }
     if (el.dataset.goals) await goalForm(el.dataset.goals);
-    if (el.dataset.material) materials(el.dataset.material);
+    if (el.dataset.material && !showPracticeMaterials(el.dataset.material,el)) materials(el.dataset.material);
     if (el.dataset.score) {
       sampleClock();
       metro.stop();
-      await showScore(el.dataset.score, shortTitle(entry(el.dataset.score)));
+      const show = host => showScore(el.dataset.score, shortTitle(entry(el.dataset.score)), {
+        host, onClose:returnToClock,
+        onPosition:() => showPracticeReference(document.querySelector('[data-position-reference]')),
+      });
+      if (!openPracticeTool('score', el, show, closeScore)) await showScore(el.dataset.score, shortTitle(entry(el.dataset.score)));
     }
     if (el.dataset.day) location.hash = `history?day=${el.dataset.day}`;
     if (el.dataset.outcome) {
@@ -427,6 +540,16 @@ document.addEventListener("click", async (ev) => {
       render();
     }
     switch (el.dataset.action) {
+      case 'return-clock': returnToClock(); break;
+      case 'watch-stop': await endWatch(); break;
+      case 'watch-discard':
+        if (watchBusy) break;
+        watchBusy = true;
+        try {
+          await acquireActivity(); await writeWatch(db, null, watchDraft);
+          watchDraft = null; releaseWatchActivity(); renderStudyPanel();
+        } finally { watchBusy = false; }
+        break;
       case "retry-storage":
         if (connectionAttempt)
           notice("仍在等待其他旧版标签页关闭，关闭后会自动恢复。");
@@ -440,6 +563,7 @@ document.addEventListener("click", async (ev) => {
         else await start(draft.entryId);
         break;
       case "finish":
+
         if (busy) break;
         busy = true;
         try {
@@ -458,8 +582,13 @@ document.addEventListener("click", async (ev) => {
         await start(draft.entryId, true);
         break;
       case "metronome":
-        document.querySelector("#metro-panel").hidden =
-          !document.querySelector("#metro-panel").hidden;
+        {
+          const panel = document.querySelector('#metro-panel'), home = panel.parentElement;
+          if (!openPracticeTool('metronome', el, host => {
+            host.innerHTML = '<header class="embedded-heading"><h2>节拍器</h2><button class="button secondary" data-action="return-clock">返回计时</button></header>';
+            host.append(panel); panel.hidden=false;
+          }, () => { home.append(panel); panel.hidden=true; })) panel.hidden = !panel.hidden;
+        }
         break;
       case "metro-toggle":
         if (metro.running) {
@@ -482,11 +611,13 @@ document.addEventListener("click", async (ev) => {
       case "export": {
         logs = await allLogs(db);
         goals = await readGoals(db);
+        watches = (await readStudy(db)).records;
         const blob = new Blob(
           [
             JSON.stringify(
               {
-                schemaVersion: 2,
+                schemaVersion: 3,
+                watches,
                 goals,
                 app: "EGuitarOmitrix",
                 exportedAt: new Date().toISOString(),
@@ -507,7 +638,8 @@ document.addEventListener("click", async (ev) => {
         break;
       }
       case "import-confirm":
-        await importLogs(db, pendingImport.logs, pendingImport.goals);
+        await importLogs(db, pendingImport.logs, pendingImport.goals, pendingImport.watches);
+        watches = (await readStudy(db)).records;
         goals = await readGoals(db);
         pendingImport = null;
         logs = await allLogs(db);
@@ -538,15 +670,6 @@ document.addEventListener("change", async (ev) => {
       document.querySelector('[data-action="metro-toggle"]').textContent =
         "播放节拍";
     }
-    if (ev.target.id === "material-select") {
-      const e = entry(modal.dataset.entry),
-        a = task(e.id);
-      const href =
-        ev.target.value === "source"
-          ? `${videoUrl(course, e)}&t=${Math.floor(a.evidence.from)}`
-          : videoUrl(course, entry(ev.target.value));
-      document.querySelector("#video-launch").href = href;
-    }
     if (ev.target.id === "import") {
       pendingImport = null;
       const file = ev.target.files[0];
@@ -558,16 +681,29 @@ document.addEventListener("change", async (ev) => {
         new Set(course.entries.map((e) => e.id)),
       );
       const preview = mergePreview(await allLogs(db), incoming);
-      mergeGoals(await readGoals(db), backup.schemaVersion === 2 ? backup.goals : null);
-      pendingImport = {logs:incoming, goals:backup.schemaVersion === 2 ? backup.goals : null};
+      mergeGoals(await readGoals(db), backup.schemaVersion >= 2 ? backup.goals : null);
+      const incomingWatches = backup.schemaVersion === 3 ? backup.watches : [];
+      const watchPreview = mergePreview((await readStudy(db)).records, incomingWatches);
+      pendingImport = {logs:incoming, goals:backup.schemaVersion >= 2 ? backup.goals : null, watches:incomingWatches};
       document.querySelector("#import-preview").innerHTML =
-        `<p>新增 ${preview.additions.length} 条，跳过 ${preview.duplicates} 条重复记录。</p>${button("import-confirm", "确认导入")}`;
+        `<p>新增 ${preview.additions.length} 条练习、${watchPreview.additions.length} 条看课，跳过 ${preview.duplicates + watchPreview.duplicates} 条重复记录。</p>${button("import-confirm", "确认导入")}`;
     }
   } catch (e) {
     notice(e.message);
   }
 });
 document.addEventListener("submit", async (e) => {
+  if (e.target.id === 'watch-form') {
+    e.preventDefault(); if (watchBusy) return; watchBusy = true;
+    try {
+      await acquireActivity();
+      const record = confirmWatch(watchDraft, parseWatchTime(new FormData(e.target).get('watchDuration')));
+      await saveWatch(db, record, watchDraft);
+      watchDraft = null; watches = [...watches, record];
+      releaseWatchActivity(); render(); notice('看课时间已单独保存');
+    } catch (error) { e.target.querySelector('.study-error').textContent = error.message; }
+    finally { watchBusy = false; }
+  }
   if(e.target.id==='result-form') {
     e.preventDefault();if(busy)return;busy=true;
     try {
@@ -614,8 +750,10 @@ modal.addEventListener(
   () => lastTrigger?.isConnected && lastTrigger.focus(),
 );
 window.addEventListener("hashchange", async () => {
+
   closeTuner();
   closeScore();
+  try { await endWatch(); } catch (e) { notice(e.message); }
   if (route().name !== "focus") {
     try {
       await pause();
@@ -628,17 +766,24 @@ window.addEventListener("hashchange", async () => {
   window.scrollTo(0, 0);
 });
 document.addEventListener("visibilitychange", () => {
+  if (document.hidden && watchDraft?.endedAt === null) watchAway = true;
+  if (!document.hidden && watchAway) endWatch().catch(e => notice(e.message));
   if (document.hidden)
     pause("离开页面，计时已暂停").catch((e) => notice(e.message));
   else if (db && !release)
-    Promise.all([allLogs(db), readDraft(db), readGoals(db)])
-      .then(([l, d, g]) => {
+    Promise.all([allLogs(db), readDraft(db), readGoals(db), readStudy(db)])
+      .then(([l, d, g, study]) => {
+        watches = study.records; watchDraft = study.draft;
         goals = g;
         logs = l;
         draft = d ? recoverSession(d) : null;
         render();
       })
       .catch((e) => notice(e.message));
+});
+window.addEventListener('blur', () => { if (watchDraft?.endedAt === null) watchAway = true; });
+window.addEventListener('focus', () => {
+  if (watchAway && !document.hidden) endWatch().catch(e => notice(e.message));
 });
 window.addEventListener("pagehide", () => {
   pause().catch(() => {});
@@ -677,6 +822,8 @@ function connectStorage() {
       const savedLogs = await allLogs(connection);
       const savedDraft = await readDraft(connection);
       goals = await readGoals(connection);
+      const study = await readStudy(connection);
+      watches = study.records; watchDraft = study.draft;
       db = connection;
       logs = savedLogs;
       draft = savedDraft ? recoverSession(savedDraft) : null;
@@ -690,6 +837,9 @@ function connectStorage() {
     } finally {
       connectionAttempt = null;
       render();
+    }
+    if (watchDraft?.endedAt === null) {
+      try { await endWatch(true); } catch (e) { notice(e.message); }
     }
   })();
   return connectionAttempt;

@@ -30,11 +30,12 @@ try {
     await page.locator('[data-score]').click();
     await page.locator('#score-position').click();
     await page.keyboard.press('Escape');
-    assert.equal(await page.locator('#score-dialog').evaluate(e=>e.open),true);
-    assert.equal(await page.locator('#score-position').evaluate(e=>e===document.activeElement),true);
+    assert.equal(await page.locator('#focus-clock').isVisible(),true);
+    assert.equal(await page.locator('dialog:modal').count(),0);
+    assert.equal(await page.locator('[data-position-reference]').evaluate(e=>e===document.activeElement),true);
     await page.screenshot({path:`/tmp/position-reference-${width}.png`});
     assert.deepEqual(errors,[]);
     await context.close();
   }
-  console.log('Position reference: desktop/tablet/mobile, switching, labels, timer and nested-dialog focus passed.');
+  console.log('Position reference: desktop/tablet/mobile, switching, labels, continuous timer and central-stage focus passed.');
 } finally { await browser.close(); }

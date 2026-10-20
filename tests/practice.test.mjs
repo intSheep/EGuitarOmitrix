@@ -15,7 +15,7 @@ test('resume uses actual practice date, excludes deleted records, and keeps cour
 test('backup validation rejects future schemas, duplicate ids and foreign lessons before merge',()=>{
   const backup={app:'EGuitarOmitrix',schemaVersion:1,logs:[log()]};
   assert.equal(validateBackup(backup,new Set(['123'])).length,1);
-  assert.throws(()=>validateBackup({...backup,schemaVersion:3},new Set(['123'])));
+  assert.throws(()=>validateBackup({...backup,schemaVersion:4},new Set(['123'])));
   assert.throws(()=>validateBackup({...backup,logs:[log(),log()]},new Set(['123'])));
   assert.throws(()=>validateBackup(backup,new Set(['456'])));
 });

@@ -155,3 +155,36 @@ Limits: synthetic capture is not validation of a physical guitar, Windows microp
 The owner's latest direction replaces both the toy-like vertical SVG and the interim photographic material style. The final generated illustration uses the app's white/grey, charcoal and royal-blue palette, conventional horizontal guitar proportions and 3+3 tuning machines. The selected RGBA asset is local to the app; its exact generation/edit prompts are documented. Manual string/mode controls are removed. The status row only indicates the nearest detected open-string target.
 
 `npm test` passed all 44 checks after removing the manual target API. Browser acceptance additionally exercises each of six standard strings at −25 and +25 cents with synthetic oscillators through WebAudio, asserting the automatically selected target and the actual UI instruction: tighten when flat, loosen when sharp. The existing real Chromium synthetic-WAV capture, permissions, device switching and capture cleanup checks remain in the same script. Final illustration screenshots at 1440/768/390 px verify horizontal layout, image load, noninteractive status labels and no horizontal overflow. No physical hardware accuracy claim is added.
+
+## Immersive tools and separate lesson viewing — 2026-10-20, issue #41
+
+Requirements FR-005/010/013/015/017/020/021/022. The focused review copy is based
+on `f927b96`; unrelated tuner feedback, ambience, count-in and saved-summary work
+remain outside this PR. The working checkout retains those existing changes.
+
+- All 48 unit/integration tests in the focused copy passed. New viewing tests cover
+  background elapsed time, stop/confirmation bounds, invalid time, independent
+  totals/deletion, backup versions, source identity and conflicting records.
+- `verify-focus-stage.mjs` passed at 1440/768/390 px with synthetic MusicXML through
+  the real alphaTab renderer/player: score and reference in the central region,
+  visible floating clock, observed timer increases, same route, explicit pause,
+  metronome/material switching, tuner pause, dragging versus click, keyboard
+  movement, native touch dragging, viewport clamping, Escape and reduced motion. No modal is opened for
+  an in-practice tool. Actual desktop and phone screenshots were inspected.
+- `verify-study.mjs` passed with intercepted synthetic external pages: direct
+  page/CID/timestamp links, background interval independent of paused practice,
+  return confirmation and adjustment, atomic save failure/retry, cross-tab lock,
+  export/import, conflicting-import rollback, deletion/restore, interrupted
+  recovery/discard and blocked-popup handling. No personal storage was accessed.
+- Existing practice, position-reference, catalog and storage-recovery browser
+  suites passed against the focused copy. This includes legacy v1 migration,
+  blocked upgrade recovery, old backup support and foreground/sleep safeguards.
+- The existing tuner suite passed against the working checkout with synthetic
+  capture, including microphone/audio cleanup on close, navigation/background and
+  late permission grants. Tuning continues to create no practice evidence.
+- Production build and whitespace checks passed locally. No CI was triggered.
+
+Limits: external Bilibili playback/pause cannot be observed; viewing is a
+learner-confirmed interval, with gaps explicitly reviewable. No real video watch,
+physical guitar/input hardware or native GP8 acceptance is claimed. The new Stitch
+generation timed out; no usable generated central-tool screen was returned.
