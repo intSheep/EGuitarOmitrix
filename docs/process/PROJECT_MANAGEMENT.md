@@ -1,6 +1,6 @@
 # Project management
 
-Agreed with the owner on 2026-10-18: GitHub Issues + Milestones + pull requests, with PRD requirement IDs linked to acceptance criteria.
+Owner refinement on 2026-10-20: use focused pull requests for reviewable changes. GitHub Issues and Milestones track work that needs independent planning or follow-up; an issue is not a prerequisite for every change. This supersedes the original one-issue-per-change convention. Link applicable PRD requirement IDs to acceptance criteria.
 
 ## Sources of truth
 
@@ -8,7 +8,7 @@ Agreed with the owner on 2026-10-18: GitHub Issues + Milestones + pull requests,
 | --- | --- |
 | Product scope | `docs/product/PRD.md` |
 | Dated feasibility findings | `docs/research/` and `docs/product/source-assessment.md` |
-| Work status and dependencies | GitHub Issues and Milestones |
+| Work status and dependencies | Pull requests; GitHub Issues and Milestones for independently tracked work |
 | Design exploration | Stitch, with references in `docs/design/` |
 | Engineering decisions | Future ADRs in `docs/decisions/` |
 | Code and accepted document revisions | Git history and reviewed PRs |
@@ -18,7 +18,17 @@ Use this small workflow rather than a separate task system unless the owner requ
 
 ## Issues
 
-Each issue states:
+Choose the lightest sufficient record:
+
+| Situation | Action |
+| --- | --- |
+| A bounded, authorized fix, polish, refactor, test or documentation update can be completed and verified in the current task | Implement it directly and describe the problem, result and actual validation in the PR. No new issue or milestone is required. |
+| The change or a related small problem belongs to an existing issue or PR | Continue that work and update its scope and evidence when needed. Do not create a separate issue for each discovery or implementation step. |
+| Work needs independent prioritization, a product/design decision, coordination across PRs, or deferred follow-up | Reuse a suitable issue or create one focused on that independently tracked outcome. |
+
+The owner's request can supply the scope for a direct fix. Do not ask the owner to file an issue before starting, invent an issue number for a branch, or create a retrospective issue merely to document a completed small fix. Judge the need for an issue by independent tracking needs, not a line-count or time threshold. An unrelated observation can be noted briefly in the PR or final response; it does not automatically require a new issue or authorize expanding the task.
+
+When an issue is warranted, it states:
 
 - The user-visible problem or research question.
 - Linked requirement IDs, scope, and explicit exclusions.
@@ -33,20 +43,21 @@ Issue creation or milestone placement is planning, not authorization to implemen
 ## Branches and pull requests
 
 - Default branch: `main`.
-- Use `docs/<topic>`, `feat/<issue>-<topic>`, `fix/<issue>-<topic>`, or `research/<issue>-<topic>`.
+- Use `codex/<topic>` by default. Existing `docs/<topic>`, `feat/<issue>-<topic>`, `fix/<issue>-<topic>` and `research/<issue>-<topic>` branches can continue. An issue number is optional; never create an issue just to name a branch.
 - Keep PRs reviewable; describe resulting behavior or findings, the evidence, and remaining limits.
-- Link `Refs #N` while review/acceptance remains open; use `Closes #N` only when the PR satisfies the full issue.
+- For direct fixes, the PR's problem/result and validation are sufficient; link applicable requirements and omit irrelevant issue/milestone fields. Do not split related small corrections into separate PRs solely to satisfy a one-change rule.
+- When an issue exists, link `Refs #N` while review/acceptance remains open; use `Closes #N` only when the PR satisfies the full issue.
 - Use draft PRs when scope/design or evidence still needs review.
 - Do not merge a requirements draft as a substitute for owner scope review.
 - Record implementation choices in ADRs when they affect storage, content ownership, deployment, or score interoperability.
 
 ## Definition of ready
 
-Requirement IDs, acceptance criteria, source inputs, and dependencies are clear. A design task has a Stitch brief. A feature that began as research has an explicit decision to implement. Unknowns that could change the design are bounded or recorded as a spike.
+The authorized problem, intended result and appropriate verification are clear. For a direct fix, this can be established by the owner's request and current code; an issue, new requirement or milestone is not required. Larger work identifies applicable requirement IDs, acceptance criteria, source inputs and dependencies. A design task has a Stitch brief. A feature that began as research has an explicit decision to implement. Unknowns that could change the design are bounded or recorded as a spike.
 
 ## Definition of done
 
-The issue's actual deliverable exists; acceptance is supported by appropriate evidence; relevant docs are updated; no secrets or course/personal payloads are committed; review is complete. A research issue can be done with a sourced conclusion and stated unknowns. That does not make the investigated feature done.
+The requested deliverable exists; acceptance is supported by appropriate evidence; relevant docs are updated; no secrets or course/personal payloads are committed; review is complete. An issue is updated only when one is involved. A research issue can be done with a sourced conclusion and stated unknowns. That does not make the investigated feature done.
 
 Documentation checks cover links, requirement traceability, source-backed claims, and whitespace. Application changes also require meaningful unit checks and browser verification appropriate to the scope. Record actual evidence and limits in `docs/engineering/validation.md`; a local build is not a deployment.
 
