@@ -1,4 +1,5 @@
 import { showPositionReference } from "./position-reference.js";
+import { saveFile } from "./file-export.js";
 import { COUNT_IN_KEY, ScoreCountIn, countInTiming } from "./score-count-in.js";
 let sdk,
   api,
@@ -42,12 +43,7 @@ export function closeScore() {
   dispose();
 }
 function download(bytes, name, type) {
-  const u = URL.createObjectURL(new Blob([bytes], { type }));
-  urls.push(u);
-  const a = document.createElement("a");
-  a.href = u;
-  a.download = name;
-  a.click();
+  return saveFile(new Blob([bytes], { type }), name);
 }
 export async function showScore(entryId, title, { host = null, onClose = null, onPosition = null } = {}) {
   if (!dialog) {
@@ -78,6 +74,8 @@ export async function showScore(entryId, title, { host = null, onClose = null, o
       notation: { elements: { scoreTitle: false } },
       player: {
         enablePlayer: true,
+        // alphaTab 1.8.4's asynchronous worklet startup can race native background/close.
+        outputMode: sdk.PlayerOutputMode.WebAudioScriptProcessor,
         soundFont: "./vendor/alphatab/soundfont/sonivox.sf2",
         scrollElement: dialog,
       },
@@ -205,9 +203,9 @@ export async function showScore(entryId, title, { host = null, onClose = null, o
       }
       player.playbackSpeed = rate ? bpm / 100 : bpm / player.score.tempo;
     };
-    dialog.querySelector("#score-gp").onclick = () => {
+    dialog.querySelector("#score-gp").onclick = async () => {
       try {
-        download(
+        await download(
           gpBytes || new sdk.exporter.Gp7Exporter().export(player.score),
           "practice.gp",
           "application/octet-stream",
@@ -216,12 +214,13 @@ export async function showScore(entryId, title, { host = null, onClose = null, o
         status.textContent = "导出失败：" + e.message;
       }
     };
-    dialog.querySelector("#score-xml").onclick = () =>
-      download(
+    dialog.querySelector("#score-xml").onclick = async () => {
+      try { await download(
         xmlBytes,
         "practice.musicxml",
         "application/vnd.recordare.musicxml+xml",
-      );
+      ); } catch(e) { status.textContent = '导出失败：' + e.message; }
+    };
     dialog.querySelector("#score-source").onclick = () => {
       const images = dialog.querySelector("#score-images");
       images.hidden = !images.hidden;

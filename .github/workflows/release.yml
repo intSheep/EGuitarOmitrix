@@ -1,0 +1,68 @@
+name: Draft application release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing vMAJOR.MINOR.PATCH tag on main; creates a draft prerelease only
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: draft-release-${{ inputs.tag }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+      - run: npm run release:check -- "$RELEASE_TAG"
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+  build:
+    needs: validate
+    uses: ./.github/workflows/app-build.yml
+    with:
+      ref: ${{ inputs.tag }}
+      retention-days: 90
+  draft:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: windows-*
+          path: artifacts/windows
+          merge-multiple: true
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: android-*
+          path: artifacts/android
+          merge-multiple: true
+      - name: Prepare release notes
+        run: |
+          cat > notes.md <<'EOF'
+          Private pilot build. Windows installer is unsigned; Android APK is debug-signed for testing only.
+
+          Export a practice backup before upgrading. Android CI debug keys can differ between runs: back up before replacing an earlier APK. Production Android distribution requires a stable signing key.
+
+          Bundled course scores/videos and learner records are excluded. Load your own local scores in the viewer. Browser, desktop and phone profiles are separate; use backup export/import for transfer. No cloud sync or automatic updates.
+
+          See platform manifests for source commit, version and SHA-256 checksums. Native device/audio acceptance remains required before publishing. This workflow creates a draft prerelease; publication is manual.
+          EOF
+      - name: Create private draft prerelease
+        run: gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --prerelease --title "EGuitarOmitrix $RELEASE_TAG pilot" --notes-file notes.md artifacts/windows/* artifacts/android/*
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}

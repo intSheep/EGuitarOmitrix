@@ -1,7 +1,7 @@
 # Product Requirements Document — EGuitarOmitrix
 
-- Version: 0.6
-- Date: 2026-10-18, Asia/Shanghai
+- Version: 0.7
+- Date: 2026-10-20, Asia/Shanghai
 - Status: Immersive timed practice and effort review authorized; automatic planning remains deferred
 - Owner: intSheep
 - Delivery: Private repository; GitHub Issues + Milestones + pull requests
@@ -333,6 +333,14 @@ Acceptance uses synthetic signal tests for all six strings, detuning, common sam
 
 
 Owner refinement for FR-020: replace the rejected toy-like vertical vector with a theme-matched horizontal electric-guitar illustration of conventional full-size proportions, headstock left and body right, with three tuning machines on each side. The string row is a noninteractive detection indicator. Plucking near an open-string pitch automatically identifies the nearest target and gives direct physical guidance: a flat note requires increasing tension (tighten), a sharp note requires reducing tension (loosen). Do not prescribe clockwise/counterclockwise rotation without knowing the instrument's winding. Report “near string” rather than claiming acoustic input establishes the exact physical string/fret used. Preserve the original secure-context, capture lifecycle and no-recording boundaries.
+
+## Installable application and CI authorization — 2026-10-20
+
+FR-023 (P1, issue #40): the owner authorizes a repeatable CI packaging process and an installable application, prioritizing Windows and including an Android test build. Reuse the existing approved workspace. Deliver a bundled offline Windows x64 application/installer, an Android shell/test APK and a sanitized shared web distribution. Preserve local records, JSON backup/merge semantics, explicit microphone control, and foreground-only practice accounting. Backgrounding stops capture/playback and pauses practice; tuning and score playback do not become proficiency evidence.
+
+Acceptance: PR/main checks validate locked dependencies, unit tests, responsive browser behavior and the actual desktop shell before platform packaging. Installable artifacts identify their version/source commit and have SHA-256 checksums. Course scores/media, credentials and learner records are excluded. Version tags are validated before a manual draft prerelease; ordinary CI never publishes. Initial Windows packages are unsigned and Android packages are debug-signed test builds. Production signing, store distribution, automatic updates, Windows ARM64, iOS and cloud sync are deferred. Native installation/upgrade and physical-device acceptance are reported separately from compilation.
+
+This authorization supersedes the earlier offline-delivery deferral for the bounded native app shell; it does not authorize a browser service worker or a hosted service. Browser/native/device profiles remain separate and records transfer through explicit backup import. See [ADR 0006](../decisions/0006-native-app-packaging.md), [release procedure](../engineering/releases.md) and [packaging verification](../engineering/app-packaging-validation.md).
 
 ## 17. Direct materials and separate viewing time (2026-10-20)
 

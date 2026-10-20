@@ -2,6 +2,7 @@ import { beginWatch, stopWatch, watchSeconds, confirmWatch, totalWatchSeconds, p
 import { readStudy, writeWatch, saveWatch, setWatchDeleted } from './study-store.js';
 import { mountFocusStage, unmountFocusStage, openPracticeTool, returnToClock } from './focus-stage.js';
 import { lessonReview } from "./review-view.js";
+import { saveFile } from "./file-export.js";
 import { teacherPrescription, todayPractice } from "./prescription.js";
 import { FINISH_OUTCOMES, emptyGoals, optionalNumber, resumeGuidance, mergeGoals } from "./guidance.js";
 import { showPositionReference, closePositionReference } from "./position-reference.js";
@@ -486,7 +487,7 @@ async function manage() {
   logs = await allLogs(db);
   watches = (await readStudy(db)).records;
   openModal(
-    `<h2 id="record-title">备份与管理</h2><p>记录保存在当前浏览器。</p>${button("export", "导出备份")}<label class="import-control">导入备份<input id="import" type="file" accept="application/json"></label><div id="import-preview"></div><h3>记录管理</h3>${logs.map((l) => `<div class="manage-row"><span>${esc(shortTitle(entry(l.entryId)))} · ${time(l.minutes * 60)}</span><button class="button secondary" data-delete="${l.id}">${l.deletedAt ? "恢复" : "删除"}</button></div>`).join("")}`,
+    `<h2 id="record-title">备份与管理</h2><p>记录仅保存在本机。</p>${button("export", "导出备份")}<label class="import-control">导入备份<input id="import" type="file" accept="application/json"></label><div id="import-preview"></div><h3>记录管理</h3>${logs.map((l) => `<div class="manage-row"><span>${esc(shortTitle(entry(l.entryId)))} · ${time(l.minutes * 60)}</span><button class="button secondary" data-delete="${l.id}">${l.deletedAt ? "恢复" : "删除"}</button></div>`).join("")}`,
   );
   modal.insertAdjacentHTML('beforeend', `<h3>看课记录管理</h3>${watches.map(r => `<div class="manage-row"><span>${esc(shortTitle(entry(r.entryId)))} · ${time(r.seconds)}</span><button class="button secondary" data-watch-delete="${r.id}">${r.deletedAt ? '恢复' : '删除'}</button></div>`).join('')}`);
 }
@@ -663,12 +664,7 @@ document.addEventListener("click", async (ev) => {
           ],
           { type: "application/json" },
         );
-        const url = URL.createObjectURL(blob),
-          a = document.createElement("a");
-        a.href = url;
-        a.download = "eguitar-practice.json";
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        await saveFile(blob, 'eguitar-practice.json');
         break;
       }
       case "import-confirm":
@@ -829,6 +825,11 @@ window.addEventListener('focus', () => {
 window.addEventListener("pagehide", () => {
   pause().catch(() => {});
 });
+// Native shells invoke the same pause/capture cleanup as browser backgrounding.
+window.eguitarPauseForBackground = async () => {
+  closeTuner();
+  await pause('离开应用，返回后自动继续', { resumeWhenBack: true });
+};
 function sampleClock(withMetronome = true) {
   if (draft && release) draft = tickSession(draft, Date.now(), performance.now(), withMetronome && metro.running ? metro.bpm : null);
 }

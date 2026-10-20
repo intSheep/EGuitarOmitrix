@@ -1,0 +1,10 @@
+import { readFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+const tag = process.argv[2];
+if (!/^v\d+\.\d+\.\d+$/.test(tag || '') || tag !== 'v' + pkg.version) throw Error('Release tag must equal v' + pkg.version);
+const git = (...args) => execFileSync('git', args, { cwd: new URL('../', import.meta.url), encoding: 'utf8' }).trim();
+if (git('rev-parse', `${tag}^{commit}`) !== git('rev-parse', 'HEAD')) throw Error('Tag does not identify this checkout');
+execFileSync('git', ['merge-base', '--is-ancestor', 'HEAD', 'origin/main'], { cwd: new URL('../', import.meta.url) });
+if (git('status', '--porcelain')) throw Error('Release checkout must be clean');
+console.log(`Validated ${tag} on origin/main.`);

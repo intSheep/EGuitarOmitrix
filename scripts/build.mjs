@@ -1,9 +1,16 @@
-import { cp, mkdir, rm } from 'node:fs/promises';
+import { mkdir, rm, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-
-const app = fileURLToPath(new URL('../app/', import.meta.url));
-const out = fileURLToPath(new URL('../dist/', import.meta.url));
+import { execFileSync } from 'node:child_process';
+import { copyPublicApp, inventory } from './build-lib.mjs';
+const root = fileURLToPath(new URL('../', import.meta.url));
+const out = root + 'dist';
+const pkg = JSON.parse(await readFile(root + 'package.json', 'utf8'));
+const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
-await cp(app, out, { recursive: true });
-console.log('Static app built in dist/');
+const files = await copyPublicApp(root + 'app', out);
+const info = { app: 'EGuitarOmitrix', version: pkg.version, commit: git('rev-parse', 'HEAD'), sourceDirty: Boolean(git('status', '--porcelain')), sourceDate: git('show', '-s', '--format=%cI', 'HEAD'), privateMediaIncluded: false, files: await inventory(out, files) };
+await writeFile(out + '/build-info.json', JSON.stringify(info, null, 2) + '\n');
+const desktop = JSON.parse(await readFile(root + 'desktop/package.json', 'utf8'));
+if (desktop.version !== pkg.version) throw Error('Desktop and root versions must match');
+console.log(`Built ${files.length} public assets for ${pkg.version}; local course media excluded.`);

@@ -67,4 +67,6 @@ Review backlog when a milestone completes or the owner changes priorities; no sc
 
 ## Repository setup boundary
 
+FR-023 adds actual PR/main CI and Windows/Android packaging; see [release procedure](../engineering/releases.md). Review the current revision's validation and both platform build gates before merging. Ordinary CI artifacts are not published releases. Manual releases remain draft prereleases until owner/device review. Branch protection and production signing are not automatically implied by these workflows.
+
 The repository is private. Templates and labels are workflow aids, not enforced branch protection or CI gates. Configure enforcement later if requested and supported; do not represent this baseline as protected or production-ready.

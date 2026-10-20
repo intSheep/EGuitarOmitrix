@@ -80,6 +80,10 @@ Documentation-only changes need link, consistency, and diff checks. Do not inven
 
 Issue #31 and ADR 0004 authorize learner goals, end-of-session stable BPM/proficiency confirmation and same-version resume guidance. This is not the broader automatic planner. Keep `tempoUsage` evidence separate from `bpm` self-report, preserve nulls and legacy untyped BPM, and never promote mastery from timer or target attainment. Backup schema 2 adds goals; schema 1 imports remain supported. Conflict checks and atomic import must cover goals and logs together. Test with isolated synthetic browser profiles.
 
+## Native delivery boundary
+
+Native delivery under FR-023 is governed by ADR 0006 and `releases.md`. Keep one public build pipeline for web, Windows and Android; preserve local origins/IDs; test backup transfer with synthetic profiles. Native background events must invoke the existing pause/capture cleanup without adding practice evidence. Native export must use an explicit system picker and report failures. Do not mistake an APK compile or CI artifact upload for device or published-release acceptance.
+
 ## Separate external viewing boundary
 
 FR-021/022 and [ADR 0005](../decisions/0005-separate-viewing-time.md), issue #41,

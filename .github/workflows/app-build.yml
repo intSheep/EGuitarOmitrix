@@ -1,0 +1,123 @@
+name: App build
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        default: ''
+      retention-days:
+        type: number
+        default: 14
+permissions:
+  contents: read
+jobs:
+  verify:
+    name: Validate application
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Prepare audio test dependency
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: npm test
+      - run: npm run build
+      - run: node scripts/verify-distribution.mjs dist
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:web
+      - name: Prepare desktop runtime
+        run: npm run desktop:setup
+      - name: Desktop smoke in isolated display and synthetic profile
+        run: xvfb-run --auto-servernum npm run test:desktop
+        env:
+          EGUITAR_TEST_NO_SANDBOX: '1'
+      - name: Upload sanitized web application
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: web-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: ${{ inputs.retention-days }}
+      - name: Keep failed browser evidence
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: browser-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-results/
+          retention-days: 7
+  windows:
+    name: Windows installer
+    needs: verify
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run desktop:setup
+      - run: npm run package:windows
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Verify packaged Windows resources
+        run: node scripts/verify-distribution.mjs release/windows/win-unpacked/resources/web
+      - name: Verify actual packaged Windows executable with synthetic profile
+        run: npm run test:desktop
+        env:
+          EGUITAR_PACKAGED_EXECUTABLE: release/windows/win-unpacked/EGuitarOmitrix.exe
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: windows-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            release/windows/*.exe
+            release/windows/*.blockmap
+            release/windows/windows-manifest.json
+            release/windows/windows-SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: ${{ inputs.retention-days }}
+  android:
+    name: Android test APK
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - run: npm ci
+      - name: Install Android build tools
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"'
+      - run: chmod +x android/gradlew
+      - run: npm run package:android
+      - name: Verify web assets inside the APK
+        run: |
+          unzip -q release/android/*-android-test.apk 'assets/public/*' -d "$RUNNER_TEMP/eguitar-apk"
+          node scripts/verify-distribution.mjs "$RUNNER_TEMP/eguitar-apk/assets/public" --android
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: android-${{ github.run_id }}-${{ github.run_attempt }}
+          path: release/android/
+          if-no-files-found: error
+          retention-days: ${{ inputs.retention-days }}
