@@ -79,3 +79,27 @@ Documentation-only changes need link, consistency, and diff checks. Do not inven
 ## Implemented quiet guidance boundary
 
 Issue #31 and ADR 0004 authorize learner goals, end-of-session stable BPM/proficiency confirmation and same-version resume guidance. This is not the broader automatic planner. Keep `tempoUsage` evidence separate from `bpm` self-report, preserve nulls and legacy untyped BPM, and never promote mastery from timer or target attainment. Backup schema 2 adds goals; schema 1 imports remain supported. Conflict checks and atomic import must cover goals and logs together. Test with isolated synthetic browser profiles.
+
+## Separate external viewing boundary
+
+FR-021/022 and [ADR 0005](../decisions/0005-separate-viewing-time.md), issue #41,
+authorize direct resource rows and learner-confirmed external viewing intervals.
+Practice retains its foreground-only clock. Never include viewing records in
+practice dose, sessions/days, resume state, BPM or proficiency. IndexedDB version 3
+adds `watches`; backup schema 3 merges practice, goals and watches atomically while
+accepting older backups. Keep unconfirmed gaps reviewable, and preserve pending
+drafts/input on failure. Verify with isolated synthetic profiles and external-page
+fixtures; actual Bilibili playback cannot be inferred from this timer.
+
+In focus mode, tools mount as inline regions in one central surface; the floating
+clock and pause/finish controls keep timing visible. Preserve explicit pause when
+switching tools and never restart practice automatically after tuning. Reduced
+motion skips the fluid transition. Tool replacement must stop its playback or
+capture resources without changing the practice record.
+
+The owner's automatic-return refinement permits continuing an automatically
+suspended live session when the visible focus surface returns. Retain a transient
+session-ID intent, clear it on explicit pause/tuning/finish/error/reload, and reset
+wall/monotonic baselines so the away interval is never counted. Watch confirmation
+may resume formerly active practice; a pending watch still blocks continuation.
+Do not recreate the selected tool or automatically restart sound/capture.

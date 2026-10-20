@@ -156,6 +156,60 @@ The owner's latest direction replaces both the toy-like vertical SVG and the int
 
 `npm test` passed all 44 checks after removing the manual target API. Browser acceptance additionally exercises each of six standard strings at −25 and +25 cents with synthetic oscillators through WebAudio, asserting the automatically selected target and the actual UI instruction: tighten when flat, loosen when sharp. The existing real Chromium synthetic-WAV capture, permissions, device switching and capture cleanup checks remain in the same script. Final illustration screenshots at 1440/768/390 px verify horizontal layout, image load, noninteractive status labels and no horizontal overflow. No physical hardware accuracy claim is added.
 
+## Immersive tools and separate lesson viewing — 2026-10-20, issue #41
+
+Requirements FR-005/010/013/015/017/020/021/022. The focused review copy is based
+on `f927b96`; unrelated tuner feedback, ambience, count-in and saved-summary work
+remain outside this PR. The working checkout retains those existing changes.
+
+- All 48 unit/integration tests in the focused copy passed. New viewing tests cover
+  background elapsed time, stop/confirmation bounds, invalid time, independent
+  totals/deletion, backup versions, source identity and conflicting records.
+- `verify-focus-stage.mjs` passed at 1440/768/390 px with synthetic MusicXML through
+  the real alphaTab renderer/player: score and reference in the central region,
+  visible floating clock, observed timer increases, same route, explicit pause,
+  metronome/material switching, tuner pause, dragging versus click, keyboard
+  movement, native touch dragging, viewport clamping, Escape and reduced motion. No modal is opened for
+  an in-practice tool. Actual desktop and phone screenshots were inspected.
+- `verify-study.mjs` passed with intercepted synthetic external pages: direct
+  page/CID/timestamp links, background interval independent of paused practice,
+  return confirmation and adjustment, atomic save failure/retry, cross-tab lock,
+  export/import, conflicting-import rollback, deletion/restore, interrupted
+  recovery/discard and blocked-popup handling. No personal storage was accessed.
+- Existing practice, position-reference, catalog and storage-recovery browser
+  suites passed against the focused copy. This includes legacy v1 migration,
+  blocked upgrade recovery, old backup support and foreground/sleep safeguards.
+- The existing tuner suite passed against the working checkout with synthetic
+  capture, including microphone/audio cleanup on close, navigation/background and
+  late permission grants. Tuning continues to create no practice evidence.
+- Production build and whitespace checks passed locally. No CI was triggered.
+
+Limits: external Bilibili playback/pause cannot be observed; viewing is a
+learner-confirmed interval, with gaps explicitly reviewable. No real video watch,
+physical guitar/input hardware or native GP8 acceptance is claimed. The new Stitch
+generation timed out; no usable generated central-tool screen was returned.
+
+### Automatic return continuation — 2026-10-20
+
+Owner refinement to FR-010/022, within issue #41 and PR #43. Added a transient
+session-ID continuation intent for automatic visibility/route suspension. Return
+starts fresh wall/monotonic baselines, preserving the selected inline tool and
+excluding the background gap. Explicit pause/tuning/finish, interrupted storage
+and fresh loads do not inherit that intention. Watch save/discard resumes only
+practice that was running before launch; pending viewing still blocks it.
+
+`verify-auto-return.mjs` passed in isolated Chromium at 1440/390 px with synthetic
+visibility and external-page fixtures: background exclusion, automatic timer and
+selected-tool continuation, duplicate events, route return, manual pause, tuner
+exclusion, formerly paused viewing, watch confirmation, aborted resume persistence,
+reload and finish safeguards. `verify-study.mjs` and the existing practice browser
+suite passed. All 48 tests in the focused PR copy and the local build passed.
+No personal records or real microphone input were used; no CI was requested.
+
+This checks lifecycle handling through deterministic browser events, not every
+operating system's window-visibility behavior. Browser reload remains an explicit
+recovery boundary and sound/capture are not automatically restarted.
+
 ### Saved practice summary — 2026-10-20, issue #44
 
 FR-010, FR-012, FR-013; ADR 0004. See the
@@ -181,6 +235,15 @@ The focused layout assertions ran from a temporary local QA script. All browser
 data was synthetic in disposable profiles. No personal records, storage schema,
 timing rules or proficiency criteria were changed. Chromium layout/interaction
 checks do not establish acceptance in every browser or owner aesthetic approval.
+
+### Main integration before merge — 2026-10-20
+
+Integrated `d35460f` (saved-practice summary, PR #46) while preserving both design
+and validation histories. Runtime files merged without code conflicts; only
+appended documentation sections required reconciliation. The combined version
+passed all 48 unit/integration tests, the build, and the automatic-return,
+separate-viewing and practice browser suites in isolated profiles. No CI was
+requested.
 
 ## Optional one-bar score count-in — 2026-10-20
 
@@ -210,3 +273,13 @@ FR-019. See [implementation](score-count-in.md) and
 - Production build, JavaScript syntax and diff checks passed. No CI was run.
   No personal records or course media were added to Git. Physical audio output
   and Safari/Firefox were not verified.
+
+### Count-in integration before merge — 2026-10-20
+
+Integrated main `5c908eb` (PR #47). Retained the optional count-in controls and
+cancellation lifecycle together with inline score mounting, return-to-clock
+callbacks and the guarded file loader. Both validation histories remain intact.
+All 55 unit/integration tests and the build passed. The central-tool browser suite
+passed at 1440/768/390 px, and the count-in browser suite passed synthesized and
+backing playback, meter/rate/resume, cancellation, tuner/background/navigation,
+persistence and storage-denial scenarios with synthetic inputs.

@@ -102,7 +102,7 @@ try {
     assert.equal(await page.locator('#tuner-note').innerText(), '—');
     await listen(page);
     await page.evaluate(() => { location.hash = 'history'; });
-    await page.waitForFunction(() => !document.querySelector('#tuner-dialog').open); await released(page);
+    await page.waitForFunction(() => !document.querySelector('#tuner-dialog')?.open); await released(page);
     await ctx.close();
   }
   // Separate synthetic oscillators exercise automatic string changes and the

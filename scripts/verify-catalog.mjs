@@ -35,7 +35,8 @@ try {
   assert.equal(await page.locator("a.directory-row").count(), 0);
   await page.locator("button.directory-row").first().click();
   await page.locator("#video-launch").waitFor();
-  assert.equal(await page.locator("a[target=_blank]").count(), 1);
+  assert.ok(await page.locator("a[data-watch][target=_blank]").count() >= 1);
+  assert.equal(await page.locator('#material-select').count(), 0);
   await page.keyboard.press("Escape");
   await page.locator("[name=q]").fill("no-such-synthetic-title");
   await page.locator(".library-search button").click();
