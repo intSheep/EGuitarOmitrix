@@ -61,7 +61,8 @@ try {
     "停止节拍",
   );
   await page.locator("[data-material]").click();
-  assert.equal(await page.locator("a[target=_blank]").count(), 1);
+  assert.ok(await page.locator("a[data-watch][target=_blank]").count() >= 2);
+  assert.equal(await page.locator('#material-select').count(), 0);
   await page.keyboard.press("Escape");
   await page.screenshot({ path: "/tmp/focus-desktop.png" });
   // Synthetic transaction abort: finishing must keep the draft and retry safely.

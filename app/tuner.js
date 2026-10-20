@@ -164,7 +164,7 @@ export function closeTuner() {
   if (panel?.open) panel.close();
 }
 
-export function showTuner() {
+export function showTuner({ host = null, onClose = null } = {}) {
   if (panel?.open) return;
   if (!panel) {
     panel = document.createElement('dialog');
@@ -187,7 +187,11 @@ export function showTuner() {
     window.addEventListener('pagehide', closeTuner);
     navigator.mediaDevices?.addEventListener('devicechange', () => { if (panel.open) devices(generation).catch(() => {}); });
   }
+  (host || document.body).append(panel);
+  panel.classList.toggle('in-practice', !!host);
+  panel.setAttribute('role', host ? 'region' : 'dialog');
+  $('close').onclick = onClose || closeTuner;
   stop('开启麦克风，开始调音。');
-  panel.showModal();
+  if (host) panel.show(); else panel.showModal();
   devices(generation).catch(() => {});
 }

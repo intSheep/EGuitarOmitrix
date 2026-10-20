@@ -53,6 +53,8 @@ try {
   await page.waitForTimeout(1200);
   assert.equal((await draft()).elapsedMs, paused);
   await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].focus());
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect.poll(async () => (await draft()).running).toBe(true);
   await page.locator('[data-score]').click();
   await expect(page.locator('#score-status')).toContainText('可载入本地');
   await page.locator('#score-file').setInputFiles({ name: 'synthetic.musicxml', mimeType: 'application/xml', buffer: Buffer.from(syntheticScore) });

@@ -1,6 +1,6 @@
 # Application packaging verification — issue #40
 
-Date: 2026-10-20. Requirements: FR-021, FR-015–017, FR-019, FR-020. Test records and notation are synthetic and disposable. The original working tree's unfinished tuner/ambience work is excluded from this change.
+Date: 2026-10-20. Requirements: FR-023, FR-015–017, FR-019, FR-020. Test records and notation are synthetic and disposable. The original working tree's unfinished tuner/ambience work is excluded from this change.
 
 ## Local evidence
 
@@ -21,3 +21,7 @@ The exact current revision's validation, packaged Windows executable smoke, Wind
 The pinned alphaTab 1.8.4 worklet implementation exhibited an asynchronous startup/stop race in CI. The application uses its documented ScriptProcessor compatibility output for this pilot; desktop acceptance checks a real source start followed by immediate simulated native background pause and close. Physical audio latency is not measured. Local browser acceptance used Chrome for Testing 156.0.8078.4; Electron 44.9.1 embeds Chromium 152.0.7977.167.
 
 No Windows certificate, stable Android release signing key, store publication, automatic updates, iOS build, real guitar accuracy measurement or cross-device synchronization is delivered. Android's native picker/permission behavior, physical audio devices, suspend/resume, installation and upgrades need target-device acceptance. The shipped course catalog/task summaries retain their existing uncertainty; excluded course media can be loaded locally by the learner.
+
+## Integration with the 2026-10-20 main branch
+
+Preserved direct materials, separately confirmed viewing time, inline tools and the optional one-bar count-in. Native background pause now retains the same transient automatic-return intent as the browser; returning resumes only the formerly running timer and never restarts sound or capture. Native delivery uses FR-023 to avoid the concurrent FR-021/022 assignments. Revalidated 58 Node tests, five responsive/backup/export browser checks, and the actual Electron shell with synthetic storage and audio. CI must revalidate the merged revision before merge.

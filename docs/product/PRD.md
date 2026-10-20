@@ -237,7 +237,7 @@ The learner owns practice records. Content revisions own source evidence and tas
 ## 11. UX and nonfunctional requirements
 
 - NFR-001: Target current Windows Chrome/Edge and responsive layouts at 390 px and desktop widths; exact tested versions are recorded when implementation exists.
-- NFR-002: The workspace has one start action. The focus page records elapsed practice automatically; self-report after completion is optional. Source videos share one material picker and launch action. Avoid promotional headlines and decorative game navigation.
+- NFR-002: The workspace has one start action. The focus page records elapsed practice automatically; self-report after completion is optional. Source videos use directly clickable material rows; viewing time is confirmed separately on return. Avoid promotional headlines and decorative game navigation.
 - NFR-003: Keyboard access, visible focus, text labels for statuses, and readable notation-independent task text are required. Color alone must not convey review or progress state.
 - NFR-004: A failed save, unavailable storage, or quota error must remain visible and offer a safe retry/export; no success toast before persistence succeeds.
 - NFR-005: Schema upgrades validate and retain a recoverable prior snapshot. Future schema versions fail safely on older clients.
@@ -284,7 +284,7 @@ See [roadmap](roadmap.md), [Stitch brief](../design/stitch-brief.md), and [Agent
 
 ## 15. Focus slice acceptance (v0.4)
 
-The latest owner request supersedes earlier manual logging and disclosure-based layouts. Use one start action, automatic observed time, pause/resume, a recoverable paused draft and transactional finish. Hide global navigation during focus. Pause on video launch, hidden pages and interruptions. One material dialog contains the video selector and launch control. Use source-backed task summaries without extraction-status badges; unknown numeric targets remain unknown. Do not infer mastery from time or metronome settings. Show real accumulated time, exercise history, daily bars and an 84-day activity calendar. Retain older manual logs and backups. See [ADR 0003](../decisions/0003-focus-practice.md) and [Stitch decisions](../design/focus-practice.md).
+The latest owner request supersedes earlier manual logging and disclosure-based layouts. Use one start action, automatic observed time, pause/resume, a recoverable paused draft and transactional finish. Hide global navigation during focus. Pause on video launch, hidden pages and interruptions. One material dialog contains directly clickable source rows (superseded by FR-021 on 2026-10-20). Use source-backed task summaries without extraction-status badges; unknown numeric targets remain unknown. Do not infer mastery from time or metronome settings. Show real accumulated time, exercise history, daily bars and an 84-day activity calendar. Retain older manual logs and backups. See [ADR 0003](../decisions/0003-focus-practice.md) and [Stitch decisions](../design/focus-practice.md).
 
 ## 16. Owner-authorized score pilot (v0.5)
 
@@ -295,6 +295,15 @@ The owner now authorizes video-frame extraction, reviewed MusicXML/GP preparatio
 Owner-authorized local MusicXML/score-model → audio processing → explicit sync points → audio-embedded GP pipeline. Keep candidate and reviewed alignment distinct. Include source hashes, trim parameters and synchronization evidence. Test GP reimport and browser playback independently from GP8 musical acceptance. Native GP8 inspection is authorized; no system protocol/file-association change is needed. The initial tooling rejects repeats/jumps, keeps uncertain timing out of accepted lesson defaults, and provides a documented GP8 acceptance gate. Current real artifact is a demonstration-audio draft; independent backing alignment and native acceptance remain open in #22.
 
 FR-019 preparation clarification (2026-10-18): when a source supplies numbered notation without string/fret instructions, preserve its pitches, octaves and rhythm as staff notation rather than inventing source fingering. Added count-in measures and candidate audio anchors are preparation metadata, distinct from the instructor's notation and the owner's listening acceptance.
+
+FR-019 playback refinement (2026-10-20): provide an optional one-bar audible
+count-in before each explicit play/resume, off by default and remembered in this
+browser. Use the current playback position's meter and tempo, including speed
+changes and embedded-audio synchronization. Show preparation state and allow
+cancellation. Pause, stop, score replacement, tuner activation, navigation and
+backgrounding cancel pending playback. Loop boundaries do not insert additional
+count-ins. This playback preference does not alter score files, instructor
+prescriptions or proficiency records. See [implementation](../engineering/score-count-in.md).
 
 ### Quiet practice guidance extension (2026-10-18, issue #31)
 
@@ -327,8 +336,53 @@ Owner refinement for FR-020: replace the rejected toy-like vertical vector with 
 
 ## Installable application and CI authorization — 2026-10-20
 
-FR-021 (P1, issue #40): the owner authorizes a repeatable CI packaging process and an installable application, prioritizing Windows and including an Android test build. Reuse the existing approved workspace. Deliver a bundled offline Windows x64 application/installer, an Android shell/test APK and a sanitized shared web distribution. Preserve local records, JSON backup/merge semantics, explicit microphone control, and foreground-only practice accounting. Backgrounding stops capture/playback and pauses practice; tuning and score playback do not become proficiency evidence.
+FR-023 (P1, issue #40): the owner authorizes a repeatable CI packaging process and an installable application, prioritizing Windows and including an Android test build. Reuse the existing approved workspace. Deliver a bundled offline Windows x64 application/installer, an Android shell/test APK and a sanitized shared web distribution. Preserve local records, JSON backup/merge semantics, explicit microphone control, and foreground-only practice accounting. Backgrounding stops capture/playback and pauses practice; tuning and score playback do not become proficiency evidence.
 
 Acceptance: PR/main checks validate locked dependencies, unit tests, responsive browser behavior and the actual desktop shell before platform packaging. Installable artifacts identify their version/source commit and have SHA-256 checksums. Course scores/media, credentials and learner records are excluded. Version tags are validated before a manual draft prerelease; ordinary CI never publishes. Initial Windows packages are unsigned and Android packages are debug-signed test builds. Production signing, store distribution, automatic updates, Windows ARM64, iOS and cloud sync are deferred. Native installation/upgrade and physical-device acceptance are reported separately from compilation.
 
 This authorization supersedes the earlier offline-delivery deferral for the bounded native app shell; it does not authorize a browser service worker or a hosted service. Browser/native/device profiles remain separate and records transfer through explicit backup import. See [ADR 0006](../decisions/0006-native-app-packaging.md), [release procedure](../engineering/releases.md) and [packaging verification](../engineering/app-packaging-validation.md).
+
+## 17. Direct materials and separate viewing time (2026-10-20)
+
+The owner authorizes FR-021, issue #41: replace select-then-open with direct
+resource rows, and count viewing as a separate learning activity. Opening an exact
+source pauses practice while an independent viewing interval continues outside
+the app. On return, freeze the candidate duration and let the learner confirm,
+reduce or discard it. Refresh/interruption retains a pending review and never
+silently adds unattended time.
+
+Learning totals show practice and confirmed viewing separately. Viewing does not
+satisfy instructor practice duration, add a practiced day/session, change BPM,
+infer proficiency or alter the next-practice cursor. Preserve all existing records,
+provide reversible deletion, and include viewing records in versioned atomic
+backup import/export with schema 1/2 compatibility. External playback state is
+unobservable; the UI must describe confirmed elapsed time without claiming verified
+playback. See [ADR 0005](../decisions/0005-separate-viewing-time.md).
+
+### FR-022 — Continuous practice surface and floating clock
+
+The owner authorizes a single central practice surface for the right-hand tools.
+Score, C-major position reference, metronome and course resources replace the large
+clock inside that surface without navigation or modal interruption. Keep active
+practice timing continuous and preserve explicit pauses. The clock becomes a
+small draggable floating control; clicking it returns to the primary clock.
+Support pointer/touch dragging, keyboard movement, viewport bounds and reduced
+motion. Use a liquid-like shape transition from the selected tool and clock.
+Pause/finish controls remain available. The tuner uses the same surface while
+retaining FR-020's required timer/audio pause and microphone cleanup. External
+lesson viewing retains FR-021's separately confirmed time. Closing, replacing or
+leaving a tool releases its audio/capture resources without ending the session.
+
+### Automatic return continuation — FR-010/022 refinement (2026-10-20)
+
+When a live, running practice session is suspended because its page becomes hidden
+or the learner leaves the focus route, returning to the visible focus surface
+automatically continues the same timer from a fresh clock baseline. Exclude the
+away interval and retain the selected inline tool on a visibility return. Keep
+this continuation intent in memory for the current page, tied to the session ID.
+Explicit pause, tuning, finishing, storage failure and a fresh page load must not
+inherit automatic continuation. Do not restart playback or microphone capture.
+
+External viewing remains separate and pauses practice until confirmation. Saving
+or discarding that viewing interval automatically continues practice if it was
+running before launch. A deliberately paused session stays paused.

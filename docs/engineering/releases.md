@@ -1,6 +1,6 @@
 # Application builds and releases
 
-Owner authorization: 2026-10-20, issue [#40](https://github.com/intSheep/EGuitarOmitrix/issues/40), FR-021. Architecture: [ADR 0006](../decisions/0006-native-app-packaging.md). All commands run from the repository root.
+Owner authorization: 2026-10-20, issue [#40](https://github.com/intSheep/EGuitarOmitrix/issues/40), FR-023. Architecture: [ADR 0006](../decisions/0006-native-app-packaging.md). All commands run from the repository root.
 
 ## Build contract
 

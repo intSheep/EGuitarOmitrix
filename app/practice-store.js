@@ -1,4 +1,5 @@
 import { emptyGoals, validateGoals, mergeGoals } from "./guidance.js";
+import { validateWatches } from './study.js';
 export const OUTCOMES = {
   learning: "还不熟",
   slow: "能慢速完成",
@@ -83,13 +84,14 @@ export function latestLog(logs, entryId) {
 }
 export function validateBackup(value, entryIds) {
   if (
-    ![1, 2].includes(value?.schemaVersion) ||
+    ![1, 2, 3].includes(value?.schemaVersion) ||
     value.app !== "EGuitarOmitrix" ||
     !Array.isArray(value.logs) ||
     value.logs.length > 100000
   )
     throw new Error("备份格式或版本不支持，现有记录未修改。");
-  if (value.schemaVersion === 2) validateGoals(value.goals, entryIds);
+  if (value.schemaVersion >= 2) validateGoals(value.goals, entryIds);
+  if (value.schemaVersion === 3) validateWatches(value.watches, entryIds);
   const ids = new Set();
   for (const log of value.logs) {
     validateLog(log);
@@ -128,12 +130,14 @@ export function mergePreview(existing, incoming) {
 }
 export function openPracticeDB({ onBlocked = () => {} } = {}) {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 2);
+    const req = indexedDB.open(DB_NAME, 3);
     req.onupgradeneeded = () => {
       if (!req.result.objectStoreNames.contains("logs"))
         req.result.createObjectStore("logs", { keyPath: "id" });
       if (!req.result.objectStoreNames.contains("session"))
         req.result.createObjectStore("session");
+      if (!req.result.objectStoreNames.contains('watches'))
+        req.result.createObjectStore('watches', { keyPath: 'id' });
     };
     req.onerror = () =>
       reject(new Error("无法打开本地练习数据库。请检查浏览器存储权限。"));
@@ -185,9 +189,11 @@ export function saveLog(db, log, expectedUpdatedAt = null) {
       );
   });
 }
-export function importLogs(db, logs, goals = null) {
+export function importLogs(db, logs, goals = null, watches = []) {
+  logs.forEach(validateLog);
+  validateWatches(watches, new Set(watches.map(r => r.entryId)));
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(["logs", "session"], "readwrite"),
+    const tx = db.transaction(["logs", "session", "watches"], "readwrite"),
       store = tx.objectStore("logs");
     let failure;
     const req = store.getAll();
@@ -195,6 +201,11 @@ export function importLogs(db, logs, goals = null) {
       try {
         const { additions } = mergePreview(req.result, logs);
         additions.forEach((l) => store.add(l));
+        const watchStore = tx.objectStore('watches'), watchRequest = watchStore.getAll();
+        watchRequest.onsuccess = () => {
+          try { mergePreview(watchRequest.result, watches).additions.forEach(r => watchStore.add(r)); }
+          catch (e) { failure = e; tx.abort(); }
+        };
         if (goals) {
           const request = tx.objectStore('session').get('goals');
           request.onsuccess = () => {

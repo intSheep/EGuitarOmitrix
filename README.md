@@ -2,7 +2,7 @@
 
 A private electric-guitar practice companion. The first slice provides a task-focused exercise workspace and exact links to the course's Bilibili lessons, backing tracks, and demonstrations.
 
-**Current:** 140 source entries and task summaries for 72 lessons; automatic focus timing, a metronome, lesson review, local backup/merge, a standard six-string tuner and local score playback. Windows and Android app packaging is authorized by FR-021. Records stay local. Source uncertainties remain in the inventory.
+**Current:** 140 source entries and task summaries for 72 lessons; automatic focus timing, a metronome, lesson review, local backup/merge, a standard six-string tuner and local score playback. Windows and Android app packaging is authorized by FR-023. Records stay local. Source uncertainties remain in the inventory.
 
 Select an exercise, click **开始练习**, pause as needed, then finish to save. Refresh restores a paused draft. Videos and hidden pages pause timing. Use **练习回顾** for history and backups. Outcome ratings are optional. Load your own MusicXML/GP scores; native Guitar Pro launch remains deferred.
 
@@ -58,7 +58,7 @@ Repository: [intSheep/EGuitarOmitrix](https://github.com/intSheep/EGuitarOmitrix
 
 Both human-facing and Agent-facing documentation are English. Original Chinese course titles and necessary evidence remain recognizable; learner UI is Simplified Chinese.
 
-Use GitHub Issues, Milestones, and pull requests with requirement/acceptance traceability. Source metadata may be committed; full transcripts, videos, scores, credentials, and personal practice records stay outside Git. A source launch is not a practice result.
+Use focused pull requests with appropriate validation. Small fixes can proceed directly from the owner's request; use GitHub Issues and Milestones only when work needs independent planning or follow-up. See [project management](docs/process/PROJECT_MANAGEMENT.md). Source metadata may be committed; full transcripts, videos, scores, credentials, and personal practice records stay outside Git. A source launch is not a practice result.
 
 Agents should start with [AGENTS.md](AGENTS.md).
 

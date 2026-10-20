@@ -1,6 +1,6 @@
 # ADR 0006 — Windows application and Android packaging pilot
 
-Date: 2026-10-20. Status: owner-authorized implementation, issue #40. Requirements: FR-021, FR-015–017, FR-019, FR-020; NFR-001, NFR-007, NFR-008.
+Date: 2026-10-20. Status: owner-authorized implementation, issue #40. Requirements: FR-023, FR-015–017, FR-019, FR-020; NFR-001, NFR-007, NFR-008.
 
 ## Decision
 
