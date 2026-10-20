@@ -7,8 +7,8 @@ android {
         applicationId "io.github.intsheep.eguitaromitrix"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode (project.findProperty('appVersionCode') ?: '301').toInteger()
-        versionName project.findProperty('appVersionName') ?: '0.3.0'
+        versionCode = (project.findProperty('appVersionCode') ?: '301').toInteger()
+        versionName = project.findProperty('appVersionName') ?: '0.3.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

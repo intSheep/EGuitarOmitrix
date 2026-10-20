@@ -49,8 +49,8 @@ Remove prior `release/` output when changing versions. The packaging manifest re
 | Gate | Actual work | Output |
 | --- | --- | --- |
 | Validate application | Clean locked install, all Node tests (Python/FFmpeg synthetic score fixtures), sanitized build, Playwright at 1440/768/390 px, actual Electron smoke under Xvfb | Sanitized web artifact; failure-only browser traces |
-| Windows installer | Windows runner, clean install, actual Electron smoke, NSIS x64 packaging | Unsigned installer, manifest, checksums |
-| Android test APK | JDK 21, Android SDK 36, pinned Gradle distribution with SHA-256, Capacitor sync, Gradle debug build | Test APK, manifest, checksums |
+| Windows installer | Windows runner, clean install, NSIS x64 packaging, packaged-resource hash verification, actual packaged-executable smoke | Unsigned installer, manifest, checksums |
+| Android test APK | JDK 21, Android SDK 36, pinned Gradle distribution with SHA-256, Capacitor sync, Gradle debug build, APK resource verification | Test APK, manifest, checksums |
 
 The platform jobs depend on successful validation. Ordinary artifacts last 14 days; failed browser traces last seven days. Download artifacts from the successful Actions run. These are CI artifacts, not a published GitHub release. The Windows runner smoke exercises a real Windows executable; it does not install the NSIS package. Android compilation does not establish on-device microphone or picker acceptance.
 

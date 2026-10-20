@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile, rm, symlink } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, rm, symlink, cp } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { copyPublicApp, inventory } from '../scripts/build-lib.mjs';
@@ -36,4 +37,25 @@ test('desktop restricts resources, outbound navigation and microphone media type
   for (const url of ['file:///etc/passwd', 'javascript:alert(1)', 'https://www.bilibili.com.evil/', 'https://name@www.bilibili.com/', 'http://www.bilibili.com/', 'ms-settings:']) assert.equal(security.externalURL(url), null);
   assert.equal(security.audioOnly(['audio']), true);
   for (const types of [[], ['audio', 'video'], ['video'], undefined]) assert.equal(security.audioOnly(types), false);
+});
+test('release tags require matching clean source on main and reject branch-only revisions', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'eguitar-release-synthetic-'));
+  const git = (...args) => execFileSync('git', args, { cwd: root, stdio: 'pipe' });
+  const check = tag => execFileSync(process.execPath, [join(root, 'scripts/check-release.mjs'), tag], { cwd: root, stdio: 'pipe' });
+  try {
+    await mkdir(join(root, 'scripts'));
+    await cp(new URL('../scripts/check-release.mjs', import.meta.url), join(root, 'scripts/check-release.mjs'));
+    await writeFile(join(root, 'package.json'), JSON.stringify({ version: '0.3.0' }));
+    git('init', '-q'); git('add', '.');
+    git('-c', 'user.name=Synthetic QA', '-c', 'user.email=synthetic@example.invalid', 'commit', '-qm', 'Synthetic release fixture');
+    git('update-ref', 'refs/remotes/origin/main', 'HEAD'); git('tag', 'v0.3.0');
+    assert.match(check('v0.3.0').toString(), /Validated/);
+    assert.throws(() => check('v0.3.1'));
+    assert.throws(() => check('v0.3.0; echo unsafe'));
+    await writeFile(join(root, 'untracked.txt'), 'SYNTHETIC');
+    assert.throws(() => check('v0.3.0'));
+    git('add', '.'); git('-c', 'user.name=Synthetic QA', '-c', 'user.email=synthetic@example.invalid', 'commit', '-qm', 'Synthetic branch-only revision');
+    git('tag', '-f', 'v0.3.0');
+    assert.throws(() => check('v0.3.0'));
+  } finally { await rm(root, { recursive: true, force: true }); }
 });

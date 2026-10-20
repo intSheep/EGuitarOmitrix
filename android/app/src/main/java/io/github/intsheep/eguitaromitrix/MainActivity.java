@@ -2,8 +2,12 @@ package io.github.intsheep.eguitaromitrix;
 
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebChromeClient;
+import com.getcapacitor.BridgeWebViewClient;
 import android.os.Bundle;
+import android.net.Uri;
 import android.webkit.PermissionRequest;
+import android.webkit.WebView;
+import android.webkit.WebResourceRequest;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
@@ -14,6 +18,19 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(ExportFilePlugin.class);
         super.onCreate(savedInstanceState);
         if (bridge == null) return;
+        bridge.getWebView().getSettings().setGeolocationEnabled(false);
+        bridge.getWebView().getSettings().setMediaPlaybackRequiresUserGesture(true);
+        bridge.getWebView().setWebViewClient(new BridgeWebViewClient(bridge) {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                Uri url = request.getUrl();
+                if ("https".equals(url.getScheme()) && url.getUserInfo() == null && url.getPort() == -1 &&
+                    ("localhost".equals(url.getHost()) || "www.bilibili.com".equals(url.getHost()))) {
+                    return super.shouldOverrideUrlLoading(view, request);
+                }
+                return true;
+            }
+        });
         bridge.getWebView().setWebChromeClient(new BridgeWebChromeClient(bridge) {
             @Override
             public void onPermissionRequest(PermissionRequest request) {

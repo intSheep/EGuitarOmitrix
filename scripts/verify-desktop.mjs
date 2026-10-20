@@ -9,7 +9,8 @@ const profile = await mkdtemp(join(tmpdir(), 'eguitar-desktop-synthetic-'));
 let application;
 async function launch() {
   const instance = await electron.launch({
-    args: [...(process.env.EGUITAR_TEST_NO_SANDBOX === '1' ? ['--no-sandbox'] : []), '--use-fake-device-for-media-stream', resolve('desktop')],
+    executablePath: process.env.EGUITAR_PACKAGED_EXECUTABLE ? resolve(process.env.EGUITAR_PACKAGED_EXECUTABLE) : undefined,
+    args: [...(process.env.EGUITAR_TEST_NO_SANDBOX === '1' ? ['--no-sandbox'] : []), '--use-fake-device-for-media-stream', ...(process.env.EGUITAR_PACKAGED_EXECUTABLE ? [] : [resolve('desktop')])],
     env: { ...process.env, EGUITAR_TEST_PROFILE: profile }, timeout: 45000,
   });
   const page = await instance.firstWindow();

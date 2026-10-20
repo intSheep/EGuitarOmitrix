@@ -358,7 +358,7 @@ function materials(id) {
 async function manage() {
   logs = await allLogs(db);
   openModal(
-    `<h2 id="record-title">备份与管理</h2><p>记录保存在当前浏览器。</p>${button("export", "导出备份")}<label class="import-control">导入备份<input id="import" type="file" accept="application/json"></label><div id="import-preview"></div><h3>记录管理</h3>${logs.map((l) => `<div class="manage-row"><span>${esc(shortTitle(entry(l.entryId)))} · ${time(l.minutes * 60)}</span><button class="button secondary" data-delete="${l.id}">${l.deletedAt ? "恢复" : "删除"}</button></div>`).join("")}`,
+    `<h2 id="record-title">备份与管理</h2><p>记录仅保存在本机。</p>${button("export", "导出备份")}<label class="import-control">导入备份<input id="import" type="file" accept="application/json"></label><div id="import-preview"></div><h3>记录管理</h3>${logs.map((l) => `<div class="manage-row"><span>${esc(shortTitle(entry(l.entryId)))} · ${time(l.minutes * 60)}</span><button class="button secondary" data-delete="${l.id}">${l.deletedAt ? "恢复" : "删除"}</button></div>`).join("")}`,
   );
 }
 let pendingImport = null;

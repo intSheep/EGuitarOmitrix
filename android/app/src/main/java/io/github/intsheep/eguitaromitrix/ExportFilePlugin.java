@@ -30,7 +30,8 @@ public class ExportFilePlugin extends Plugin {
         intent.setType(name.endsWith(".json") ? "application/json" : "application/octet-stream");
         intent.putExtra(Intent.EXTRA_TITLE, name);
         exporting = true;
-        startActivityForResult(call, intent, "documentSelected");
+        try { startActivityForResult(call, intent, "documentSelected"); }
+        catch (Exception error) { exporting = false; call.reject("无法打开系统文件保存窗口"); }
     }
 
     @ActivityCallback
@@ -44,9 +45,10 @@ public class ExportFilePlugin extends Plugin {
             if (out == null) throw new IllegalStateException("No output stream");
             out.write(Base64.decode(call.getString("data", ""), Base64.DEFAULT));
             out.flush();
-            call.resolve(new JSObject().put("saved", true));
         } catch (Exception error) {
             call.reject("文件保存失败，请重试");
+            return;
         }
+        call.resolve(new JSObject().put("saved", true));
     }
 }

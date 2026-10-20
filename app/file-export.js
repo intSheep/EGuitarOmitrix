@@ -8,7 +8,9 @@ export async function saveFile(blob, name) {
       reader.onload = () => resolve(String(reader.result).split(',')[1]);
       reader.readAsDataURL(blob);
     });
-    return native.registerPlugin('ExportFile').save({ name, mime: blob.type || 'application/octet-stream', data });
+    const exporter = native.Plugins?.ExportFile;
+    if (!exporter?.save) throw Error('当前应用无法保存文件，请更新应用后重试');
+    return exporter.save({ name, mime: blob.type || 'application/octet-stream', data });
   }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

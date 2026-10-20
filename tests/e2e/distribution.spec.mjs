@@ -56,10 +56,10 @@ test('Android export adapter delegates to the system picker without creating a b
   await page.goto('/');
   const result = await page.evaluate(async () => {
     const calls = [];
-    globalThis.Capacitor = { getPlatform: () => 'android', registerPlugin: plugin => ({ save: async args => { calls.push({ plugin, ...args }); return { saved: true }; } }) };
+    globalThis.Capacitor = { getPlatform: () => 'android', Plugins: { ExportFile: { save: async args => { calls.push(args); return { saved: true }; } } } };
     const { saveFile } = await import('./file-export.js');
     await saveFile(new Blob(['SYNTHETIC BACKUP'], { type: 'application/json' }), 'eguitar-practice.json');
     return calls;
   });
-  expect(result).toEqual([{ plugin: 'ExportFile', name: 'eguitar-practice.json', mime: 'application/json', data: Buffer.from('SYNTHETIC BACKUP').toString('base64') }]);
+  expect(result).toEqual([{ name: 'eguitar-practice.json', mime: 'application/json', data: Buffer.from('SYNTHETIC BACKUP').toString('base64') }]);
 });
