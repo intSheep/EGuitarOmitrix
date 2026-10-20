@@ -2,11 +2,11 @@
 
 Describe the user-visible change or the research conclusion.
 
-## Traceability
+<!-- Small fixes need only a concise problem/result and actual validation. Delete unused sections. Do not create an issue just to complete this template. -->
 
-- Issue:
-- PRD requirements:
-- Milestone:
+## Context (when relevant)
+
+Link the owner's request, an existing issue, applicable PRD requirements or a milestone. A new issue is not required for a direct fix.
 
 ## Validation
 

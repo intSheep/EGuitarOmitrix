@@ -25,5 +25,5 @@ The owner additionally authorizes a browser-local microphone tuner (FR-020, issu
 - Preserve course revisions and session history. Re-imports must not erase learner edits or logs.
 - Never commit full course transcripts, videos, score files, cookies, tokens, or personal records. Synthetic test fixtures must be clearly labeled.
 - Score preparation and browser playback are now authorized. Do not register native URI handlers or alter file associations without an explicit request. Keep local course score/media files out of Git.
-- Keep one focused issue and PR per reviewable change. Link requirements and report actual verification with its limits.
+- Keep each PR focused. A bounded fix, polish, refactor, test or documentation update can proceed directly from the owner's request without a new issue. Reuse an existing issue when relevant; create one only for work needing independent prioritization, discussion, coordination or deferred follow-up. Do not create an issue merely to obtain a branch number or fill a PR template, and do not ask the owner to file one before starting. Link applicable requirements and report actual verification with its limits. See `docs/process/PROJECT_MANAGEMENT.md`.
 - Do not claim a documentation review or generated screen is a working application or successful integration test.

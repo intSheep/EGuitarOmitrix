@@ -42,7 +42,7 @@ Repository: [intSheep/EGuitarOmitrix](https://github.com/intSheep/EGuitarOmitrix
 
 Both human-facing and Agent-facing documentation are English. Original Chinese course titles and necessary evidence remain recognizable; learner UI is Simplified Chinese.
 
-Use GitHub Issues, Milestones, and pull requests with requirement/acceptance traceability. Source metadata may be committed; full transcripts, videos, scores, credentials, and personal practice records stay outside Git. A source launch is not a practice result.
+Use focused pull requests with appropriate validation. Small fixes can proceed directly from the owner's request; use GitHub Issues and Milestones only when work needs independent planning or follow-up. See [project management](docs/process/PROJECT_MANAGEMENT.md). Source metadata may be committed; full transcripts, videos, scores, credentials, and personal practice records stay outside Git. A source launch is not a practice result.
 
 Agents should start with [AGENTS.md](AGENTS.md).
 
