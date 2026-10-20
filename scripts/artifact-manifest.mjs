@@ -12,5 +12,5 @@ for (const name of files) {
   artifacts.push({ name, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') });
 }
 await writeFile(resolve(directory, basename(directory) + '-SHA256SUMS.txt'), artifacts.map(a => `${a.sha256}  ${a.name}\n`).join(''));
-await writeFile(resolve(directory, basename(directory) + '-manifest.json'), JSON.stringify({ app: info.app, version: info.version, commit: info.commit, sourceDirty: info.sourceDirty, platform: basename(directory), signing: basename(directory) === 'windows' ? 'unsigned' : 'debug-signed test key; not production', privateMediaIncluded: false, artifacts }, null, 2) + '\n');
+await writeFile(resolve(directory, basename(directory) + '-manifest.json'), JSON.stringify({ app: info.app, version: info.version, commit: info.commit, sourceDirty: info.sourceDirty, platform: basename(directory), signing: basename(directory) === 'windows' ? 'unsigned' : 'debug-signed test key; not production', privateMediaIncluded: info.privateMediaIncluded, learnerRecordsIncluded: false, courseResources: info.courseResources, artifacts }, null, 2) + '\n');
 console.log('Wrote artifact manifest and SHA-256 checksums.');

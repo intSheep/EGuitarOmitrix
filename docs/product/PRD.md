@@ -386,3 +386,7 @@ inherit automatic continuation. Do not restart playback or microphone capture.
 External viewing remains separate and pauses practice until confirmation. Saving
 or discarding that viewing interval automatically continues practice if it was
 running before launch. A deliberately paused session stays paused.
+
+### FR-023 standardized private course delivery refinement (2026-10-20)
+
+The owner requires prepared course resources to accompany the app so repository-authorized testers can open scores without manually locating files. Windows and Android course builds include an immutable, checksum-pinned resource pack containing the runtime index, its GP/MusicXML files and source images. Store payload bytes as private GitHub Release assets, never Git history. Preserve existing item/source/revision metadata and all uncertainty; packaging does not establish musical correctness, mastery or backing-track synchronization. Original videos, preparation intermediates, learner records and secrets remain excluded. Ordinary PR builds stay lightweight with short-lived artifacts; manual course builds and draft releases verify the pinned pack, inventory actual Windows/APK resources and open representative notation/images offline. See [course resource delivery](../engineering/course-resources.md).

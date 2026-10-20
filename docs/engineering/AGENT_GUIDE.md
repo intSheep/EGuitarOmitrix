@@ -107,3 +107,7 @@ session-ID intent, clear it on explicit pause/tuning/finish/error/reload, and re
 wall/monotonic baselines so the away interval is never counted. Watch confirmation
 may resume formerly active practice; a pending watch still blocks continuation.
 Do not recreate the selected tool or automatically restart sound/capture.
+
+## Standardized private course packages
+
+The owner authorizes bundling the pinned course resources for repository-authorized testers under FR-023. Use `course-resources.md`; never weaken the default lightweight boundary or include arbitrary ignored files. Verify the outer pack hash, manifest hash, exact indexed file set and asset hashes before extraction. Fail the course build when the pinned pack is unavailable. Resource updates are explicit version/lock changes; installation must not overwrite learner storage or promote notation/audio review status.

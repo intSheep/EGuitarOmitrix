@@ -5,10 +5,10 @@ Owner authorization: 2026-10-20, issue [#40](https://github.com/intSheep/EGuitar
 ## Build contract
 
 - Use Node 24 (`.nvmrc`) and `npm ci`; commit `package-lock.json` with dependency changes. Exact direct versions are pinned. Electron's binary is prepared explicitly with `npm run desktop:setup`.
-- Root and `desktop/package.json` versions must match. Android derives version name/code from the root version when packaged; each component must be 0–99. Version `0.3.0` maps to Android versionCode `301`.
-- Every platform consumes `npm run build`, never a copy of the developer's application directory. The public build emits `build-info.json` with version, source commit and asset hashes. It deliberately replaces the local score index with an empty index.
-- Keep course media, scores, learner records and signing files outside Git and release inputs. The build and privacy-confinement tests are part of validation. `npm start` still serves machine-local material for development; it is not the release payload.
-- Keep app IDs, Windows data directory and web origins stable. Browser and native profiles are separate; transfer records through **练习回顾 → 备份与管理 → 导出备份 / 导入备份**. Scores/media are relinked separately.
+- Root and `desktop/package.json` versions must match. Android derives version name/code from the root version when packaged; each component must be 0–99. Version `0.3.1` maps to Android versionCode `302`.
+- Every platform consumes `npm run build`, never a copy of the developer's application directory. The public build emits `build-info.json` with version, source commit and asset hashes. The default lightweight build replaces the local score index with an empty index. Explicit course builds consume the pinned private pack; see [course resources](course-resources.md).
+- Keep course media/scores outside Git; only the pinned private course pack may enter an explicitly selected course build. Learner records and signing files never enter release inputs. The build and privacy-confinement tests are part of validation. `npm start` still serves machine-local material for development; it is not the release payload.
+- Keep app IDs, Windows data directory and web origins stable. Browser and native profiles are separate; transfer records through **练习回顾 → 备份与管理 → 导出备份 / 导入备份**. Learner-selected files are relinked separately; the pinned bundled course library is available immediately.
 
 ## Local commands
 
@@ -52,7 +52,7 @@ Remove prior `release/` output when changing versions. The packaging manifest re
 | Windows installer | Windows runner, clean install, NSIS x64 packaging, packaged-resource hash verification, actual packaged-executable smoke | Unsigned installer, manifest, checksums |
 | Android test APK | JDK 21, Android SDK 36, pinned Gradle distribution with SHA-256, Capacitor sync, Gradle debug build, APK resource verification | Test APK, manifest, checksums |
 
-The platform jobs depend on successful validation. Ordinary artifacts last 14 days; failed browser traces last seven days. Download artifacts from the successful Actions run. These are CI artifacts, not a published GitHub release. The Windows runner smoke exercises a real Windows executable; it does not install the NSIS package. Android compilation does not establish on-device microphone or picker acceptance.
+The platform jobs depend on successful validation. Ordinary artifacts and failed browser traces last one day. Private course builds skip the duplicate web artifact. Long-term tester downloads belong in private Releases. Download artifacts from the successful Actions run. These are CI artifacts, not a published GitHub release. The Windows runner smoke exercises a real Windows executable; it does not install the NSIS package. Android compilation does not establish on-device microphone or picker acceptance.
 
 Before merging, require all three gates to pass for the current PR revision. Do not merge based on a successful earlier commit. Repository branch-protection rules are not configured by this change; this convention is a review rule, not a claim of enforced GitHub protection.
 
@@ -61,7 +61,7 @@ Before merging, require all three gates to pass for the current PR revision. Do 
 1. Review and merge the focused PR after its current gates pass. Export a user backup before device upgrade testing.
 2. Bump root and desktop versions together, update the lockfile, and merge through the same process.
 3. Create an existing `vMAJOR.MINOR.PATCH` tag identifying that version on `main`.
-4. Dispatch **Draft application release** with the tag. Validation requires an exact package/tag match, a clean checkout and ancestry on `origin/main`. Wrong tags or arbitrary branch commits fail.
+4. Dispatch **Draft application release** with the tag. `include-course` defaults to true for repository-authorized testers; download and verification of the pinned pack must succeed before packaging. Validation requires an exact package/tag match, a clean checkout and ancestry on `origin/main`. Wrong tags or arbitrary branch commits fail.
 5. The workflow rebuilds and tests the tag, then creates a **draft prerelease** containing Windows/Android packages, manifests and checksums. It does not auto-publish, upload to a store or install anything.
 6. Inspect the draft and test installation, restart, backup/restore, local score loading/playback, microphone start/deny/close/background, sleep recovery and an upgrade retaining synthetic records on target devices. Publishing and production signing remain explicit owner actions.
 
