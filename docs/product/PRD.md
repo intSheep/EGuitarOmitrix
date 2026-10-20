@@ -296,6 +296,15 @@ Owner-authorized local MusicXML/score-model → audio processing → explicit sy
 
 FR-019 preparation clarification (2026-10-18): when a source supplies numbered notation without string/fret instructions, preserve its pitches, octaves and rhythm as staff notation rather than inventing source fingering. Added count-in measures and candidate audio anchors are preparation metadata, distinct from the instructor's notation and the owner's listening acceptance.
 
+FR-019 playback refinement (2026-10-20): provide an optional one-bar audible
+count-in before each explicit play/resume, off by default and remembered in this
+browser. Use the current playback position's meter and tempo, including speed
+changes and embedded-audio synchronization. Show preparation state and allow
+cancellation. Pause, stop, score replacement, tuner activation, navigation and
+backgrounding cancel pending playback. Loop boundaries do not insert additional
+count-ins. This playback preference does not alter score files, instructor
+prescriptions or proficiency records. See [implementation](../engineering/score-count-in.md).
+
 ### Quiet practice guidance extension (2026-10-18, issue #31)
 
 The owner authorizes a bounded FR-010–016 loop: optional learner-authored minutes per session, weekly session intention and target BPM; automatically observed foreground practice time and metronome-use duration by BPM; an end screen with optional self-reported stable BPM and learning/steady/mastered choice; and direct continuation of the same lesson on return. Finishing a session does not infer mastery or automatically advance the course. No practice-time prompts, microphone judgment, scheduled notifications or automatic speed increases are included.
