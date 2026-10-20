@@ -2,15 +2,16 @@
 
 A private electric-guitar practice companion. The first slice provides a task-focused exercise workspace and exact links to the course's Bilibili lessons, backing tracks, and demonstrations.
 
-**Current:** PRD v0.4; 140 source entries and task summaries for 72 lessons. One start action opens an immersive automatic timer with a metronome and consolidated course materials. Finishing saves actual time and opens an effort review with daily bars, activity calendar and exercise history. Records stay in browser IndexedDB, with backup merge and reversible deletion. Source uncertainties remain in the inventory.
+**Current:** 140 source entries and task summaries for 72 lessons; automatic focus timing, a metronome, lesson review, local backup/merge, a standard six-string tuner and local score playback. Windows and Android app packaging is authorized by FR-021. Records stay local. Source uncertainties remain in the inventory.
 
-Select an exercise, click **开始练习**, pause as needed, then finish to save. Refresh restores a paused draft. Videos and hidden pages pause timing. Use **练习回顾** for history and backups. Outcome ratings are optional. Score conversion/playback and Guitar Pro integration remain deferred.
+Select an exercise, click **开始练习**, pause as needed, then finish to save. Refresh restores a paused draft. Videos and hidden pages pause timing. Use **练习回顾** for history and backups. Outcome ratings are optional. Load your own MusicXML/GP scores; native Guitar Pro launch remains deferred.
 
 ## Run locally
 
-Node.js 22 or newer is required. No package installation is needed for the app, build, or unit tests.
+Use Node.js 24 (`.nvmrc`; minimum 22.12) and install the locked dependencies first.
 
 ```sh
+npm ci
 npm run dev
 ```
 
@@ -21,7 +22,22 @@ npm test
 npm run build
 ```
 
-The build copies the static application into ignored `dist/`. The development server is for local use; no hosting or deployment is configured.
+The build creates a sanitized static application in ignored `dist/`, with version/source metadata and asset hashes. It excludes machine-local course media/scores and personal records. The development server can still serve your ignored local score collection; the distributed app offers local score-file import. No hosting or public deployment is configured.
+
+## Installable apps and CI
+
+Windows is the primary native target. CI validates unit/browser/desktop behavior before producing an unsigned Windows x64 installer and a debug-signed Android test APK. Download packages, manifests and checksums from the successful PR/main Actions run. Ordinary CI does not publish a release. The manual release workflow validates an existing version tag and creates a draft prerelease only.
+
+```sh
+npm run desktop:setup
+npm run desktop
+# On Windows:
+npm run package:windows
+# With JDK 21 and Android SDK 36:
+npm run package:android
+```
+
+Windows keeps records in `%APPDATA%/EGuitarOmitrix`, separate from your browser. Transfer existing records through **练习回顾 → 备份与管理**. Android test signing keys may differ across CI runs: export a backup before replacing an older test APK. Stable production signing and iPhone packaging are deferred. See [build/release procedure](docs/engineering/releases.md), [architecture](docs/decisions/0005-native-app-packaging.md) and [actual verification and limits](docs/engineering/app-packaging-validation.md).
 
 ## Product and design
 

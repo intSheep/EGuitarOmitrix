@@ -1,0 +1,9 @@
+{
+  "name": "eguitar-omitrix-desktop",
+  "productName": "EGuitarOmitrix",
+  "version": "0.3.0",
+  "description": "Local electric-guitar practice companion",
+  "author": "intSheep",
+  "private": true,
+  "main": "main.cjs"
+}

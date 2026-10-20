@@ -1,4 +1,5 @@
 import { lessonReview } from "./review-view.js";
+import { saveFile } from "./file-export.js";
 import { teacherPrescription, todayPractice } from "./prescription.js";
 import { FINISH_OUTCOMES, emptyGoals, optionalNumber, resumeGuidance, mergeGoals } from "./guidance.js";
 import { showPositionReference } from "./position-reference.js";
@@ -498,12 +499,7 @@ document.addEventListener("click", async (ev) => {
           ],
           { type: "application/json" },
         );
-        const url = URL.createObjectURL(blob),
-          a = document.createElement("a");
-        a.href = url;
-        a.download = "eguitar-practice.json";
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        await saveFile(blob, 'eguitar-practice.json');
         break;
       }
       case "import-confirm":
@@ -643,6 +639,11 @@ document.addEventListener("visibilitychange", () => {
 window.addEventListener("pagehide", () => {
   pause().catch(() => {});
 });
+// Native shells invoke the same pause/capture cleanup as browser backgrounding.
+window.eguitarPauseForBackground = async () => {
+  closeTuner();
+  await pause('离开应用，计时已暂停');
+};
 function sampleClock(withMetronome = true) {
   if (draft && release) draft = tickSession(draft, Date.now(), performance.now(), withMetronome && metro.running ? metro.bpm : null);
 }

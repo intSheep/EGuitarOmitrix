@@ -3,9 +3,9 @@ import { readFile, realpath } from "node:fs/promises";
 import { resolve, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const appRoot = await realpath(
-  fileURLToPath(new URL("../app/", import.meta.url)),
-);
+const appRoot = await realpath(process.env.EGUITAR_SERVE_DIST === '1'
+  ? fileURLToPath(new URL('../dist/', import.meta.url))
+  : fileURLToPath(new URL('../app/', import.meta.url)));
 const port = Number(process.env.PORT || 5173);
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -14,6 +14,7 @@ const mime = {
   ".png": "image/png",
   ".woff2": "font/woff2",
   ".woff": "font/woff",
+  ".sf2": "application/octet-stream",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",

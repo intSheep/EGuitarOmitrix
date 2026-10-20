@@ -1,4 +1,5 @@
 import { showPositionReference } from "./position-reference.js";
+import { saveFile } from "./file-export.js";
 let sdk,
   api,
   generation = 0,
@@ -35,12 +36,7 @@ export function closeScore() {
   else dispose();
 }
 function download(bytes, name, type) {
-  const u = URL.createObjectURL(new Blob([bytes], { type }));
-  urls.push(u);
-  const a = document.createElement("a");
-  a.href = u;
-  a.download = name;
-  a.click();
+  return saveFile(new Blob([bytes], { type }), name);
 }
 export async function showScore(entryId, title) {
   if (!dialog) {
@@ -139,9 +135,9 @@ export async function showScore(entryId, title) {
       }
       player.playbackSpeed = rate ? bpm / 100 : bpm / player.score.tempo;
     };
-    dialog.querySelector("#score-gp").onclick = () => {
+    dialog.querySelector("#score-gp").onclick = async () => {
       try {
-        download(
+        await download(
           gpBytes || new sdk.exporter.Gp7Exporter().export(player.score),
           "practice.gp",
           "application/octet-stream",
@@ -150,12 +146,13 @@ export async function showScore(entryId, title) {
         status.textContent = "导出失败：" + e.message;
       }
     };
-    dialog.querySelector("#score-xml").onclick = () =>
-      download(
+    dialog.querySelector("#score-xml").onclick = async () => {
+      try { await download(
         xmlBytes,
         "practice.musicxml",
         "application/vnd.recordare.musicxml+xml",
-      );
+      ); } catch(e) { status.textContent = '导出失败：' + e.message; }
+    };
     dialog.querySelector("#score-source").onclick = () => {
       const images = dialog.querySelector("#score-images");
       images.hidden = !images.hidden;

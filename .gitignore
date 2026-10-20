@@ -48,3 +48,16 @@ __pycache__/
 # Generated, local-only score media and third-party runtime
 /app/local-scores/
 /app/vendor/
+
+# Native application builds and signing material
+/release/
+/test-results/
+/playwright-report/
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.apk
+*.aab
+*.exe
+*.blockmap

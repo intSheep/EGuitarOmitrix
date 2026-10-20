@@ -1,0 +1,9 @@
+{
+  "appId": "io.github.intsheep.eguitaromitrix",
+  "appName": "EGuitarOmitrix",
+  "webDir": "dist",
+  "backgroundColor": "#ffffff",
+  "loggingBehavior": "debug",
+  "server": { "hostname": "localhost", "androidScheme": "https", "cleartext": false },
+  "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false, "minWebViewVersion": 120 }
+}
