@@ -155,3 +155,29 @@ Limits: synthetic capture is not validation of a physical guitar, Windows microp
 The owner's latest direction replaces both the toy-like vertical SVG and the interim photographic material style. The final generated illustration uses the app's white/grey, charcoal and royal-blue palette, conventional horizontal guitar proportions and 3+3 tuning machines. The selected RGBA asset is local to the app; its exact generation/edit prompts are documented. Manual string/mode controls are removed. The status row only indicates the nearest detected open-string target.
 
 `npm test` passed all 44 checks after removing the manual target API. Browser acceptance additionally exercises each of six standard strings at −25 and +25 cents with synthetic oscillators through WebAudio, asserting the automatically selected target and the actual UI instruction: tighten when flat, loosen when sharp. The existing real Chromium synthetic-WAV capture, permissions, device switching and capture cleanup checks remain in the same script. Final illustration screenshots at 1440/768/390 px verify horizontal layout, image load, noninteractive status labels and no horizontal overflow. No physical hardware accuracy claim is added.
+
+### Saved practice summary — 2026-10-20, issue #44
+
+FR-010, FR-012, FR-013; ADR 0004. See the
+[design reference and decisions](../design/saved-practice.md).
+
+- Isolated Chromium contexts at 1440, 768, 390 and 320px passed actual
+  start/finish/save, initially unknown proficiency/BPM, reversible proficiency
+  selection, teacher-material opening, stable-BPM/result editing, reload without
+  duplicate records and return to the same lesson.
+- Geometry assertions confirmed equal action widths/heights, aligned desktop
+  action tops, separated full-width phone actions, and three equal proficiency
+  choices on one row. Long synthetic notes remained escaped and wrapped without
+  horizontal document overflow. No page errors occurred.
+- Actual desktop and phone completion screenshots were visually inspected. The
+  straight checkmark uses an inline SVG, independent of font-glyph rendering.
+- All 44 local unit tests passed on Node 24.19.0. Existing
+  `scripts/verify-guidance.mjs` passed at 1440/768/390px, including
+  confirmation recovery, failed-save retry, fixed-tempo rules, goal conflict
+  rejection and continued practice. `npm run build`, JavaScript syntax checking
+  and `git diff --check` passed. No CI was triggered.
+
+The focused layout assertions ran from a temporary local QA script. All browser
+data was synthetic in disposable profiles. No personal records, storage schema,
+timing rules or proficiency criteria were changed. Chromium layout/interaction
+checks do not establish acceptance in every browser or owner aesthetic approval.
