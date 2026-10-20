@@ -169,21 +169,33 @@ function focus() {
   const toolButton = (attribute, label, paths) => `<button class="focus-tool" ${attribute}>${icon(paths)}<span>${label}</span></button>`;
   return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><div class="focus-layout"><div class="focus-main"><h1>${esc(shortTitle(e))}</h1><div id="focus-clock"><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div></div><div id="focus-tool-content" tabindex="-1" hidden></div><button id="floating-timer" type="button" aria-label="返回主计时，拖动或使用方向键移动" hidden><span class="floating-grip" aria-hidden="true">⠿</span><span><small data-floating-state>练习中</small><strong data-floating-time>${time(draft.elapsedMs/1000)}</strong></span><span class="floating-return" aria-hidden="true">↩</span></button><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div><div id="focus-requirements">${requirements(e)}</div></div><aside class="focus-tools" aria-label="练习工具"><h2>练习工具</h2><div class="tool-dock">${toolButton('data-tuner', '调音器', '<path d="M9 3v8a3 3 0 0 0 6 0V3M12 14v7M7 3v7m10-7v7"/>')}${toolButton('data-position-reference', '把位速查', '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v18m6-18v18M4 9h16M4 15h16"/><circle cx="12" cy="12" r="1"/>')}${toolButton(`data-score="${e.id}"`, '乐谱', '<path d="M9 17V5l11-2v12M9 8l11-2"/><ellipse cx="6" cy="17" rx="3" ry="2"/><ellipse cx="17" cy="15" rx="3" ry="2"/>')}${!teacherPrescription(a).noMetronome ? toolButton('data-action="metronome"', '节拍器', '<path d="M9 3h6l5 18H4L9 3ZM12 16l5-10M8 17h8"/>') : ''}${toolButton(`data-material="${e.id}"`, '课程资料', '<rect x="3" y="5" width="18" height="15" rx="2"/><path d="m10 9 5 3-5 3V9ZM7 2v3m10-3v3"/>')}</div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></aside></div></section>`;
 }
+function savedPractice(record) {
+  return `<section class="completion" aria-labelledby="completion-title">
+    <header class="completion-heading">
+      <span class="complete-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg></span>
+      <h2 id="completion-title">本次练习已记录</h2>
+    </header>
+    <div class="completion-body">
+      <div class="completion-time"><span class="completion-label">本次练习时间</span><strong class="session-duration">${time(record.minutes * 60)}</strong><p class="completion-lesson">${esc(shortTitle(entry(record.entryId)))}</p></div>
+      <div class="completion-result">
+        <p class="completion-label" id="completion-outcome-label">熟练程度 · 自评</p>
+        <div class="outcomes" role="group" aria-labelledby="completion-outcome-label">${Object.entries(FINISH_OUTCOMES).map(([k, v]) => `<button class="button secondary" data-outcome="${k}" data-log="${record.id}" aria-pressed="${record.outcome === k}">${v}</button>`).join('')}</div>
+        ${record.bpm ? `<p class="completion-bpm"><strong>${record.bpm} <span>BPM</span></strong><span>${record.bpmBasis === 'self-reported-stable' ? '自评稳定速度' : '记录速度'}</span></p>` : ''}
+      </div>
+    </div>
+    ${record.note || record.nextFocus || record.tempoUsage?.length ? `<div class="completion-details">${record.note ? `<p>${esc(record.note)}</p>` : ''}${record.nextFocus ? `<p>下次重点：${esc(record.nextFocus)}</p>` : ''}${tempoEvidence(record)}</div>` : ''}
+    <footer class="completion-footer">
+      ${record.outcome === 'learning' ? `<button class="text-link" data-material="${record.entryId}">查看老师讲解<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>` : ''}
+      <div class="completion-actions"><button class="button secondary" data-edit-result="${record.id}">修改本次结果</button><a class="button primary" href="#practice?lesson=${record.entryId}">返回练习台</a></div>
+    </footer>
+  </section>`;
+}
 function history() {
   const all = activeLogs(logs), record = all.find(l=>l.id===route().params.get('session')), days = dailySeconds(logs);
   const filter=route().params.get('day');
   const heading = `<div class="page-heading"><h1>练习回顾</h1>${button("manage", "备份与管理")}</div>${
     record
-      ? `<section class="completion"><div class="complete-mark">✓</div><h2>本次练习已记录</h2><strong class="session-duration">${time(record.minutes * 60)}</strong><p>${esc(shortTitle(entry(record.entryId)))}</p>${record.note ? `<p>${esc(record.note)}</p>` : ""}${record.nextFocus ? `<p>下次重点：${esc(record.nextFocus)}</p>` : ""}${record.bpm ? `<p>${record.bpm} BPM${record.bpmBasis === "self-reported-stable" ? " · 自评稳定速度" : ""}</p>` : ""}${tempoEvidence(record)}<div class="outcomes">${Object.entries(
-          FINISH_OUTCOMES,
-        )
-          .map(
-            ([k, v]) =>
-              `<button class="button secondary" data-outcome="${k}" data-log="${record.id}" aria-pressed="${record.outcome === k}">${v}</button>`,
-          )
-          .join(
-            "",
-          )}</div>${record.outcome === 'learning' ? `<div class="next-actions"><button class="button secondary" data-material="${record.entryId}">查看老师讲解</button></div>` : ''}<button class="button secondary" data-edit-result="${record.id}">修改本次结果</button><a class="button primary" href="#practice?lesson=${record.entryId}">返回练习台</a></section>`
+      ? savedPractice(record)
       : ""
   }`;
 

@@ -62,3 +62,10 @@ materials screen `f5031812a7cc497c8cc67b007abfb995`, following the owner's expli
 central-surface, fluid-transition and floating-clock direction. It rejects new
 routes, fake score/proficiency data and nested practice overlays. Actual browser
 verification and its limits are recorded independently.
+
+## Saved practice summary — 2026-10-20
+
+The owner-requested completion redesign, Stitch reference, retained/rejected
+decisions and interaction boundary are recorded in
+[Saved practice summary](saved-practice.md). This replaces the oversized centered
+completion panel with a compact summary and consistently aligned action buttons.

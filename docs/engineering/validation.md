@@ -209,3 +209,38 @@ No personal records or real microphone input were used; no CI was requested.
 This checks lifecycle handling through deterministic browser events, not every
 operating system's window-visibility behavior. Browser reload remains an explicit
 recovery boundary and sound/capture are not automatically restarted.
+
+### Saved practice summary — 2026-10-20, issue #44
+
+FR-010, FR-012, FR-013; ADR 0004. See the
+[design reference and decisions](../design/saved-practice.md).
+
+- Isolated Chromium contexts at 1440, 768, 390 and 320px passed actual
+  start/finish/save, initially unknown proficiency/BPM, reversible proficiency
+  selection, teacher-material opening, stable-BPM/result editing, reload without
+  duplicate records and return to the same lesson.
+- Geometry assertions confirmed equal action widths/heights, aligned desktop
+  action tops, separated full-width phone actions, and three equal proficiency
+  choices on one row. Long synthetic notes remained escaped and wrapped without
+  horizontal document overflow. No page errors occurred.
+- Actual desktop and phone completion screenshots were visually inspected. The
+  straight checkmark uses an inline SVG, independent of font-glyph rendering.
+- All 44 local unit tests passed on Node 24.19.0. Existing
+  `scripts/verify-guidance.mjs` passed at 1440/768/390px, including
+  confirmation recovery, failed-save retry, fixed-tempo rules, goal conflict
+  rejection and continued practice. `npm run build`, JavaScript syntax checking
+  and `git diff --check` passed. No CI was triggered.
+
+The focused layout assertions ran from a temporary local QA script. All browser
+data was synthetic in disposable profiles. No personal records, storage schema,
+timing rules or proficiency criteria were changed. Chromium layout/interaction
+checks do not establish acceptance in every browser or owner aesthetic approval.
+
+### Main integration before merge — 2026-10-20
+
+Integrated `d35460f` (saved-practice summary, PR #46) while preserving both design
+and validation histories. Runtime files merged without code conflicts; only
+appended documentation sections required reconciliation. The combined version
+passed all 48 unit/integration tests, the build, and the automatic-return,
+separate-viewing and practice browser suites in isolated profiles. No CI was
+requested.
