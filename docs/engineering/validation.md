@@ -188,3 +188,24 @@ Limits: external Bilibili playback/pause cannot be observed; viewing is a
 learner-confirmed interval, with gaps explicitly reviewable. No real video watch,
 physical guitar/input hardware or native GP8 acceptance is claimed. The new Stitch
 generation timed out; no usable generated central-tool screen was returned.
+
+### Automatic return continuation — 2026-10-20
+
+Owner refinement to FR-010/022, within issue #41 and PR #43. Added a transient
+session-ID continuation intent for automatic visibility/route suspension. Return
+starts fresh wall/monotonic baselines, preserving the selected inline tool and
+excluding the background gap. Explicit pause/tuning/finish, interrupted storage
+and fresh loads do not inherit that intention. Watch save/discard resumes only
+practice that was running before launch; pending viewing still blocks it.
+
+`verify-auto-return.mjs` passed in isolated Chromium at 1440/390 px with synthetic
+visibility and external-page fixtures: background exclusion, automatic timer and
+selected-tool continuation, duplicate events, route return, manual pause, tuner
+exclusion, formerly paused viewing, watch confirmation, aborted resume persistence,
+reload and finish safeguards. `verify-study.mjs` and the existing practice browser
+suite passed. All 48 tests in the focused PR copy and the local build passed.
+No personal records or real microphone input were used; no CI was requested.
+
+This checks lifecycle handling through deterministic browser events, not every
+operating system's window-visibility behavior. Browser reload remains an explicit
+recovery boundary and sound/capture are not automatically restarted.

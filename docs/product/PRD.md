@@ -355,3 +355,17 @@ Pause/finish controls remain available. The tuner uses the same surface while
 retaining FR-020's required timer/audio pause and microphone cleanup. External
 lesson viewing retains FR-021's separately confirmed time. Closing, replacing or
 leaving a tool releases its audio/capture resources without ending the session.
+
+### Automatic return continuation — FR-010/022 refinement (2026-10-20)
+
+When a live, running practice session is suspended because its page becomes hidden
+or the learner leaves the focus route, returning to the visible focus surface
+automatically continues the same timer from a fresh clock baseline. Exclude the
+away interval and retain the selected inline tool on a visibility return. Keep
+this continuation intent in memory for the current page, tied to the session ID.
+Explicit pause, tuning, finishing, storage failure and a fresh page load must not
+inherit automatic continuation. Do not restart playback or microphone capture.
+
+External viewing remains separate and pauses practice until confirmation. Saving
+or discarding that viewing interval automatically continues practice if it was
+running before launch. A deliberately paused session stays paused.

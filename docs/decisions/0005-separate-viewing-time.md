@@ -16,7 +16,8 @@ measures wall time from launch until return to the app, including background tim
 Returning through focus, visibility or in-app navigation freezes the candidate
 duration. A visible stop control covers browsers that do not deliver return events.
 The learner confirms the interval, reduces it to actual viewing time in minutes
-and seconds, or discards it. There is no automatic practice restart.
+and seconds, or discards it. Confirming or discarding resumes practice only when it was running
+before the video launch and the same live page/session still owns the clock.
 
 External playback, pause and completion are unavailable to this application.
 The record is a learner-confirmed viewing interval, not verified playback or
@@ -52,3 +53,18 @@ No embedded external player, playback-position telemetry, native app launch help
 recording, cloud synchronization or automatic planning is included. Browser-local
 storage remains subject to deletion by the user or browser. Synthetic browser
 acceptance does not establish real Bilibili playback or physical user attention.
+
+## Owner refinement: automatic return continuation
+
+On 2026-10-20 the owner requested eliminating the repeated Continue click after
+page switches. Automatically suspended practice now carries an in-memory session
+ID. Visible return to the focus route resumes from fresh wall/monotonic clock
+baselines and excludes the away gap. Visibility returns preserve the current
+inline tool. Duplicate return events cannot start a second resume.
+
+Explicit pause/tuning/finish, a failed persistence operation and a new page load
+clear that intent. An unconfirmed external-viewing draft blocks continuation;
+save/discard then resumes formerly running practice. A previously paused practice
+session, including one recovered after reload, stays paused. Sound and microphone
+capture require their existing explicit controls. No storage schema change is
+required.

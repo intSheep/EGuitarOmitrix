@@ -96,3 +96,10 @@ clock and pause/finish controls keep timing visible. Preserve explicit pause whe
 switching tools and never restart practice automatically after tuning. Reduced
 motion skips the fluid transition. Tool replacement must stop its playback or
 capture resources without changing the practice record.
+
+The owner's automatic-return refinement permits continuing an automatically
+suspended live session when the visible focus surface returns. Retain a transient
+session-ID intent, clear it on explicit pause/tuning/finish/error/reload, and reset
+wall/monotonic baselines so the away interval is never counted. Watch confirmation
+may resume formerly active practice; a pending watch still blocks continuation.
+Do not recreate the selected tool or automatically restart sound/capture.

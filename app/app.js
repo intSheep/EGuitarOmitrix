@@ -74,6 +74,8 @@ let course,
   lastTrigger,
   saveQueue = Promise.resolve();
 let watches = [], watchDraft = null, watchBusy = false, watchAway = false;
+// Only this live page may resume a session it automatically suspended.
+let returnSessionId = null;
 const metro = new Metronome((beat) =>
   document
     .querySelectorAll(".beat-dot")
@@ -301,15 +303,33 @@ function persist() {
   saveQueue = saveQueue.catch(() => {}).then(() => writeDraft(db, snapshot));
   return saveQueue;
 }
-async function pause(reason = "已暂停") {
+async function pause(reason = "已暂停", { resumeWhenBack = false } = {}) {
+  if (!resumeWhenBack) returnSessionId = null;
+  else if (draft?.running && release && !draft.finishing) returnSessionId = draft.id;
   pauseScore();
-  if (draft && release) draft = pauseSession(draft, Date.now(), performance.now(), reason, metro.running ? metro.bpm : null);
+  if (draft && release && (!resumeWhenBack || draft.running))
+    draft = pauseSession(draft, Date.now(), performance.now(), reason, metro.running ? metro.bpm : null);
   metro.stop();
   const mb = document.querySelector('[data-action="metro-toggle"]');
   if (mb) mb.textContent = "播放节拍";
   if (!draft || !release) return;
   updateClock();
   await persist();
+}
+async function resumeAfterReturn() {
+  if (!returnSessionId || !db || !release || document.hidden || route().name !== 'focus' ||
+      !draft || draft.id !== returnSessionId || draft.running || draft.finishing ||
+      draft.elapsedMs >= 86400000 || watchDraft || watchBusy || busy ||
+      document.querySelector('#tuner-dialog[open]')) return;
+  returnSessionId = null;
+  draft = resumeSession(draft, Date.now(), performance.now());
+  updateClock();
+  try { await persist(); }
+  catch (e) {
+    draft = recoverSession(draft);
+    updateClock();
+    throw e;
+  }
 }
 async function claimSession(id, expectedId = null) {
   if (!db) throw new Error(storageError || "无法打开练习存储");
@@ -346,6 +366,7 @@ async function claimSession(id, expectedId = null) {
   }
 }
 async function start(id, resume = false) {
+  returnSessionId = null;
   const alreadyFocusing = route().name === 'focus' && !!document.querySelector('#focus-clock');
   if (watchDraft) throw Error('请先确认或不计入这次看课时间，再继续练习');
   await claimSession(id);
@@ -435,7 +456,7 @@ async function launchMaterial(el) {
   video.opener = null;
   watchBusy = true;
   try {
-    await pause('正在看课，练习计时已暂停');
+    await pause('正在看课，练习计时已暂停', { resumeWhenBack: true });
     if (db && navigator.locks) {
       await acquireActivity();
       const next = beginWatch(el.dataset.watch);
@@ -446,7 +467,7 @@ async function launchMaterial(el) {
     else notice('当前无法保存看课计时，本次仅打开视频');
     video.location.replace(el.href);
     modal.close(); renderStudyPanel();
-  } catch (error) { video.close(); releaseWatchActivity(); throw error; }
+  } catch (error) { returnSessionId = null; video.close(); releaseWatchActivity(); throw error; }
   finally { watchBusy = false; }
 }
 async function manage() {
@@ -549,6 +570,7 @@ document.addEventListener("click", async (ev) => {
           await acquireActivity(); await writeWatch(db, null, watchDraft);
           watchDraft = null; releaseWatchActivity(); renderStudyPanel();
         } finally { watchBusy = false; }
+        await resumeAfterReturn();
         break;
       case "retry-storage":
         if (connectionAttempt)
@@ -703,6 +725,7 @@ document.addEventListener("submit", async (e) => {
       releaseWatchActivity(); render(); notice('看课时间已单独保存');
     } catch (error) { e.target.querySelector('.study-error').textContent = error.message; }
     finally { watchBusy = false; }
+    await resumeAfterReturn().catch(error => notice(error.message));
   }
   if(e.target.id==='result-form') {
     e.preventDefault();if(busy)return;busy=true;
@@ -750,26 +773,30 @@ modal.addEventListener(
   () => lastTrigger?.isConnected && lastTrigger.focus(),
 );
 window.addEventListener("hashchange", async () => {
-
+  const leavingPractice = route().name !== 'focus';
   closeTuner();
   closeScore();
-  try { await endWatch(); } catch (e) { notice(e.message); }
-  if (route().name !== "focus") {
+  if (leavingPractice) {
     try {
-      await pause();
+      await pause('离开练习区，返回后自动继续', { resumeWhenBack: true });
     } catch (e) {
       notice(e.message);
     }
   }
+  try { await endWatch(); } catch (e) { notice(e.message); }
   modal.close();
   render();
+  try { await resumeAfterReturn(); } catch (e) { notice(e.message); }
   window.scrollTo(0, 0);
 });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && watchDraft?.endedAt === null) watchAway = true;
   if (!document.hidden && watchAway) endWatch().catch(e => notice(e.message));
   if (document.hidden)
-    pause("离开页面，计时已暂停").catch((e) => notice(e.message));
+    pause("离开页面，返回后自动继续", { resumeWhenBack: true }).catch((e) => {
+      returnSessionId = null;
+      notice(e.message);
+    });
   else if (db && !release)
     Promise.all([allLogs(db), readDraft(db), readGoals(db), readStudy(db)])
       .then(([l, d, g, study]) => {
@@ -780,10 +807,12 @@ document.addEventListener("visibilitychange", () => {
         render();
       })
       .catch((e) => notice(e.message));
+  else if (!document.hidden) resumeAfterReturn().catch(e => notice(e.message));
 });
 window.addEventListener('blur', () => { if (watchDraft?.endedAt === null) watchAway = true; });
 window.addEventListener('focus', () => {
   if (watchAway && !document.hidden) endWatch().catch(e => notice(e.message));
+  if (!document.hidden) resumeAfterReturn().catch(e => notice(e.message));
 });
 window.addEventListener("pagehide", () => {
   pause().catch(() => {});
@@ -799,6 +828,7 @@ setInterval(async () => {
   try {
     await persist();
   } catch (e) {
+    returnSessionId = null;
     draft = recoverSession(draft);
     metro.stop();
     updateClock();
@@ -807,6 +837,7 @@ setInterval(async () => {
 }, 1000);
 function connectStorage() {
   if (connectionAttempt) return connectionAttempt;
+  returnSessionId = null;
   storageError = "正在连接本地练习记录…";
   render();
   connectionAttempt = (async () => {

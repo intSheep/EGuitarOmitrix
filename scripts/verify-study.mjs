@@ -77,7 +77,7 @@ try {
   assert.equal((await study()).records[0].seconds, 1);
   assert.equal((await practice()).elapsedMs, paused.elapsedMs);
   await popup.close();
-  await page.locator('[data-action=pause]').click();
+  await page.waitForFunction(async () => { const m=await import('/practice-store.js'); return (await m.readDraft(await m.openPracticeDB())).running; });
   await page.waitForTimeout(1200);
   await page.locator('[data-action=finish]').click();
   await page.locator('#finish-form [type=submit]').click();
