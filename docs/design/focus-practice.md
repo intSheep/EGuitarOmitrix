@@ -25,3 +25,10 @@ The owner rejected the flat catalog as still visually weak. Stitch screen `6880f
 ## Embedded score overlay — issue #20
 
 Stitch screen `2a0fbb0207eb4294a0ae876021df9021` was generated for the score overlay. Retained the large white notation canvas, compact blue/neutral playback tools, local file input, source-frame toggle and download actions. No score asset is fabricated as an empty-state placeholder. Actual alphaTab-rendered desktop/mobile screenshots were inspected; the notation layout is supplied by the library, not the design mockup.
+
+## Saved practice summary — 2026-10-20
+
+The owner-requested completion redesign, Stitch reference, retained/rejected
+decisions and interaction boundary are recorded in
+[Saved practice summary](saved-practice.md). This replaces the oversized centered
+completion panel with a compact summary and consistently aligned action buttons.
