@@ -244,3 +244,42 @@ appended documentation sections required reconciliation. The combined version
 passed all 48 unit/integration tests, the build, and the automatic-return,
 separate-viewing and practice browser suites in isolated profiles. No CI was
 requested.
+
+## Optional one-bar score count-in — 2026-10-20
+
+FR-019. See [implementation](score-count-in.md) and
+[Stitch design decisions](../design/score-count-in.md).
+
+- The focused PR copy is based on `d35460f` and excludes unrelated working
+  changes. All 51 local tests passed, including seven count-in tests for meter and
+  denominator, current/repeated bar and tempo changes, backing-sync tempo,
+  playback speed, audio-clock completion, cancellation, late activation,
+  interrupted/stalled audio and activation failure.
+- `scripts/verify-score-count-in.mjs` passed with isolated Chromium storage and
+  synthetic MusicXML/audio-embedded GP fixtures. Verified default-off immediate
+  playback, remembered opt-in after reload, play/resume preparation, 3/4 and 6/8,
+  half-speed backing, unchanged loop continuity, first-beat accent, visible
+  cancellation, no early score/media playback, and actual playback advancement.
+  Checked expected bar durations of 1000 ms, 750 ms and 2000 ms using
+  scheduled clicks and actual player calls. These are browser-clock checks,
+  not acoustic latency measurements.
+- Cancel, stop, preference/tempo changes, score replacement, pause, background,
+  navigation, close and tuner activation prevented delayed playback. Storage
+  denial preserved the current in-memory setting; audio activation failure
+  restored a usable Play button without starting the score. No page errors in
+  the completed acceptance run.
+- Desktop/tablet/phone layouts at 1440, 768 and 390 px passed after score layout
+  settled; actual phone screenshot inspected.
+- Production build, JavaScript syntax and diff checks passed. No CI was run.
+  No personal records or course media were added to Git. Physical audio output
+  and Safari/Firefox were not verified.
+
+### Count-in integration before merge — 2026-10-20
+
+Integrated main `5c908eb` (PR #47). Retained the optional count-in controls and
+cancellation lifecycle together with inline score mounting, return-to-clock
+callbacks and the guarded file loader. Both validation histories remain intact.
+All 55 unit/integration tests and the build passed. The central-tool browser suite
+passed at 1440/768/390 px, and the count-in browser suite passed synthesized and
+backing playback, meter/rate/resume, cancellation, tuner/background/navigation,
+persistence and storage-denial scenarios with synthetic inputs.
