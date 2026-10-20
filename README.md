@@ -37,7 +37,7 @@ npm run package:windows
 npm run package:android
 ```
 
-Windows keeps records in `%APPDATA%/EGuitarOmitrix`, separate from your browser. Transfer existing records through **练习回顾 → 备份与管理**. Android test signing keys may differ across CI runs: export a backup before replacing an older test APK. Stable production signing and iPhone packaging are deferred. See [build/release procedure](docs/engineering/releases.md), [architecture](docs/decisions/0005-native-app-packaging.md) and [actual verification and limits](docs/engineering/app-packaging-validation.md).
+Windows keeps records in `%APPDATA%/EGuitarOmitrix`, separate from your browser. Transfer existing records through **练习回顾 → 备份与管理**. Android test signing keys may differ across CI runs: export a backup before replacing an older test APK. Stable production signing and iPhone packaging are deferred. See [build/release procedure](docs/engineering/releases.md), [architecture](docs/decisions/0006-native-app-packaging.md) and [actual verification and limits](docs/engineering/app-packaging-validation.md).
 
 ## Product and design
 

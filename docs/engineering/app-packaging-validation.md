@@ -12,6 +12,12 @@ Electron 44.9.1 passed the actual Linux shell smoke in an isolated Xvfb display 
 
 `npm audit --omit=dev` reported zero known production dependency advisories on this date. Native/CI evidence is appended after execution below. A configured workflow is not a successful Actions run; a compiled APK is not device acceptance.
 
+## CI evidence
+
+The exact current revision's validation, packaged Windows executable smoke, Windows installer build, Android compilation and APK asset verification are reported in [PR #42 Checks](https://github.com/intSheep/EGuitarOmitrix/pull/42/checks). Use the successful run's downloadable manifests/checksums to identify a delivered artifact and its merge/tag source commit. The PR description records the actual completed run separately from this local evidence. This change does not run the manual tag/draft-release workflow, create a version tag or publish a release.
+
 ## Acceptance limits
+
+The pinned alphaTab 1.8.4 worklet implementation exhibited an asynchronous startup/stop race in CI. The application uses its documented ScriptProcessor compatibility output for this pilot; desktop acceptance checks a real source start followed by immediate simulated native background pause and close. Physical audio latency is not measured. Local browser acceptance used Chrome for Testing 156.0.8078.4; Electron 44.9.1 embeds Chromium 152.0.7977.167.
 
 No Windows certificate, stable Android release signing key, store publication, automatic updates, iOS build, real guitar accuracy measurement or cross-device synchronization is delivered. Android's native picker/permission behavior, physical audio devices, suspend/resume, installation and upgrades need target-device acceptance. The shipped course catalog/task summaries retain their existing uncertainty; excluded course media can be loaded locally by the learner.

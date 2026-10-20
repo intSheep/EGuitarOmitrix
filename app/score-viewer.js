@@ -62,6 +62,8 @@ export async function showScore(entryId, title) {
       notation: { elements: { scoreTitle: false } },
       player: {
         enablePlayer: true,
+        // alphaTab 1.8.4's asynchronous worklet startup can race native background/close.
+        outputMode: sdk.PlayerOutputMode.WebAudioScriptProcessor,
         soundFont: "./vendor/alphatab/soundfont/sonivox.sf2",
         scrollElement: dialog,
       },

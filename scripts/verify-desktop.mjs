@@ -57,8 +57,18 @@ try {
   await expect(page.locator('#score-status')).toContainText('可载入本地');
   await page.locator('#score-file').setInputFiles({ name: 'synthetic.musicxml', mimeType: 'application/xml', buffer: Buffer.from(syntheticScore) });
   await expect(page.locator('#score-play')).toBeEnabled({ timeout: 15000 });
+  await page.evaluate(() => {
+    window.testScoreAudioStarted = false;
+    const start = AudioBufferSourceNode.prototype.start;
+    AudioBufferSourceNode.prototype.start = function(...args) {
+      const result = start.apply(this, args); window.testScoreAudioStarted = true; return result;
+    };
+  });
   await page.locator('#score-play').click();
   await expect(page.locator('#score-play')).toHaveText('暂停');
+  await expect.poll(() => page.evaluate(() => testScoreAudioStarted)).toBe(true);
+  await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].emit('blur'));
+  await expect(page.locator('#score-play')).toHaveText('播放');
   await page.locator('#score-close').click();
   await page.locator('[data-action=finish]').click();
   await page.locator('#finish-form button[type=submit]').click();

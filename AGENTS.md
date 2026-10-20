@@ -8,7 +8,7 @@ Design correction: use the owner-supplied Brilliant screenshot as the visual ref
 
 ## Read before work
 
-The owner authorizes Windows app delivery and Android test packaging under FR-021 (issue #40). Follow ADR 0005 and `docs/engineering/releases.md`. Every distribution uses the sanitized build; never copy ignored local scores/media into native resources. Preserve application IDs/origins and backup compatibility. Initial packages are unsigned Windows/debug-signed Android pilots; iOS, store publishing and production signing remain deferred.
+The owner authorizes Windows app delivery and Android test packaging under FR-021 (issue #40). Follow ADR 0006 and `docs/engineering/releases.md`. Every distribution uses the sanitized build; never copy ignored local scores/media into native resources. Preserve application IDs/origins and backup compatibility. Initial packages are unsigned Windows/debug-signed Android pilots; iOS, store publishing and production signing remain deferred.
 
 The owner additionally authorizes a browser-local microphone tuner (FR-020, issue #37). Standard six-string tuning, explicit microphone control and input selection are included. Opening it pauses practice and playback; capture must stop on close, navigation and background. Tuning creates no practice or proficiency evidence. Recording and uploading are outside this feature.
 

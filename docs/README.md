@@ -13,7 +13,7 @@ All project prose is English. Audience determines the location, not a different 
 | Shared: human and Agent | [Project management](process/PROJECT_MANAGEMENT.md) | Source of truth, issues, PRs, completion |
 | Agent: implementer, reviewer | [Agent guide](engineering/AGENT_GUIDE.md) | Data boundaries, invariants, acceptance scenarios |
 | Shared: human and Agent | [Application releases](engineering/releases.md) | CI gates, Windows/Android builds, draft releases and signing boundaries |
-| Shared: human and Agent | [Native packaging decision](decisions/0005-native-app-packaging.md) | Local origins, profiles, asset exclusion and wrapper scope |
+| Shared: human and Agent | [Native packaging decision](decisions/0006-native-app-packaging.md) | Local origins, profiles, asset exclusion and wrapper scope |
 | Shared: human and Agent | [Packaging verification](engineering/app-packaging-validation.md) | Actual validation evidence and unverified device behavior |
 
 The PRD owns requirements. Research documents own dated external findings. GitHub owns work status. Stitch owns design exploration; repository briefs record its references and review status. Examples are not approved course data.

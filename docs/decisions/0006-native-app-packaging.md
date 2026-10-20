@@ -1,4 +1,4 @@
-# ADR 0005 — Windows application and Android packaging pilot
+# ADR 0006 — Windows application and Android packaging pilot
 
 Date: 2026-10-20. Status: owner-authorized implementation, issue #40. Requirements: FR-021, FR-015–017, FR-019, FR-020; NFR-001, NFR-007, NFR-008.
 
@@ -23,6 +23,8 @@ Profiles remain separate from browsers and other devices. Existing versioned JSO
 PRs and main builds run unit, sanitized-build, responsive browser and isolated Electron checks, followed by Windows NSIS and Android debug-APK packaging. Artifacts have a source/version manifest and SHA-256 checksums. They do not publish a release. A manual, validated version tag creates a draft prerelease only; see the [release procedure](../engineering/releases.md).
 
 The initial Windows installer is unsigned and the Android APK is a debug-signed test build. No signing identity, store credentials or personal content is committed. Automatic updates, store submission, production Android signing, Windows ARM64 and iOS packaging remain separate work.
+
+CI exposed an alphaTab 1.8.4 audio-worklet startup/stop race when playback was immediately closed. The pilot explicitly selects the SDK's documented `WebAudioScriptProcessor` output mode so background/close can stop playback synchronously. This avoids patching generated vendor code; it may have more scheduling overhead than worklets. Revisit the compatibility choice when the pinned SDK is upgraded. See [official output-mode documentation](https://alphatab.net/docs/reference/settings/player/outputmode).
 
 ## Visual provenance
 

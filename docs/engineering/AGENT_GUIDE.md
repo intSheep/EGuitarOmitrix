@@ -82,4 +82,4 @@ Issue #31 and ADR 0004 authorize learner goals, end-of-session stable BPM/profic
 
 ## Native delivery boundary
 
-Native delivery under FR-021 is governed by ADR 0005 and `releases.md`. Keep one public build pipeline for web, Windows and Android; preserve local origins/IDs; test backup transfer with synthetic profiles. Native background events must invoke the existing pause/capture cleanup without adding practice evidence. Native export must use an explicit system picker and report failures. Do not mistake an APK compile or CI artifact upload for device or published-release acceptance.
+Native delivery under FR-021 is governed by ADR 0006 and `releases.md`. Keep one public build pipeline for web, Windows and Android; preserve local origins/IDs; test backup transfer with synthetic profiles. Native background events must invoke the existing pause/capture cleanup without adding practice evidence. Native export must use an explicit system picker and report failures. Do not mistake an APK compile or CI artifact upload for device or published-release acceptance.
