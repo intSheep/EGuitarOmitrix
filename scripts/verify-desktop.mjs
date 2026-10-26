@@ -24,7 +24,8 @@ try {
   const flags = await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences());
   assert.equal(flags.nodeIntegration, false); assert.equal(flags.contextIsolation, true); assert.equal(flags.sandbox, true); assert.equal(flags.webSecurity, true);
   assert.deepEqual(await page.evaluate(() => [isSecureContext, typeof require, typeof process, !!navigator.locks]), [true, 'undefined', 'undefined', true]);
-  assert.equal(await page.evaluate(async () => (await fetch('./local-scores/p003/score.musicxml')).status), 404);
+  assert.equal(await page.evaluate(async () => (await fetch('./local-scores/p999/score.musicxml')).status), 404);
+  const course = await page.evaluate(async () => (await (await fetch('./build-info.json')).json()).courseResources);
   await application.evaluate(({ dialog, shell, session }, profile) => {
     global.testOpened = [];
     dialog.showMessageBox = async () => ({ response: 1 });
@@ -56,7 +57,10 @@ try {
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect.poll(async () => (await draft()).running).toBe(true);
   await page.locator('[data-score]').click();
-  await expect(page.locator('#score-status')).toContainText('可载入本地');
+  if (course) {
+    await expect(page.locator('#score-play')).toBeEnabled({ timeout: 20000 });
+    await expect(page.locator('#score-render svg').first()).toBeVisible();
+  } else await expect(page.locator('#score-status')).toContainText('可载入本地');
   await page.locator('#score-file').setInputFiles({ name: 'synthetic.musicxml', mimeType: 'application/xml', buffer: Buffer.from(syntheticScore) });
   await expect(page.locator('#score-play')).toBeEnabled({ timeout: 15000 });
   await page.evaluate(() => {

@@ -22,7 +22,7 @@ npm test
 npm run build
 ```
 
-The build creates a sanitized static application in ignored `dist/`, with version/source metadata and asset hashes. It excludes machine-local course media/scores and personal records. The development server can still serve your ignored local score collection; the distributed app offers local score-file import. No hosting or public deployment is configured.
+The build creates a sanitized static application in ignored `dist/`, with version/source metadata and asset hashes. The default lightweight build excludes machine-local course media/scores. Explicit private tester builds bundle the checksum-pinned course pack; personal records are always excluded. See [course resources](docs/engineering/course-resources.md). The development server can still serve your ignored local score collection; the distributed app offers local score-file import. No hosting or public deployment is configured.
 
 ## Installable apps and CI
 
@@ -67,7 +67,7 @@ Agents should start with [AGENTS.md](AGENTS.md).
 
 ## Local score pilot
 
-Run `npm install` before starting; `npm start` prepares the pinned alphaTab runtime locally. In focus mode choose **乐谱** to view/play a prepared score or open a local MusicXML/GP file. The two machine-local pilots cover P025 (from P026) and P071 (from P073); course assets are intentionally ignored by Git. New clones can load their own local files. See [video score preparation](docs/research/video-score-preparation.md) for tools, provenance, assumptions and coverage. GP downloads are available; native GP8 launch is not integrated.
+Run `npm install` before starting; `npm start` prepares the pinned alphaTab runtime locally. In focus mode choose **乐谱** to view/play a prepared score or open a local MusicXML/GP file. The two machine-local pilots cover P025 (from P026) and P071 (from P073); course assets are intentionally ignored by Git. Lightweight clones can load local files; private course builds include the pinned library without manual import. See [video score preparation](docs/research/video-score-preparation.md) for tools, provenance, assumptions and coverage. GP downloads are available; native GP8 launch is not integrated.
 
 For local embedded-audio GP preparation, see [the audio/synchronization pipeline](docs/research/audio-score-pipeline.md). Generated GP candidates are not automatically accepted lesson scores.
 

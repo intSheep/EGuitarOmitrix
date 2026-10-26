@@ -9,12 +9,16 @@ for (const width of [1440, 768, 390]) {
     await expect(page.locator('[data-start]')).toBeEnabled();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const info = await (await page.request.get('/build-info.json')).json();
-    expect(info.privateMediaIncluded).toBe(false);
-    expect((await (await page.request.get('/local-scores/index.json')).json()).items).toEqual([]);
+    const items = (await (await page.request.get('/local-scores/index.json')).json()).items;
+    expect(info.privateMediaIncluded).toBe(Boolean(info.courseResources));
+    expect(items).toHaveLength(info.courseResources?.itemCount || 0);
     await page.locator('[data-start]').click();
     await expect(page.locator('#timer-value')).toBeVisible();
     await page.locator('[data-score]').click();
-    await expect(page.locator('#score-status')).toContainText('可载入本地');
+    if (info.courseResources) {
+      await expect(page.locator('#score-play')).toBeEnabled({ timeout: 20000 });
+      await expect(page.locator('#score-render svg').first()).toBeVisible();
+    } else await expect(page.locator('#score-status')).toContainText('可载入本地');
     // Clearly synthetic notation; no course material or fingering is inferred.
     const xml = '<?xml version="1.0"?><score-partwise version="4.0"><work><work-title>SYNTHETIC QA</work-title></work><part-list><score-part id="P1"><part-name>Synthetic</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes><note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note></measure></part></score-partwise>';
     await page.locator('#score-file').setInputFiles({ name: 'synthetic.musicxml', mimeType: 'application/xml', buffer: Buffer.from(xml) });
@@ -24,6 +28,25 @@ for (const width of [1440, 768, 390]) {
     expect(errors).toEqual([]);
   });
 }
+test('bundled XML-only notation and source diagrams load without manual file import', async ({ page }) => {
+  await page.goto('/');
+  const info = await (await page.request.get('/build-info.json')).json();
+  test.skip(!info.courseResources, 'Lightweight CI excludes private course resources');
+  const { items } = await (await page.request.get('/local-scores/index.json')).json();
+  const xml = items.find(item => item.xml && !item.gp && !item.acceptedAudioGp);
+  const diagram = items.find(item => !item.xml && !item.gp && item.images.length);
+  expect(xml).toBeTruthy(); expect(diagram).toBeTruthy();
+  await page.evaluate(async item => { const m = await import('./score-viewer.js'); await m.showScore(item.entryId, item.title); }, xml);
+  await expect(page.locator('#score-play')).toBeEnabled({ timeout: 20000 });
+  await expect(page.locator('#score-render svg').first()).toBeVisible();
+  await page.locator('#score-close').click();
+  await page.evaluate(async item => { const m = await import('./score-viewer.js'); await m.showScore(item.entryId, item.title); }, diagram);
+  const choices = items.filter(item => item.entryId === diagram.entryId || item.entryIds?.includes(diagram.entryId));
+  if (choices.length > 1) await page.locator('#score-choice').selectOption(String(choices.findIndex(item => item.id === diagram.id)));
+  await expect(page.locator('#score-images img').first()).toBeVisible();
+  expect(await page.locator('#score-images img').first().evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+  await expect(page.locator('#score-play')).toBeDisabled();
+});
 test('built app saves, exports and restores one actual session in isolated storage', async ({ page, browser }) => {
   await page.goto('/');
   await page.locator('[data-start]:enabled').click();

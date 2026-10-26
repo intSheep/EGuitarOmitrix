@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      include-course:
+        description: Bundle the pinned private course resources for authorized testers
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -12,3 +17,5 @@ concurrency:
 jobs:
   build:
     uses: ./.github/workflows/app-build.yml
+    with:
+      include-course: ${{ github.event_name == 'workflow_dispatch' && inputs.include-course || false }}
