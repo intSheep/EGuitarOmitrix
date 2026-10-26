@@ -1,5 +1,7 @@
 # Application builds and releases
 
+**Current public-delivery policy (2026-10-26):** See [public distribution](public-distribution.md). Public source/course distribution supersedes the historical private-audience wording below. Version 0.4.0 adds explicit Windows updates and stable Android release signing; macOS remains experimental.
+
 Owner authorization: 2026-10-20, issue [#40](https://github.com/intSheep/EGuitarOmitrix/issues/40), FR-023. Architecture: [ADR 0006](../decisions/0006-native-app-packaging.md). All commands run from the repository root.
 
 ## Build contract

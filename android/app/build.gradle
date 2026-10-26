@@ -16,8 +16,19 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (System.getenv('EGUITAR_ANDROID_KEYSTORE')) {
+                storeFile file(System.getenv('EGUITAR_ANDROID_KEYSTORE'))
+                storePassword System.getenv('EGUITAR_ANDROID_PASSWORD')
+                keyAlias 'eguitar-release'
+                keyPassword System.getenv('EGUITAR_ANDROID_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -390,3 +390,15 @@ running before launch. A deliberately paused session stays paused.
 ### FR-023 standardized private course delivery refinement (2026-10-20)
 
 The owner requires prepared course resources to accompany the app so repository-authorized testers can open scores without manually locating files. Windows and Android course builds include an immutable, checksum-pinned resource pack containing the runtime index, its GP/MusicXML files and source images. Store payload bytes as private GitHub Release assets, never Git history. Preserve existing item/source/revision metadata and all uncertainty; packaging does not establish musical correctness, mastery or backing-track synchronization. Original videos, preparation intermediates, learner records and secrets remain excluded. Ordinary PR builds stay lightweight with short-lived artifacts; manual course builds and draft releases verify the pinned pack, inventory actual Windows/APK resources and open representative notation/images offline. See [course resource delivery](../engineering/course-resources.md).
+
+### Public delivery refinement — FR-023 (2026-10-26)
+
+The owner authorizes public source and course resources, the display name
+「帅帅练琴屋」 and prominent thanks to 「帅帅是把电吉他」老师 with the original
+BV1FT411Z7iu link. This supersedes earlier private-repository constraints.
+GitHub Pages provides an HTTPS browser entry point without an account or backend.
+No full offline or synchronization claim is made. Windows supports explicitly
+confirmed update download/install; Android release packages use a stable signing
+identity. macOS remains browser-first, with an experimental native build path
+until signing/notarization and target-device acceptance are available.
+IDs, origins, local records and backup compatibility survive the display rename.

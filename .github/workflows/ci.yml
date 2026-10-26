@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       include-course:
-        description: Bundle the pinned private course resources for authorized testers
+        description: Bundle the pinned course resources for public distribution
         type: boolean
         default: false
 permissions:

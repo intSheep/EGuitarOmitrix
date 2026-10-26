@@ -826,6 +826,12 @@ window.addEventListener("pagehide", () => {
   pause().catch(() => {});
 });
 // Native shells invoke the same pause/capture cleanup as browser backgrounding.
+window.eguitarPrepareForUpdate = async () => {
+  closeTuner();
+  await pause('安装更新，练习已暂停');
+  await saveQueue;
+  return true;
+};
 window.eguitarPauseForBackground = async () => {
   closeTuner();
   await pause('离开应用，返回后自动继续', { resumeWhenBack: true });

@@ -86,3 +86,22 @@ test('Android export adapter delegates to the system picker without creating a b
   });
   expect(result).toEqual([{ name: 'eguitar-practice.json', mime: 'application/json', data: Buffer.from('SYNTHETIC BACKUP').toString('base64') }]);
 });
+
+test('update preparation persists a paused draft and does not resume on focus or reload', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('[data-start]').click();
+  const draft = () => page.evaluate(async () => {
+    const m = await import('./practice-store.js'), db = await m.openPracticeDB();
+    const d = await m.readDraft(db); db.close(); return d;
+  });
+  await expect.poll(async () => (await draft())?.elapsedMs || 0).toBeGreaterThan(0);
+  expect(await page.evaluate(() => window.eguitarPrepareForUpdate())).toBe(true);
+  const paused = await draft();
+  expect(paused.running).toBe(false);
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  expect((await draft()).running).toBe(false);
+  await page.reload();
+  await expect(page.locator('[data-action="pause"]')).toHaveText('继续练习');
+  expect((await draft()).id).toBe(paused.id);
+  expect((await draft()).running).toBe(false);
+});

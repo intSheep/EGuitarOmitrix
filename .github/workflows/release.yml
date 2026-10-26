@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing vMAJOR.MINOR.PATCH tag on main; creates a draft prerelease only
+        description: Existing vMAJOR.MINOR.PATCH tag on main; creates a draft release only
         required: true
         type: string
       include-course:
-        description: Include the pinned private course pack for authorized testers
+        description: Include the pinned course pack for public distribution
         type: boolean
         default: true
 permissions:
@@ -34,7 +34,11 @@ jobs:
   build:
     needs: validate
     uses: ./.github/workflows/app-build.yml
+    secrets:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
     with:
+      release-build: true
       ref: ${{ inputs.tag }}
       retention-days: 1
       include-course: ${{ inputs.include-course }}
@@ -58,16 +62,18 @@ jobs:
       - name: Prepare release notes
         run: |
           cat > notes.md <<'EOF'
-          Private pilot build. Windows installer is unsigned; Android APK is debug-signed for testing only.
+          帅帅练琴屋 — public pilot. Windows installer is unsigned; Android APK uses the stable project release key.
 
-          Export a practice backup before upgrading. Android CI debug keys can differ between runs: back up before replacing an earlier APK. Production Android distribution requires a stable signing key.
+          Export a practice backup before upgrading. Earlier Android debug builds may require backup/uninstall/import for the first release-key installation. Later release builds retain the signing identity.
 
-          See each platform manifest's courseResources field for the bundled course version, item count and checksums. A null courseResources field identifies a lightweight package. Original course videos, preparation intermediates and learner records are excluded. Bundling preserves existing notation/review status; it does not certify musical accuracy or backing-track synchronization. Browser, desktop and phone profiles are separate; use backup export/import for transfer. No cloud sync or automatic updates.
+          See each platform manifest's courseResources field for the bundled course version, item count and checksums. A null courseResources field identifies a lightweight package. Original course videos, preparation intermediates and learner records are excluded. Bundling preserves existing notation/review status; it does not certify musical accuracy or backing-track synchronization. Browser, desktop and phone profiles are separate; use backup export/import for transfer. No cloud sync. Windows: 帮助 → 检查更新, with explicit download/install confirmation. Versions before 0.4.0 need one manual upgrade. Android: download/install the newer APK.
 
-          See platform manifests for source commit, version and SHA-256 checksums. Native device/audio acceptance remains required before publishing. This workflow creates a draft prerelease; publication is manual.
+          Thanks to 「帅帅是把电吉他」老师: https://www.bilibili.com/video/BV1FT411Z7iu/ . Independent companion, not an official teacher product.
+
+          See platform manifests for source commit, version and SHA-256 checksums. Native device/audio acceptance remains required before publishing. This workflow creates a draft release; publication is manual.
           EOF
-      - name: Create private draft prerelease
-        run: gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --prerelease --title "EGuitarOmitrix $RELEASE_TAG pilot" --notes-file notes.md artifacts/windows/* artifacts/android/*
+      - name: Create public draft release
+        run: gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "帅帅练琴屋 $RELEASE_TAG" --notes-file notes.md artifacts/windows/* artifacts/android/*
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag }}

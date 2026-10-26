@@ -1,5 +1,7 @@
 # Standardized private course resources
 
+**Current public-delivery policy (2026-10-26):** See [public distribution](public-distribution.md). Public source/course distribution supersedes the historical private-audience wording below. Version 0.4.0 adds explicit Windows updates and stable Android release signing; macOS remains experimental.
+
 Date: 2026-10-20. Owner authorization: FR-023; Windows first, Android included. Initial audience: testers with read access to the private GitHub repository. This refines ADR 0006's initial lightweight content boundary. The existing approved interface is retained; no new screen layout or Stitch output is introduced.
 
 ## Payload and ownership

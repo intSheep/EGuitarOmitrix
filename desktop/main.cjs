@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, net, protocol, session, shell } = require('electron');
+const { app, BrowserWindow, dialog, Menu, net, protocol, session, shell } = require('electron');
 const path = require('node:path');
 const { realpath } = require('node:fs/promises');
 const { pathToFileURL } = require('node:url');
@@ -44,7 +44,7 @@ else {
       prompting = true;
       let approved = false;
       try { const result = await dialog.showMessageBox(window, {
-        type: 'question', title: '开启麦克风', message: '允许 EGuitarOmitrix 使用麦克风调音吗？',
+        type: 'question', title: '开启麦克风', message: '允许帅帅练琴屋使用麦克风调音吗？',
         detail: '声音仅在本机分析，不录音、不上传。关闭调音器或离开应用即停止。',
         buttons: ['取消', '允许本次使用'], defaultId: 0, cancelId: 0,
       });
@@ -56,7 +56,7 @@ else {
     local.setDevicePermissionHandler(() => false);
     window = new BrowserWindow({
       width: 1280, height: 900, minWidth: 390, minHeight: 600, show: false,
-      title: 'EGuitarOmitrix', backgroundColor: '#ffffff', icon: path.join(__dirname, 'icon.png'), autoHideMenuBar: true,
+      title: '帅帅练琴屋', backgroundColor: '#ffffff', icon: path.join(__dirname, 'icon.png'), autoHideMenuBar: true,
       webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, webviewTag: false },
     });
     const openExternal = value => {
@@ -77,6 +77,25 @@ else {
     });
     window.once('ready-to-show', () => window.show());
     await window.loadURL(ORIGIN + '/index.html');
+    const { createUpdateController } = require('./updates.cjs');
+    const updates = app.isPackaged && ['win32', 'darwin'].includes(process.platform)
+      ? createUpdateController({
+        updater: require('electron-updater').autoUpdater,
+        ask: options => dialog.showMessageBox(window, options),
+        prepare: () => window.webContents.executeJavaScript('window.eguitarPrepareForUpdate()'),
+        installing: () => { quitting = true; },
+        failed: () => { quitting = false; },
+      }) : null;
+    Menu.setApplicationMenu(Menu.buildFromTemplate([
+      ...(process.platform === 'darwin' ? [{ role: 'appMenu' }] : []),
+      { label: '帮助', submenu: [
+        { label: '检查更新', enabled: !!updates, click: () => updates.check() },
+        { label: '下载与版本说明', click: () => { background(); shell.openExternal('https://github.com/intSheep/EGuitarOmitrix/releases').catch(() => {}); } },
+        { label: '关于帅帅练琴屋', click: () => dialog.showMessageBox(window, { message: '帅帅练琴屋 ' + app.getVersion(), detail: '感谢「帅帅是把电吉他」老师的课程。本项目是独立练习辅助工具，非老师官方出品。' }) },
+      ] },
+    ]));
+    window.setAutoHideMenuBar(false);
+    window.setMenuBarVisibility(true);
   }).catch(error => { dialog.showErrorBox('EGuitarOmitrix', '应用无法启动：' + error.message); app.exit(1); });
   app.on('window-all-closed', () => app.quit());
 }
