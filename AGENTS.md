@@ -19,7 +19,7 @@ The owner additionally authorizes a browser-local microphone tuner (FR-020, issu
 
 ## Rules
 
-- Write human-facing and Agent-facing project documentation in English. Keep original course identifiers and necessary source evidence intact.
+- Write human-facing and Agent-facing project documentation in English, except README.md, which the owner requires in Simplified Chinese. Keep original course identifiers and necessary source evidence intact.
 - Use Stitch for frontend design and document which output was retained or rejected. Apply the latest user direction over earlier generated design systems. Label unimplemented interactions accurately.
 - Keep instructor prescriptions, learner plans, and actual practice results separate.
 - Never invent a BPM, duration, repetition count, fingering, or mastery criterion missing from the evidence.
