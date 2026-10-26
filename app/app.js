@@ -827,6 +827,8 @@ window.addEventListener("pagehide", () => {
 });
 // Native shells invoke the same pause/capture cleanup as browser backgrounding.
 window.eguitarPrepareForUpdate = async () => {
+  if (busy || draft?.finishing || watchDraft || watchBusy || modal.open)
+    throw Error('请先保存或关闭当前编辑、练习结果和观看记录，再安装更新。');
   closeTuner();
   await pause('安装更新，练习已暂停');
   await saveQueue;

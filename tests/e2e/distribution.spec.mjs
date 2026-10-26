@@ -105,3 +105,16 @@ test('update preparation persists a paused draft and does not resume on focus or
   expect((await draft()).id).toBe(paused.id);
   expect((await draft()).running).toBe(false);
 });
+
+test('update cannot discard an unfinished result form', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('[data-start]').click();
+  await expect.poll(() => page.evaluate(async () => {
+    const m = await import('./practice-store.js'), db = await m.openPracticeDB();
+    const d = await m.readDraft(db); db.close(); return d?.elapsedMs || 0;
+  })).toBeGreaterThan(0);
+  await page.locator('[data-action=finish]').click();
+  await page.locator('#stable-bpm').fill('65');
+  expect(await page.evaluate(() => window.eguitarPrepareForUpdate().then(() => false, () => true))).toBe(true);
+  await expect(page.locator('#stable-bpm')).toHaveValue('65');
+});
