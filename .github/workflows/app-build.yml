@@ -148,7 +148,11 @@ jobs:
           umask 077
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/eguitar-release.jks"
       - name: Package Android
-        run: npm run package:android
+        run: |
+          npm run package:android
+          if [ "$EGUITAR_ANDROID_RELEASE" = '1' ]; then
+            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose release/android/*-android-release.apk
+          fi
         env:
           EGUITAR_ANDROID_RELEASE: ${{ inputs.release-build && '1' || '0' }}
           EGUITAR_ANDROID_KEYSTORE: ${{ runner.temp }}/eguitar-release.jks
