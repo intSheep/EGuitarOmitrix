@@ -21,7 +21,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
       - run: npm test
       - run: node scripts/download-course-resources.mjs
         env:
