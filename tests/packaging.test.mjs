@@ -59,3 +59,25 @@ test('release tags require matching clean source on main and reject branch-only 
     assert.throws(() => check('v0.3.0'));
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test('release inventory includes update metadata, excludes builder diagnostics and rejects a missing feed', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'eguitar-artifacts-synthetic-'));
+  try {
+    await mkdir(join(root, 'scripts'));
+    await mkdir(join(root, 'dist'));
+    await mkdir(join(root, 'windows'));
+    await cp(new URL('../scripts/artifact-manifest.mjs', import.meta.url), join(root, 'scripts/artifact-manifest.mjs'));
+    await writeFile(join(root, 'dist/build-info.json'), JSON.stringify({ version: '0.4.0', app: 'SYNTHETIC', commit: 'SYNTHETIC', learnerRecordsIncluded: false }));
+    await writeFile(join(root, 'windows/EGuitarOmitrix-0.4.0-windows-x64-setup.exe'), 'SYNTHETIC INSTALLER');
+    await writeFile(join(root, 'windows/builder-effective-config.yaml'), 'SYNTHETIC DIAGNOSTIC');
+    await writeFile(join(root, 'windows/builder-debug.yml'), 'SYNTHETIC DIAGNOSTIC');
+    const run = () => execFileSync(process.execPath, [join(root, 'scripts/artifact-manifest.mjs'), join(root, 'windows')], { stdio: 'pipe' });
+    assert.throws(run, /latest.yml is required/);
+    await writeFile(join(root, 'windows/latest.yml'), 'version: 0.4.0\n');
+    run();
+    const manifest = JSON.parse(await readFile(join(root, 'windows/windows-manifest.json'), 'utf8'));
+    assert.deepEqual(manifest.artifacts.map(a => a.name), ['EGuitarOmitrix-0.4.0-windows-x64-setup.exe', 'latest.yml']);
+    await writeFile(join(root, 'windows/EGuitarOmitrix-0.3.0-windows-x64-setup.exe'), 'SYNTHETIC STALE INSTALLER');
+    assert.throws(run, /Old or unexpected artifact/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
