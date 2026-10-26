@@ -112,7 +112,7 @@ test('update cannot discard an unfinished result form', async ({ page }) => {
   await expect.poll(() => page.evaluate(async () => {
     const m = await import('./practice-store.js'), db = await m.openPracticeDB();
     const d = await m.readDraft(db); db.close(); return d?.elapsedMs || 0;
-  })).toBeGreaterThan(0);
+  })).toBeGreaterThan(1000);
   await page.locator('[data-action=finish]').click();
   await page.locator('#stable-bpm').fill('65');
   expect(await page.evaluate(() => window.eguitarPrepareForUpdate().then(() => false, () => true))).toBe(true);
