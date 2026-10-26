@@ -114,3 +114,11 @@ There is no string selection step: start capture and pluck an open string. The n
 
 
 The owner subsequently clarified that photorealism was unwanted and requested the app's theme. The final asset is a built-in imagegen style transfer of the same horizontal silhouette: white/very light grey body, restrained dark contours, charcoal fretboard and small royal-blue accents, with conventional instrument proportions and the 3+3 tuning machines preserved. The shipped style supersedes the photographic material treatment in both Stitch references. Composition and automatic interaction remain as reviewed above. No new options or manual string-selection controls were added. The exact final edit prompt is recorded in the linked image provenance document.
+
+## Public display name (2026-10-26)
+
+The owner selected 「帅帅练琴屋」. Retain the existing approved Stitch-backed
+workspace layout, typography, assets and blue controls; only the brand/title
+text changes. No new screen or generated design is claimed. Desktop update
+consent uses native menus/dialogs. README carries the course attribution and
+download links without adding promotional UI to the practice surface.

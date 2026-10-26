@@ -1,0 +1,35 @@
+name: Experimental macOS packages
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run desktop:setup
+      - run: node scripts/download-course-resources.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: npm run package:mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: experimental-mac-unsigned-${{ github.run_id }}
+          path: |
+            release/mac/*.dmg
+            release/mac/*.zip
+            release/mac/*.yml
+            release/mac/*-manifest.json
+            release/mac/*-SHA256SUMS.txt
+          retention-days: 3

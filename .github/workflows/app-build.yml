@@ -2,6 +2,9 @@ name: App build
 on:
   workflow_call:
     inputs:
+      release-build:
+        type: boolean
+        default: false
       ref:
         type: string
         default: ''
@@ -11,6 +14,11 @@ on:
       include-course:
         type: boolean
         default: false
+    secrets:
+      ANDROID_KEYSTORE_BASE64:
+        required: false
+      ANDROID_KEYSTORE_PASSWORD:
+        required: false
 permissions:
   contents: read
 jobs:
@@ -29,9 +37,9 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Prepare audio test dependency
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
       - run: npm test
-      - name: Fetch pinned private course resources
+      - name: Fetch pinned course resources
         if: inputs.include-course
         run: node scripts/download-course-resources.mjs
         env:
@@ -77,7 +85,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run desktop:setup
-      - name: Fetch pinned private course resources
+      - name: Fetch pinned course resources
         if: inputs.include-course
         run: node scripts/download-course-resources.mjs
         env:
@@ -97,6 +105,7 @@ jobs:
           path: |
             release/windows/*.exe
             release/windows/*.blockmap
+            release/windows/latest.yml
             release/windows/windows-manifest.json
             release/windows/windows-SHA256SUMS.txt
           if-no-files-found: error
@@ -124,15 +133,36 @@ jobs:
       - name: Install Android build tools
         run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"'
       - run: chmod +x android/gradlew
-      - name: Fetch pinned private course resources
+      - name: Fetch pinned course resources
         if: inputs.include-course
         run: node scripts/download-course-resources.mjs
         env:
           GH_TOKEN: ${{ github.token }}
-      - run: npm run package:android
+      - name: Restore stable release signing key
+        if: inputs.release-build
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_BASE64" && test -n "$KEYSTORE_PASSWORD"
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/eguitar-release.jks"
+      - name: Package Android
+        run: |
+          npm run package:android
+          if [ "$EGUITAR_ANDROID_RELEASE" = '1' ]; then
+            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose release/android/*-android-release.apk
+          fi
+        env:
+          EGUITAR_ANDROID_RELEASE: ${{ inputs.release-build && '1' || '0' }}
+          EGUITAR_ANDROID_KEYSTORE: ${{ runner.temp }}/eguitar-release.jks
+          EGUITAR_ANDROID_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      - name: Remove temporary signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/eguitar-release.jks"
       - name: Verify web assets inside the APK
         run: |
-          unzip -q release/android/*-android-test.apk 'assets/public/*' -d "$RUNNER_TEMP/eguitar-apk"
+          unzip -q release/android/*-android-*.apk 'assets/public/*' -d "$RUNNER_TEMP/eguitar-apk"
           node scripts/verify-distribution.mjs "$RUNNER_TEMP/eguitar-apk/assets/public" --android
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:

@@ -1,9 +1,17 @@
 {
   "appId": "io.github.intsheep.eguitaromitrix",
-  "appName": "EGuitarOmitrix",
+  "appName": "帅帅练琴屋",
   "webDir": "dist",
   "backgroundColor": "#ffffff",
   "loggingBehavior": "debug",
-  "server": { "hostname": "localhost", "androidScheme": "https", "cleartext": false },
-  "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false, "minWebViewVersion": 120 }
+  "server": {
+    "hostname": "localhost",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false,
+    "minWebViewVersion": 120
+  }
 }
