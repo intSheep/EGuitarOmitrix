@@ -122,3 +122,15 @@ workspace layout, typography, assets and blue controls; only the brand/title
 text changes. No new screen or generated design is claimed. Desktop update
 consent uses native menus/dialogs. README carries the course attribution and
 download links without adding promotional UI to the practice surface.
+
+## Installed-client workspace — 2026-11-02
+
+The owner requires application navigation and primary actions to remain visible
+without scrolling the entire window. Stitch project `6723020998384701419`, session
+`6673846253610034287`, supplied a bounded-workspace exploration. Retained fixed
+navigation/actions, independent list/detail scroll areas and Android list/detail
+navigation; retained the existing desktop top navigation instead of a second rail.
+Rejected generated version/status, unsupported technique advice and numeric values.
+See [ADR 0007](../decisions/0007-client-workspace-and-updates.md) for provenance and
+platform boundaries. Actual synthetic-profile screenshots in local test results
+are runtime evidence; the generated description is not application acceptance.

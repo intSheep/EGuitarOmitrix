@@ -1,3 +1,4 @@
+import { initClient, syncClientView } from './client.js';
 import { beginWatch, stopWatch, watchSeconds, confirmWatch, totalWatchSeconds, parseWatchTime } from './study.js';
 import { readStudy, writeWatch, saveWatch, setWatchDeleted } from './study-store.js';
 import { mountFocusStage, unmountFocusStage, openPracticeTool, returnToClock } from './focus-stage.js';
@@ -285,6 +286,7 @@ function render() {
     if (a.dataset.nav === name) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   });
+  syncClientView(name);
   renderStudyPanel();
   updateClock();
   if (name === "focus") { mountFocusStage();  }
@@ -909,3 +911,5 @@ async function init() {
   }
 }
 init();
+
+initClient();

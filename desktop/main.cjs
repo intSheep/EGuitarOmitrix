@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, Menu, net, protocol, session, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Menu, net, protocol, session, shell } = require('electron');
 const path = require('node:path');
 const { realpath } = require('node:fs/promises');
 const { pathToFileURL } = require('node:url');
@@ -57,7 +57,7 @@ else {
     window = new BrowserWindow({
       width: 1280, height: 900, minWidth: 390, minHeight: 600, show: false,
       title: '帅帅练琴屋', backgroundColor: '#ffffff', icon: path.join(__dirname, 'icon.png'), autoHideMenuBar: true,
-      webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, webviewTag: false },
+      webPreferences: { preload: path.join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, webviewTag: false },
     });
     const openExternal = value => {
       const url = externalURL(value);
@@ -85,7 +85,13 @@ else {
         prepare: () => window.webContents.executeJavaScript('window.eguitarPrepareForUpdate()'),
         installing: () => { quitting = true; },
         failed: () => { quitting = false; },
+        progress: value => { if (!window.isDestroyed()) window.setProgressBar(value); },
       }) : null;
+    ipcMain.handle('eguitar:check-updates', async event => {
+      if (event.sender !== window?.webContents || event.senderFrame !== window.webContents.mainFrame || !isAppURL(event.senderFrame.url)) throw Error('Untrusted update request');
+      if (!updates) throw Error('请使用已安装的正式版本检查更新');
+      await updates.check();
+    });
     Menu.setApplicationMenu(Menu.buildFromTemplate([
       ...(process.platform === 'darwin' ? [{ role: 'appMenu' }] : []),
       { label: '帮助', submenu: [

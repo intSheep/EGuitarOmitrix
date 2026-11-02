@@ -402,3 +402,18 @@ confirmed update download/install; Android release packages use a stable signing
 identity. macOS remains browser-first, with an experimental native build path
 until signing/notarization and target-device acceptance are available.
 IDs, origins, local records and backup compatibility survive the display rename.
+
+### FR-024 — Installed-client interaction and online updates (2026-11-02)
+
+Owner-authorized: installed Windows and Android clients use fixed navigation and
+primary actions, bounded list/detail workspaces, and compact-client list/detail
+navigation instead of scrolling an entire website inside the window. Practice
+tools and pause/finish remain reachable without scrolling for them. Preserve
+Brilliant styling, application IDs/origins, records and backup compatibility.
+
+Provide an application-level check-for-updates entry. Require explicit download
+and installation decisions, verify package integrity/identity and preserve drafts
+before installation. Failures retain the current usable version and records.
+Android uses the system APK installer; desktop uses the existing stable release
+channel. No silent install, automatic downgrade or content hot-code replacement.
+See [ADR 0007](../decisions/0007-client-workspace-and-updates.md).

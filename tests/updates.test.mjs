@@ -36,3 +36,12 @@ test('concurrent check is ignored, and current version never downloads', async (
   const f = fixture({ version: null }); await Promise.all([f.controller.check(), f.controller.check()]);
   assert.deepEqual(f.events, ['check']); assert.equal(f.dialogs[0].type, 'info');
 });
+
+test('taskbar progress is bounded and always cleared after a failed download', async () => {
+  const updater = new EventEmitter(), progress = [];
+  updater.checkForUpdates = async () => { updater.emit('update-available', {version:'0.5.0'}); return {}; };
+  updater.downloadUpdate = async () => { updater.emit('download-progress', {percent:45}); updater.emit('download-progress', {percent:250}); throw Error('synthetic network error'); };
+  const controller = createUpdateController({updater, ask:async()=>({response:1}), prepare:async()=>true, installing:()=>assert.fail('must not install'), progress:value=>progress.push(value)});
+  await controller.check();
+  assert.deepEqual(progress, [2,0,.45,1,-1]);
+});

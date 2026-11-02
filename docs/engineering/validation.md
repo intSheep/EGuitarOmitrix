@@ -283,3 +283,29 @@ All 55 unit/integration tests and the build passed. The central-tool browser sui
 passed at 1440/768/390 px, and the count-in browser suite passed synthesized and
 backing playback, meter/rate/resume, cancellation, tuner/background/navigation,
 persistence and storage-denial scenarios with synthetic inputs.
+
+## Installed-client workspace and online updates — 2026-11-02
+
+Synthetic profiles only, independent checkout based on public main `ed5ae6c`.
+Implemented FR-024 / ADR 0007. All 65 Node tests pass, including download failure,
+consent, persistence and bounded taskbar progress. Sanitized build succeeds.
+Playwright: 12 passed, one course-pack-only test skipped in the lightweight build.
+New checks cover 1280×720, 800×600, 390×700 and 390×560 client workspaces, anchored
+start/pause/finish, fixed navigation, internal scrolling, synthetic update bridge
+and Android Back. Browser-only regression, backup/restore, update-save barrier and
+unfinished result protection pass. Used installed Chromium 1247 through the
+configured executable override; CI uses the project's pinned browser download.
+
+Real Electron smoke passed using an isolated profile: bundled UI/score playback,
+sandbox configuration, microphone start/stop, camera denial, background cleanup,
+export, outbound allowlist and record persistence after restart. Production keeps
+sandboxing enabled; this nested Linux test used the existing test-only
+`EGUITAR_TEST_NO_SANDBOX=1` option. Actual client screenshots were visually inspected.
+
+Android update policy compiles with the local JDK. Native JUnit tests cover malformed
+versions, tampered/truncated/oversized payloads and signing identity mismatches;
+Android packaging now runs these tests before assembly. Full APK compilation and
+Windows packaged-runtime gates remain pending CI at this entry. No release was
+published and no owner profile was migrated, uninstalled or upgraded. Physical
+Android upgrade/installer/settings flows, physical audio and real Windows NSIS
+overwrite remain unverified. No claim of full native-widget rendering is made.

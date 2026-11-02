@@ -72,3 +72,19 @@ Build timestamps and signatures can vary between runner/package-tool executions;
 ## iPhone follow-up
 
 Capacitor can reuse the interface for iOS, but native builds require macOS/Xcode and Apple signing/distribution setup. No iOS directory, IPA, Apple account access or App Store submission is configured. Keep that work separate from the current Windows/Android pilot. See [Capacitor's official environment requirements](https://capacitorjs.com/docs/getting-started/environment-setup).
+
+## Installed-client adaptation (2026-11-02)
+
+FR-024 / [ADR 0007](../decisions/0007-client-workspace-and-updates.md) add a bounded
+installed-app layout and an always-available **检查更新** header action. Desktop
+continues to use the existing native confirmation flow and now displays taskbar
+download progress. Android checks the latest stable public Release, verifies its
+manifest/APK, package/version and installed signer, then requests a successful
+practice-save barrier before launching the system installer. Users must explicitly
+allow APK installation in Android settings if it is not already allowed.
+
+The first upgrade from older Android versions still needs a manual APK installation
+because those versions have no update checker. Future versions must retain the
+release signing key, app ID and origin. Do not uninstall to bypass a signer mismatch.
+API/network failures or unavailable stable Android assets leave the current app
+usable. No background startup checks or silent installation are configured.

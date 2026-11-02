@@ -2,7 +2,7 @@ module.exports = {
   appId: 'io.github.intsheep.eguitaromitrix',
   productName: '帅帅练琴屋',
   directories: { app: 'desktop', output: 'release/windows' },
-  files: ['main.cjs', 'security.cjs', 'updates.cjs', 'package.json', 'icon.png'],
+  files: ['main.cjs', 'preload.cjs', 'security.cjs', 'updates.cjs', 'package.json', 'icon.png'],
   extraResources: [{ from: 'dist', to: 'web', filter: ['**/*'] }],
   asar: true,
   npmRebuild: false,
