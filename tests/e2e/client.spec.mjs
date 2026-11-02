@@ -65,3 +65,14 @@ for(const width of [1280,390]) {
     const rect=await manage.boundingBox();expect(rect.y).toBeGreaterThanOrEqual(0);expect(rect.y+rect.height).toBeLessThanOrEqual(600);
   });
 }
+
+test('compact catalog lesson links open detail directly and Back returns to the list', async ({page})=>{
+  await page.setViewportSize({width:390,height:700});
+  await page.addInitScript(()=>{window.eguitarDesktop={checkUpdates:async()=>{}};});
+  await page.goto('/#catalog');
+  await page.locator('a.directory-action').first().click();
+  await expect(page.locator('.lesson-detail')).toBeVisible();
+  await expect(page.locator('[data-start]')).toBeVisible();
+  expect(await page.evaluate(()=>eguitarClientBack())).toBe(true);
+  await expect(page.locator('.exercise-list')).toBeVisible();
+});

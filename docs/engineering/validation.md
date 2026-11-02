@@ -289,7 +289,9 @@ persistence and storage-denial scenarios with synthetic inputs.
 Synthetic profiles only, independent checkout based on public main `ed5ae6c`.
 Implemented FR-024 / ADR 0007. All 65 Node tests pass, including download failure,
 consent, persistence and bounded taskbar progress. Sanitized build succeeds.
-Playwright: 12 passed, one course-pack-only test skipped in the lightweight build.
+Playwright: the full regression had 14 passes and one course-pack-only skip in
+the lightweight build; the final focused client rerun passed all eight checks,
+including direct catalog-to-detail navigation.
 New checks cover 1280×720, 800×600, 390×700 and 390×560 client workspaces, anchored
 start/pause/finish, fixed navigation, internal scrolling, synthetic update bridge
 and Android Back. Browser-only regression, backup/restore, update-save barrier and
@@ -302,7 +304,8 @@ export, outbound allowlist and record persistence after restart. Production keep
 sandboxing enabled; this nested Linux test used the existing test-only
 `EGUITAR_TEST_NO_SANDBOX=1` option. Actual client screenshots were visually inspected.
 
-Android update policy compiles with the local JDK. Native JUnit tests cover malformed
+Android update policy compiles with the local JDK; all three actual JUnit 4.13.2
+tests pass locally. These tests cover malformed
 versions, tampered/truncated/oversized payloads and signing identity mismatches;
 Android packaging now runs these tests before assembly. Full APK compilation and
 Windows packaged-runtime gates remain pending CI at this entry. No release was

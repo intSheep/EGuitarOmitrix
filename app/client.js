@@ -2,16 +2,16 @@
 const desktop = globalThis.eguitarDesktop;
 const android = globalThis.Capacitor?.getPlatform() === 'android';
 export const isClient = !!desktop || android;
-let lastSelection = '', listScroll = 0;
+let lastStage = '', listScroll = 0;
 export function syncClientView(route) {
   if (!isClient) return;
   document.documentElement.dataset.client = android ? 'android' : 'desktop';
   document.body.dataset.clientRoute = route || 'practice';
   const params = new URLSearchParams(location.hash.split('?')[1] || '');
-  document.body.classList.toggle('client-detail', params.get('view') === 'lesson');
+  document.body.classList.toggle('client-detail', params.get('view') === 'lesson' || (!params.has('view') && params.has('lesson')));
   const list = document.querySelector('.exercise-list ul');
-  const selection = params.get('lesson') || '';
-  if (selection !== lastSelection) { lastSelection = selection; listScroll = 0; }
+  const stage = document.querySelector('.stage-pills [aria-current=step]')?.textContent;
+  if (stage && stage !== lastStage) { lastStage = stage; listScroll = 0; }
   if (list) {
     list.scrollTop = listScroll;
     list.addEventListener('scroll', () => { listScroll = list.scrollTop; }, { passive: true });
@@ -60,7 +60,7 @@ export function initClient() {
     if (document.querySelector('.has-focus-tool')) { document.querySelector('#floating-timer')?.click(); return true; }
     const [route, query] = location.hash.slice(1).split('?');
     if (route === 'finish') return true; // Never discard unconfirmed results with Back.
-    if (route === 'practice' && new URLSearchParams(query).get('view') === 'lesson') { document.querySelector('.client-back')?.click(); return true; }
+    if (route === 'practice' && document.body.classList.contains('client-detail')) { document.querySelector('.client-back')?.click(); return true; }
     if (route && route !== 'practice') { location.hash = 'practice'; return true; }
     return false;
   };
