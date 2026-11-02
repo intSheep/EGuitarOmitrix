@@ -23,6 +23,8 @@ try {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   const flags = await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences());
   assert.equal(flags.nodeIntegration, false); assert.equal(flags.contextIsolation, true); assert.equal(flags.sandbox, true); assert.equal(flags.webSecurity, true);
+  assert.deepEqual(await page.evaluate(() => Object.keys(eguitarDesktop)), ['checkUpdates']);
+  assert.equal(await page.locator('html').getAttribute('data-client'), 'desktop');
   assert.deepEqual(await page.evaluate(() => [isSecureContext, typeof require, typeof process, !!navigator.locks]), [true, 'undefined', 'undefined', true]);
   assert.equal(await page.evaluate(async () => (await fetch('./local-scores/p999/score.musicxml')).status), 404);
   const course = await page.evaluate(async () => (await (await fetch('./build-info.json')).json()).courseResources);

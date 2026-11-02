@@ -186,7 +186,7 @@ public class AppUpdatePlugin extends Plugin {
             throw new IOException("签名不匹配，已阻止更新；请先导出备份，勿卸载应用");
     }
     private void install(PluginCall call, File file) {
-        if (!getContext().getPackageManager().canRequestPackageInstalls()) {
+        if (Build.VERSION.SDK_INT >= 26 && !getContext().getPackageManager().canRequestPackageInstalls()) {
             new AlertDialog.Builder(getActivity()).setTitle("需要允许安装更新")
                 .setMessage("请在系统设置中允许此应用安装更新，然后返回重新检查更新。")
                 .setNegativeButton("稍后", (d,w) -> done(call))

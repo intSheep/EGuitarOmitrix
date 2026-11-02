@@ -48,3 +48,20 @@ test('Android back returns from detail without navigating out of the client', as
   await expect(page.locator('.exercise-list')).toBeVisible();
   expect(await page.evaluate(()=>eguitarClientBack())).toBe(false);
 });
+for(const width of [1280,390]) {
+  test(`client catalog filters and history management remain reachable at ${width}px`, async ({page})=>{
+    await page.setViewportSize({width,height:600});
+    await page.addInitScript(()=>{window.eguitarDesktop={checkUpdates:async()=>{}};});
+    await page.goto('/#catalog');
+    const search=page.locator('.library-search'); await expect(search).toBeVisible();
+    const before=await search.boundingBox();
+    await page.locator('.course-directory').evaluate(el=>el.scrollTop=el.scrollHeight);
+    expect((await search.boundingBox()).y).toBe(before.y);
+    expect(await page.locator('#app').evaluate(el=>el.scrollTop)).toBe(0);
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await page.locator('[data-nav=history]').click();
+    const manage=page.locator('[data-action=manage]');await expect(manage).toBeVisible();
+    await page.locator('#app').evaluate(el=>el.scrollTop=el.scrollHeight);
+    const rect=await manage.boundingBox();expect(rect.y).toBeGreaterThanOrEqual(0);expect(rect.y+rect.height).toBeLessThanOrEqual(600);
+  });
+}
