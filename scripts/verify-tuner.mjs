@@ -92,12 +92,12 @@ try {
     await page.locator('[data-action="metronome"]').click();
     await page.locator('[data-action="metro-toggle"]').click();
     await open(page);
-    assert.match(await page.locator('#timer-state').innerText(), /调音中/);
+    assert.match(await page.locator('#timer-state').innerText(), /练习中/);
     assert.equal(await page.locator('[data-action="metro-toggle"]').innerText(), '播放节拍');
     const time = await page.locator('#timer-value').innerText();
     await listen(page);
     await page.waitForTimeout(1100);
-    assert.equal(await page.locator('#timer-value').innerText(), time);
+    assert.notEqual(await page.locator('#timer-value').innerText(), time);
     await page.locator('#tuner-stop').click(); await released(page);
     assert.equal(await page.locator('#tuner-note').innerText(), '—');
     await listen(page);

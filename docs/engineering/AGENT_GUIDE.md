@@ -121,3 +121,14 @@ The desktop bridge exposes only a check-updates request; native code owns update
 metadata, download and installer decisions. Android updates require size/hash,
 package/version and installed-signer validation plus the existing draft-save
 barrier. Preserve IDs, origins, data directories and backup schemas.
+
+## Manual practice timing supersedes foreground/automatic-return rules
+
+Owner correction on 2026-11-02: ADR 0008 supersedes the foreground-only clock,
+automatic-return intent and tuner-induced timer pause described above. Navigation,
+blur/minimize and tool changes release media independently and preserve manual
+session run/pause intent. Matched wall/monotonic delays count; clock discontinuities
+exclude the gap without inventing a pause. Reload recovers the last saved draft
+paused. Separate viewing requires the learner to pause practice first; launching a
+lesson while running does not create overlapping watch evidence. Verify the single
+contextual return and unique session actions through `quiet-practice.spec.mjs`.

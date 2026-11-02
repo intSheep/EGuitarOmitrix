@@ -49,15 +49,21 @@ try {
   await page.locator('[data-start]').click();
   const draft = () => page.evaluate(async () => { const m = await import('./practice-store.js'), db = await m.openPracticeDB(); const d = await m.readDraft(db); db.close(); return d; });
   await expect.poll(async () => (await draft())?.elapsedMs || 0).toBeGreaterThan(1000);
+  // Capture cleanup is independent of the practice timer.
+  await page.locator('[data-tuner]').click();
+  await page.locator('#tuner-start').click();
+  await expect.poll(() => page.evaluate(() => testStreams.length)).toBe(2);
   // Xvfb/WSLg may not have a window manager; simulate the native background signal.
   await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].emit('blur'));
-  await expect.poll(async () => (await draft()).running).toBe(false);
-  const paused = (await draft()).elapsedMs;
-  await page.waitForTimeout(1200);
-  assert.equal((await draft()).elapsedMs, paused);
+  assert.equal((await draft()).running, true);
+  await expect.poll(() => page.evaluate(() => testStreams.every(s=>s.getTracks().every(t=>t.readyState==='ended')))).toBe(true);
+  await expect(page.locator('#tuner-start')).toBeVisible();
+  const beforeBackground = (await draft()).elapsedMs;
+  await expect.poll(async () => (await draft()).elapsedMs).toBeGreaterThan(beforeBackground);
   await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].focus());
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect.poll(async () => (await draft()).running).toBe(true);
+  await page.locator('#focus-back').click();
   await page.locator('[data-score]').click();
   if (course) {
     await expect(page.locator('#score-play')).toBeEnabled({ timeout: 20000 });
@@ -73,11 +79,11 @@ try {
     };
   });
   await page.locator('#score-play').click();
-  await expect(page.locator('#score-play')).toHaveText('暂停');
+  await expect(page.locator('#score-play')).toHaveText('暂停播放');
   await expect.poll(() => page.evaluate(() => testScoreAudioStarted)).toBe(true);
   await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].emit('blur'));
-  await expect(page.locator('#score-play')).toHaveText('播放');
-  await page.locator('#score-close').click();
+  await expect(page.locator('#score-play')).toHaveText('播放乐谱');
+  await page.locator('#focus-back').click();
   await page.locator('[data-action=finish]').click();
   await page.locator('#finish-form button[type=submit]').click();
   await page.locator('.completion').waitFor();
@@ -96,7 +102,7 @@ try {
   launched = await launch(); application = launched.instance;
   const persisted = await launched.page.evaluate(async () => { const m = await import('./practice-store.js'), db = await m.openPracticeDB(); const logs = await m.allLogs(db); db.close(); return logs.length; });
   assert.equal(persisted, 1);
-  console.log('Desktop smoke passed: bundled offline UI and score playback, sandbox configuration, microphone start/stop, camera denial, simulated background pause, export, outbound links and persistence after restart.');
+  console.log('Desktop smoke passed: bundled offline UI and score playback, sandbox configuration, microphone start/stop, camera denial, background media cleanup with continuous manual timing, export, outbound links and persistence after restart.');
 } finally {
   await application?.close();
   await rm(profile, { recursive: true, force: true });

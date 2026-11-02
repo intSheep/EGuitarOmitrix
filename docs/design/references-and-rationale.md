@@ -134,3 +134,14 @@ Rejected generated version/status, unsupported technique advice and numeric valu
 See [ADR 0007](../decisions/0007-client-workspace-and-updates.md) for provenance and
 platform boundaries. Actual synthetic-profile screenshots in local test results
 are runtime evidence; the generated description is not application acceptance.
+
+## Quiet practice correction — 2026-11-02
+
+The owner supplied a real client screenshot and rejected repeated navigation and
+nested button groups. Stitch screen `a63dc5be9f7947ec8b8073b2bca509de` in project
+`6723020998384701419` was generated and visually inspected. Retained flat tool tabs,
+one corner menu/contextual return, passive time, grouped score options and one
+session-control footer. Rejected generated ASIO status, invented notation/advice,
+bar-loop claims and nested teaching cards. This supersedes the floating-clock
+interaction and redundant score shortcuts. See ADR 0008 for the page-by-page audit
+and changed manual-timer rules; runtime screenshots and tests are separate evidence.

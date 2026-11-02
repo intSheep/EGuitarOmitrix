@@ -1,4 +1,4 @@
-// Pure clock accounting: only observed, foreground intervals count.
+// Manual-session accounting: navigation and delayed callbacks retain the learner's run/pause intent.
 export function createSession(
   entryId,
   assignmentVersion,
@@ -25,13 +25,12 @@ export function tickSession(s, wall, mono, metronomeBpm = null) {
   if (!s.running) return s;
   const dw = wall - s.lastWall,
     dm = mono - s.lastMono;
-  if (dw < 0 || dm < 0 || dw > 5000 || dm > 5000 || Math.abs(dw - dm) > 1000)
+  if (dw < 0 || dm < 0 || Math.abs(dw - dm) > 1000)
     return {
       ...s,
-      running: false,
-      lastWall: null,
-      lastMono: null,
-      reason: "检测到中断，计时已暂停",
+      lastWall: Math.max(wall, s.intervals.at(-1)?.end ?? wall),
+      lastMono: mono,
+      reason: "时钟已校准，中断间隔未计入",
     };
   const counted = Math.min(dw, 86400000 - s.elapsedMs);
   wall = s.lastWall + counted;

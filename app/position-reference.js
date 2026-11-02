@@ -41,7 +41,7 @@ export function showPositionReference({ host = null, onClose = null } = {}) {
       ${notes.map(n=>{const x=100+(n.fret-min+.5)*step,y=70+(n.string-1)*40;return `<g>${n.root?`<rect x="${x-16}" y="${y-16}" width="32" height="32" rx="8" fill="#3f5cf0"/>`:`<circle cx="${x}" cy="${y}" r="16" fill="#17203a"/>`}<text x="${x}" y="${y+6}" fill="white" text-anchor="middle">${noteNames?n.name:n.degree}</text></g>`}).join('')}</svg>
       <div class="position-legend"><span><i></i>主音 C · 1</span><span>标准调弦 E A D G B E</span></div>`;
     panel.querySelector('[data-close]').onclick=onClose || (()=>panel.close());
-    if (host) panel.querySelector('[data-close]').textContent = '返回计时';
+    panel.querySelector('[data-close]').hidden = !!host;
     panel.querySelectorAll('[data-position]').forEach(b=>b.onclick=()=>{selected=Number(b.dataset.position);render();panel.querySelector(`[data-position="${selected}"]`).focus()});
     panel.querySelector('[data-label]').onclick=()=>{noteNames=!noteNames;render();panel.querySelector('[data-label]').focus()};
   }

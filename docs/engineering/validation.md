@@ -312,3 +312,22 @@ Windows packaged-runtime gates remain pending CI at this entry. No release was
 published and no owner profile was migrated, uninstalled or upgraded. Physical
 Android upgrade/installer/settings flows, physical audio and real Windows NSIS
 overwrite remain unverified. No claim of full native-widget rendering is made.
+
+## Quiet practice and manual-timer correction — 2026-11-02
+
+Owner screenshot review, FR-010/020/021/022/024 and ADR 0008. Local verification:
+67 Node tests pass; sanitized build passes; 20 Playwright checks pass with one
+course-pack-only skip. New synthetic-profile checks cover a single contextual
+return, one session-control pair, compact/desktop geometry, More disclosure,
+manual run/pause across all tools and menu routes, visibility/native background,
+Android Back, finish/return and non-overlapping viewing. Screenshots at 1280/800/390
+were visually inspected. The older automatic-return/floating-clock scripts now
+invoke the maintained owner-corrected suite; they no longer assert removed behavior.
+
+Real Electron smoke passed, including native background cleanup during live
+microphone capture while the same practice timer continues, score playback, export
+and restart persistence. Final native packaging CI will be reported in the PR.
+No device was upgraded, no release published, and no owner records modified. Physical
+sleep/process eviction, Windows installer overwrite and real Android/hardware audio
+remain unverified. Timer duration now follows learner intent rather than verified
+foreground playing; neither tuning nor playback implies proficiency.

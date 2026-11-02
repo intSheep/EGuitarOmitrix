@@ -29,13 +29,7 @@ export function syncClientView(route) {
     actions.append(detail.querySelector('.single-start'), detail.querySelector('[data-material]'));
     content.append(...detail.childNodes); detail.append(back, content, actions);
   }
-  const focus = document.querySelector('.focus-page');
-  if (focus) {
-    const main = focus.querySelector('.focus-main');
-    const scroll = document.createElement('div'); scroll.className = 'client-focus-content';
-    const actions = main.querySelector('.focus-actions');
-    scroll.append(...main.childNodes); main.append(scroll, actions);
-  }
+
 }
 export function initClient() {
   if (!isClient) return;
@@ -55,9 +49,9 @@ export function initClient() {
   document.querySelector('.app-header').append(update);
   // Called by Android's system back button before it backgrounds the task.
   globalThis.eguitarClientBack = () => {
-    const dialog = [...document.querySelectorAll('dialog[open]')].at(-1);
+    const dialog = document.querySelector('dialog:modal');
     if (dialog) { dialog.dispatchEvent(new Event('cancel', {cancelable:true})); if(dialog.open) dialog.close(); return true; }
-    if (document.querySelector('.has-focus-tool')) { document.querySelector('#floating-timer')?.click(); return true; }
+    if (document.querySelector('.has-focus-tool')) { document.querySelector('#focus-back')?.click(); return true; }
     const [route, query] = location.hash.slice(1).split('?');
     if (route === 'finish') return true; // Never discard unconfirmed results with Back.
     if (route === 'practice' && document.body.classList.contains('client-detail')) { document.querySelector('.client-back')?.click(); return true; }

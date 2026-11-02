@@ -40,3 +40,13 @@ Preserve technical app IDs, origins and data directories. Windows updates requir
 explicit download/install consent and successful draft persistence. Android
 release signing keys are private secrets; PR builds never receive them. macOS
 buildability is not signed/notarized distribution or physical-device acceptance.
+
+## Quiet practice correction — 2026-11-02
+
+The owner's latest screenshot review supersedes automatic practice pauses on tool,
+route, visibility or window changes, including tuner entry. Follow ADR 0008. Keep
+one contextual return to timing, one corner menu, and one session pause/finish pair.
+Media/capture cleanup must not change manual timer intent. Explicit pauses persist;
+reload/storage/update/finish integrity safeguards remain. No tuning or playback
+operation creates proficiency evidence. Audit every entry/finish/navigation action
+and test native background signals independently of microphone release.

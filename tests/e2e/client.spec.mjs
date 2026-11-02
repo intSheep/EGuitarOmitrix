@@ -32,7 +32,7 @@ for (const viewport of [{width:1280,height:720},{width:800,height:600},{width:39
     await page.locator('[data-score]').click();
     await within(page.locator('[data-action=pause]'));
     await within(page.locator('[data-action=finish]'));
-    await expect(page.locator('[data-floating-time]')).not.toHaveText('00:00');
+    await expect(page.locator('[data-session-time]')).not.toHaveText('00:00');
     await page.locator('[data-action=finish]').click();
     await expect(page.locator('#finish-form')).toBeVisible();
     expect(errors).toEqual([]);
@@ -54,6 +54,7 @@ for(const width of [1280,390]) {
     await page.addInitScript(()=>{window.eguitarDesktop={checkUpdates:async()=>{}};});
     await page.goto('/#catalog');
     const search=page.locator('.library-search'); await expect(search).toBeVisible();
+    await expect(page.locator('.storage-banner')).toHaveCount(0);
     const before=await search.boundingBox();
     await page.locator('.course-directory').evaluate(el=>el.scrollTop=el.scrollHeight);
     expect((await search.boundingBox()).y).toBe(before.y);

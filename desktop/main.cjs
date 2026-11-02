@@ -57,7 +57,7 @@ else {
     window = new BrowserWindow({
       width: 1280, height: 900, minWidth: 390, minHeight: 600, show: false,
       title: '帅帅练琴屋', backgroundColor: '#ffffff', icon: path.join(__dirname, 'icon.png'), autoHideMenuBar: true,
-      webPreferences: { preload: path.join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, webviewTag: false },
+      webPreferences: { preload: path.join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, webviewTag: false, backgroundThrottling: false },
     });
     const openExternal = value => {
       const url = externalURL(value);
