@@ -24,7 +24,7 @@ for (const width of [1440, 768, 390]) {
     await page.locator('#score-file').setInputFiles({ name: 'synthetic.musicxml', mimeType: 'application/xml', buffer: Buffer.from(xml) });
     await expect(page.locator('#score-play')).toBeEnabled();
     await expect(page.locator('#score-render svg').first()).toBeVisible();
-    await page.locator('#score-close').click();
+    await page.locator('#focus-back').click();
     expect(errors).toEqual([]);
   });
 }

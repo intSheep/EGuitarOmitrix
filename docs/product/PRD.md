@@ -402,3 +402,36 @@ confirmed update download/install; Android release packages use a stable signing
 identity. macOS remains browser-first, with an experimental native build path
 until signing/notarization and target-device acceptance are available.
 IDs, origins, local records and backup compatibility survive the display rename.
+
+### FR-024 — Installed-client interaction and online updates (2026-11-02)
+
+Owner-authorized: installed Windows and Android clients use fixed navigation and
+primary actions, bounded list/detail workspaces, and compact-client list/detail
+navigation instead of scrolling an entire website inside the window. Practice
+tools and pause/finish remain reachable without scrolling for them. Preserve
+Brilliant styling, application IDs/origins, records and backup compatibility.
+
+Provide an application-level check-for-updates entry. Require explicit download
+and installation decisions, verify package integrity/identity and preserve drafts
+before installation. Failures retain the current usable version and records.
+Android uses the system APK installer; desktop uses the existing stable release
+channel. No silent install, automatic downgrade or content hot-code replacement.
+See [ADR 0007](../decisions/0007-client-workspace-and-updates.md).
+
+### Quiet practice and manual-timer correction — 2026-11-02
+
+The owner's screenshot review requires fewer competing actions across workspace,
+focus tools, menus and completion. One corner menu, one contextual return to timing,
+a passive clock and one pause/finish pair replace nested/duplicate controls. Score
+playback controls remain distinct from practice controls; low-frequency score
+operations move to More. See [ADR 0008](../decisions/0008-quiet-practice-and-manual-timing.md).
+
+FR-010/020/021/022/024 refinement: ordinary tool, page, window and visibility changes
+must not pause a running practice session. Only explicit pause/continue changes
+normal run intent. Stop media/capture independently on background/tuning/navigation;
+never restart sound or capture on return. Explicit pauses persist across all views.
+Matched elapsed clocks survive delayed callbacks; discontinuities exclude the gap.
+Crash/reload recovery, storage failure, the 24-hour bound and consented finish/update
+retain their existing integrity safeguards. A running practice session does not
+create overlapping automatic viewing time on external lesson launch. Existing
+viewing records, source/plan/result separation and backup schemas remain unchanged.

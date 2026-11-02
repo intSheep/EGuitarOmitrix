@@ -1,4 +1,3 @@
-import { showPositionReference } from "./position-reference.js";
 import { saveFile } from "./file-export.js";
 import { COUNT_IN_KEY, ScoreCountIn, countInTiming } from "./score-count-in.js";
 let sdk,
@@ -45,7 +44,7 @@ export function closeScore() {
 function download(bytes, name, type) {
   return saveFile(new Blob([bytes], { type }), name);
 }
-export async function showScore(entryId, title, { host = null, onClose = null, onPosition = null } = {}) {
+export async function showScore(entryId, title, { host = null, onClose = null } = {}) {
   if (!dialog) {
     dialog = document.createElement("dialog");
     dialog.id = "score-dialog";
@@ -58,10 +57,9 @@ export async function showScore(entryId, title, { host = null, onClose = null, o
   dialog.setAttribute('role', host ? 'region' : 'dialog');
   dispose();
   const token = generation;
-  dialog.innerHTML = `<header class="score-heading"><h2 id="score-title">${esc(title)}</h2><button class="button secondary" id="score-close">关闭乐谱</button></header><div class="score-controls"><label id="score-choice-label" hidden>本课乐谱 <select id="score-choice" aria-label="本课乐谱"></select></label><button class="button secondary" data-tuner>调音器</button><button class="button secondary" id="score-position">把位速查</button><label class="button secondary score-file">载入本地谱<input id="score-file" type="file" disabled accept=".gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.xml,.mxl"></label><button class="button primary" id="score-play" disabled>播放</button><button class="button secondary" id="score-stop" disabled>回到开头</button><label>BPM <input id="score-bpm" type="number" min="20" max="300" disabled></label><label><input id="score-loop" type="checkbox">循环</label><label title="按当前速度和拍号预备后播放"><input id="score-count-in" type="checkbox" disabled>一小节预备拍</label><button class="button secondary" id="score-gp" disabled>下载 GP 文件</button><button class="button secondary" id="score-xml" hidden>下载 MusicXML</button><button class="button secondary" id="score-source" hidden>原谱画面</button></div><p id="score-count-in-status" role="status" hidden></p><p id="score-status" role="status">正在加载乐谱…</p><div id="score-render"></div><div id="score-images" hidden></div>`;
+  dialog.innerHTML = `<header class="score-heading"><h2 id="score-title">${esc(title)}</h2><button class="button secondary" id="score-close">关闭乐谱</button></header><div class="score-controls"><label id="score-choice-label" hidden>本课乐谱 <select id="score-choice" aria-label="本课乐谱"></select></label><button class="button primary" id="score-play" disabled>播放乐谱</button><label>BPM <input id="score-bpm" type="number" min="20" max="300" disabled></label><label><input id="score-loop" type="checkbox">循环</label><details class="score-options"><summary>更多</summary><div class="score-options-menu"><button id="score-stop" disabled>回到开头</button><label title="按当前速度和拍号预备后播放"><input id="score-count-in" type="checkbox" disabled>一小节预备拍</label><label class="score-file">载入本地谱<input id="score-file" type="file" disabled accept=".gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.xml,.mxl"></label><button id="score-gp" disabled>下载 GP 文件</button><button id="score-xml" hidden>下载 MusicXML</button><button id="score-source" hidden>原谱画面</button></div></details></div><p id="score-count-in-status" role="status" hidden></p><p id="score-status" role="status">正在加载乐谱…</p><div id="score-render"></div><div id="score-images" hidden></div>`;
   dialog.querySelector("#score-count-in").checked = countInEnabled;
-  if (host) { dialog.querySelector('#score-title').textContent = '乐谱'; dialog.querySelector('#score-close').textContent = '返回计时'; }
-  dialog.querySelector("#score-position").onclick = onPosition || showPositionReference;
+  dialog.querySelector('.score-heading').hidden = !!host;
   dialog.querySelector("#score-close").onclick = onClose || (() => dialog.close());
   if (!dialog.open) { if (host) dialog.show(); else dialog.showModal(); }
   const status = dialog.querySelector("#score-status");
@@ -87,7 +85,7 @@ export async function showScore(entryId, title, { host = null, onClose = null, o
     let playRequest = 0, position = null;
     cancelPreparation = () => {
       playRequest++;
-      playButton.textContent = player.playerState === 1 ? "暂停" : "播放";
+      playButton.textContent = player.playerState === 1 ? "暂停播放" : "播放乐谱";
       countIn.stop();
       preparationStatus.hidden = true;
     };
@@ -147,7 +145,7 @@ export async function showScore(entryId, title, { host = null, onClose = null, o
     player.playerStateChanged.on((e) => {
       if (token === generation)
         dialog.querySelector("#score-play").textContent =
-          e.state === 1 ? "暂停" : "播放";
+          e.state === 1 ? "暂停播放" : "播放乐谱";
     });
     player.playerPositionChanged.on((e) => {
       if (token !== generation) return;
@@ -172,7 +170,7 @@ export async function showScore(entryId, title, { host = null, onClose = null, o
         });
         if (token !== generation || request !== playRequest) return;
         preparationStatus.hidden = true;
-        playButton.textContent = "播放";
+        playButton.textContent = "播放乐谱";
         if (completed && dialog.open && !document.hidden) player.play();
         else status.textContent = "预备已中断，请重新播放。";
       } catch (e) {
@@ -265,6 +263,9 @@ export async function showScore(entryId, title, { host = null, onClose = null, o
       if (token !== generation || current !== selection) return;
       await load(bytes, /\.(musicxml|xml)$/i.test(file.name), /\.gp$/i.test(file.name));
     };
+    dialog.querySelector('.score-options-menu').addEventListener('click', e => {
+      if (e.target.closest('button')) dialog.querySelector('.score-options').open = false;
+    });
     dialog.querySelector("#score-file").disabled = false;
     const response = await fetch("./local-scores/index.json");
     if (token !== generation || manualSelected) return;

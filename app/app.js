@@ -1,3 +1,4 @@
+import { initClient, syncClientView, isClient } from './client.js';
 import { beginWatch, stopWatch, watchSeconds, confirmWatch, totalWatchSeconds, parseWatchTime } from './study.js';
 import { readStudy, writeWatch, saveWatch, setWatchDeleted } from './study-store.js';
 import { mountFocusStage, unmountFocusStage, openPracticeTool, returnToClock } from './focus-stage.js';
@@ -43,7 +44,7 @@ import {
   dayKey,
 } from "./session.js";
 import { Metronome } from "./metronome.js";
-import { showTuner, closeTuner } from "./tuner.js";
+import { showTuner, closeTuner, stopTunerCapture } from "./tuner.js";
 const root = document.querySelector("#app"),
   modal = document.querySelector("#record-dialog");
 const esc = (v) =>
@@ -75,8 +76,6 @@ let course,
   lastTrigger,
   saveQueue = Promise.resolve();
 let watches = [], watchDraft = null, watchBusy = false, watchAway = false;
-// Only this live page may resume a session it automatically suspended.
-let returnSessionId = null;
 const metro = new Metronome((beat) =>
   document
     .querySelectorAll(".beat-dot")
@@ -140,7 +139,7 @@ function resumePanel(e) {
 function finishPage() {
   if (!draft) return '<h1>本次练习已结束</h1><a class="button primary" href="#practice">返回练习台</a>';
   const review=draft.review || {}, e=entry(draft.entryId);
-  return `<section class="finish-page"><h1>收好这次练习</h1><p>${esc(shortTitle(e))}</p><div class="finish-time"><strong>${time(draft.elapsedMs/1000)}</strong><span>专注时间</span></div>${draft.goal?.minutes ? `<label>本次目标 ${draft.goal.minutes} 分钟<progress max="${draft.goal.minutes*60}" value="${Math.min(draft.elapsedMs/1000,draft.goal.minutes*60)}"></progress></label>` : ''}<div data-daily-progress="${e.id}">${dailyProgress(e)}</div>${tempoEvidence(draft)}<form id="finish-form"><label for="stable-bpm">实际稳定 BPM · 选填</label><input id="stable-bpm" name="bpm" type="number" min="1" max="400" step="1" inputmode="numeric" value="${esc(review.bpm ?? '')}" placeholder="未确认可留空"><fieldset class="finish-outcomes"><legend>这次练得怎么样 · 选填</legend>${Object.entries(FINISH_OUTCOMES).map(([k,v])=>`<label><input type="radio" name="outcome" value="${k}" ${review.outcome===k?'checked':''}><span>${v}</span></label>`).join('')}</fieldset><p id="finish-error" role="alert"></p><div class="finish-actions"><button class="button primary" type="submit">保存练习</button><button class="button secondary" type="button" data-action="resume-finish">继续练习</button></div></form></section>`;
+  return `<section class="finish-page"><h1>收好这次练习</h1><p>${esc(shortTitle(e))}</p><div class="finish-time"><strong>${time(draft.elapsedMs/1000)}</strong><span>练习时间</span></div>${draft.goal?.minutes ? `<label>本次目标 ${draft.goal.minutes} 分钟<progress max="${draft.goal.minutes*60}" value="${Math.min(draft.elapsedMs/1000,draft.goal.minutes*60)}"></progress></label>` : ''}<form id="finish-form"><label for="stable-bpm">实际稳定 BPM · 选填</label><input id="stable-bpm" name="bpm" type="number" min="1" max="400" step="1" inputmode="numeric" value="${esc(review.bpm ?? '')}" placeholder="未确认可留空"><fieldset class="finish-outcomes"><legend>这次练得怎么样 · 选填</legend>${Object.entries(FINISH_OUTCOMES).map(([k,v])=>`<label><input type="radio" name="outcome" value="${k}" ${review.outcome===k?'checked':''}><span>${v}</span></label>`).join('')}</fieldset><p id="finish-error" role="alert"></p><div class="finish-actions"><button class="button primary" type="submit">保存结果</button><button class="button secondary" type="button" data-action="resume-finish">返回练习</button></div></form></section>`;
 }
 function tempoEvidence(record) {
   return record.tempoUsage?.length ? `<div class="tempo-evidence"><h3>节拍器使用</h3>${record.tempoUsage.map(x=>`<span>${x.bpm} BPM · ${time(x.seconds)}</span>`).join('')}</div>` : '';
@@ -159,7 +158,7 @@ function workspace() {
   const lessons = primaryLessons(course, stage);
   if (e.legacy && e.stage === stage) lessons.push(e);
   if (e.stage !== stage || e.kind !== "lesson") e = lessons[0];
-  return `<div class="page-heading"><h1>练习台</h1><div class="workspace-tools"><button class="button secondary" data-tuner>调音器</button><a class="text-link" href="#history">练习回顾</a></div></div><div class="stage-pills">${STAGES.map((s) => `<a class="button secondary" aria-current="${s.id === stage ? "step" : "false"}" href="#practice?stage=${s.id}&lesson=${primaryLessons(course, s.id)[0].id}">W${s.id}</a>`).join("")}</div><div class="practice-layout"><section class="exercise-list"><div class="list-heading"><h2>${esc(STAGES.find((s) => s.id === stage).title)}</h2></div><ul>${lessons.map((l) => `<li class="exercise-row ${l.id === e.id ? "is-selected" : ""}"><a class="exercise-select" href="#practice?stage=${stage}&lesson=${l.id}"><span class="exercise-number">${String(l.exercises[0]).padStart(2, "0")}</span><span class="exercise-label"><strong>${esc(shortTitle(l))}</strong><span>${seconds(l.id) > 0 ? `累计 ${time(seconds(l.id))}${guidance(l).last?.outcome === "mastered" ? " · 已掌握" : ""}` : "尚未练习"}</span></span></a></li>`).join("")}</ul></section><aside class="lesson-detail"><img class="detail-art" src="./assets/fretboard.svg" alt=""><h2>${esc(shortTitle(e))}</h2>${requirements(e)}${resumePanel(e)}<div class="single-start"><button class="button primary wide" data-start="${draft?.entryId || e.id}" ${!db ? "disabled" : ""}>${draft ? (draft.finishing ? "确认上次练习" : "继续未结束的练习") : guidance(e).last ? "接着练" : "开始练习"}</button>${draft && draft.entryId !== e.id ? `<p>${esc(shortTitle(entry(draft.entryId)))}</p>` : ""}</div><button class="button secondary wide" data-material="${e.id}">课程资料</button><section class="effort-mini"><h3>最近七天</h3>${bars()}</section></aside></div>`;
+  return `<div class="page-heading"><h1>练习台</h1><div class="workspace-tools"><button class="button secondary" data-tuner>调音器</button></div></div><div class="stage-pills">${STAGES.map((s) => `<a class="button secondary" aria-current="${s.id === stage ? "step" : "false"}" href="#practice?stage=${s.id}&lesson=${primaryLessons(course, s.id)[0].id}">W${s.id}</a>`).join("")}</div><div class="practice-layout"><section class="exercise-list"><div class="list-heading"><h2>${esc(STAGES.find((s) => s.id === stage).title)}</h2></div><ul>${lessons.map((l) => `<li class="exercise-row ${l.id === e.id ? "is-selected" : ""}"><a class="exercise-select" href="#practice?stage=${stage}&lesson=${l.id}"><span class="exercise-number">${String(l.exercises[0]).padStart(2, "0")}</span><span class="exercise-label"><strong>${esc(shortTitle(l))}</strong><span>${seconds(l.id) > 0 ? `累计 ${time(seconds(l.id))}${guidance(l).last?.outcome === "mastered" ? " · 已掌握" : ""}` : "尚未练习"}</span></span></a></li>`).join("")}</ul></section><aside class="lesson-detail"><img class="detail-art" src="./assets/fretboard.svg" alt=""><h2>${esc(shortTitle(e))}</h2>${requirements(e)}${resumePanel(e)}<div class="single-start"><button class="button primary wide" data-start="${draft?.entryId || e.id}" ${!db ? "disabled" : ""}>${draft ? (draft.finishing ? "确认练习结果" : draft.running ? "返回计时" : "继续练习") : guidance(e).last ? "接着练" : "开始练习"}</button>${draft && draft.entryId !== e.id ? `<p>${esc(shortTitle(entry(draft.entryId)))}</p>` : ""}</div><button class="button secondary wide" data-material="${e.id}">课程资料</button><section class="effort-mini"><h3>最近七天</h3>${bars()}</section></aside></div>`;
 }
 function focus() {
   if (!draft)
@@ -168,7 +167,7 @@ function focus() {
     a = task(e.id);
   const icon = paths => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
   const toolButton = (attribute, label, paths) => `<button class="focus-tool" ${attribute}>${icon(paths)}<span>${label}</span></button>`;
-  return `<section class="focus-page"><div class="focus-top"><a class="button secondary" href="#practice?lesson=${e.id}">返回练习台</a><span>W${e.stage} · EX${e.exercises[0]}</span></div><div class="focus-layout"><div class="focus-main"><h1>${esc(shortTitle(e))}</h1><div id="focus-clock"><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="专注练习时间">${time(draft.elapsedMs / 1000)}</strong><span>专注时间</span></div></div></div><div id="focus-tool-content" tabindex="-1" hidden></div><button id="floating-timer" type="button" aria-label="返回主计时，拖动或使用方向键移动" hidden><span class="floating-grip" aria-hidden="true">⠿</span><span><small data-floating-state>练习中</small><strong data-floating-time>${time(draft.elapsedMs/1000)}</strong></span><span class="floating-return" aria-hidden="true">↩</span></button><div class="focus-actions">${button("pause", draft.running ? "暂停" : "继续练习")}${button("finish", "结束练习", true)}</div><div id="focus-requirements">${requirements(e)}</div></div><aside class="focus-tools" aria-label="练习工具"><h2>练习工具</h2><div class="tool-dock">${toolButton('data-tuner', '调音器', '<path d="M9 3v8a3 3 0 0 0 6 0V3M12 14v7M7 3v7m10-7v7"/>')}${toolButton('data-position-reference', '把位速查', '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v18m6-18v18M4 9h16M4 15h16"/><circle cx="12" cy="12" r="1"/>')}${toolButton(`data-score="${e.id}"`, '乐谱', '<path d="M9 17V5l11-2v12M9 8l11-2"/><ellipse cx="6" cy="17" rx="3" ry="2"/><ellipse cx="17" cy="15" rx="3" ry="2"/>')}${!teacherPrescription(a).noMetronome ? toolButton('data-action="metronome"', '节拍器', '<path d="M9 3h6l5 18H4L9 3ZM12 16l5-10M8 17h8"/>') : ''}${toolButton(`data-material="${e.id}"`, '课程资料', '<rect x="3" y="5" width="18" height="15" rx="2"/><path d="m10 9 5 3-5 3V9ZM7 2v3m10-3v3"/>')}</div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></aside></div></section>`;
+  return `<section class="focus-page"><header class="focus-top"><div class="focus-navigation"><button class="practice-menu-toggle" data-action="practice-menu" aria-label="打开菜单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>菜单</span></button><button id="focus-back" class="text-link" data-action="return-clock" hidden>← 返回计时</button></div><span class="practice-clock-label" data-session-time>${time(draft.elapsedMs / 1000)}</span><span>W${e.stage} · EX${e.exercises[0]}</span></header><div class="focus-layout"><div class="focus-main"><h1>${esc(shortTitle(e))}</h1><div id="focus-clock"><div class="timer-orbit"><div class="ambient-orbit"></div><div class="timer-content"><p id="timer-state" role="status"></p><strong id="timer-value" role="timer" aria-label="练习计时">${time(draft.elapsedMs / 1000)}</strong><span>练习时间</span></div></div></div><div id="focus-tool-content" tabindex="-1" hidden></div><div class="focus-actions">${button("pause", draft.running ? "暂停练习" : "继续练习")}${button("finish", "结束练习")}</div><div id="focus-requirements">${requirements(e)}</div></div><aside class="focus-tools" aria-label="练习工具"><div class="tool-dock">${toolButton('data-tuner', '调音器', '<path d="M9 3v8a3 3 0 0 0 6 0V3M12 14v7M7 3v7m10-7v7"/>')}${toolButton('data-position-reference', '把位速查', '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v18m6-18v18M4 9h16M4 15h16"/><circle cx="12" cy="12" r="1"/>')}${toolButton(`data-score="${e.id}"`, '乐谱', '<path d="M9 17V5l11-2v12M9 8l11-2"/><ellipse cx="6" cy="17" rx="3" ry="2"/><ellipse cx="17" cy="15" rx="3" ry="2"/>')}${!teacherPrescription(a).noMetronome ? toolButton('data-action="metronome"', '节拍器', '<path d="M9 3h6l5 18H4L9 3ZM12 16l5-10M8 17h8"/>') : ''}${toolButton(`data-material="${e.id}"`, '课程资料', '<rect x="3" y="5" width="18" height="15" rx="2"/><path d="m10 9 5 3-5 3V9ZM7 2v3m10-3v3"/>')}</div><div id="metro-panel" hidden><label>BPM <input id="bpm" type="number" min="20" max="300" value="${guidance(e).bpm || teacherPrescription(a).startBpm || 60}" ${teacherPrescription(a).fixedBpm ? "disabled" : ""}></label><div class="beats" aria-hidden="true">${[0, 1, 2, 3].map(() => '<i class="beat-dot"></i>').join("")}</div>${button("metro-toggle", "播放节拍")}</div></aside></div></section>`;
 }
 function savedPractice(record) {
   return `<section class="completion" aria-labelledby="completion-title">
@@ -285,9 +284,30 @@ function render() {
     if (a.dataset.nav === name) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   });
+  syncClientView(name);
+  renderSessionAccess();
   renderStudyPanel();
   updateClock();
-  if (name === "focus") { mountFocusStage();  }
+  if (name === 'focus') {
+    const main = root.querySelector('.focus-main'), actions = main?.querySelector('.focus-actions');
+    if (main && actions) {
+      const content = document.createElement('div'); content.className = 'client-focus-content';
+      content.append(...main.childNodes); main.append(content, actions);
+    }
+    mountFocusStage();
+  }
+}
+function renderSessionAccess() {
+  document.querySelector('#session-access')?.remove();
+  const name=route().name;
+  if (!draft || ['focus','finish'].includes(name)) return;
+  if (['practice',''].includes(name) && !(isClient && innerWidth<=760 && !document.body.classList.contains('client-detail'))) return;
+  const strip = document.createElement('div'); strip.id = 'session-access';
+  strip.innerHTML = `<span>${esc(shortTitle(entry(draft.entryId)))} · <strong data-session-time>${time(draft.elapsedMs / 1000)}</strong>${draft.running ? '' : ' · 已暂停'}</span><a class="text-link" href="#${draft.finishing ? 'finish' : 'focus'}">${draft.finishing ? '确认练习结果' : '返回计时'}</a>`;
+  document.querySelector('.workspace').prepend(strip);
+}
+function practiceMenu() {
+  openModal(`<h2 id="record-title">菜单</h2><nav class="practice-menu" aria-label="应用菜单"><a href="#practice">练习台</a><a href="#catalog">课程目录</a><a href="#history">练习回顾</a>${document.querySelector('#client-update') ? '<button data-action="client-update">检查更新</button>' : ''}</nav>`);
 }
 function updateClock() {
   const watchClock = root.querySelector("[data-watch-clock]");
@@ -296,19 +316,14 @@ function updateClock() {
     const e=entry(node.dataset.dailyProgress);if(e)node.innerHTML=dailyProgress(e);
   });
   if (!draft) return;
-  const floatingValue = document.querySelector('[data-floating-time]');
-  if (floatingValue) floatingValue.textContent = time(draft.elapsedMs / 1000);
-  const floatingState = document.querySelector('[data-floating-state]');
-  if (floatingState) floatingState.textContent = draft.running ? '练习中' : '已暂停';
-  const floating = document.querySelector('#floating-timer');
-  if (floating) floating.dataset.running = String(draft.running);
+  document.querySelectorAll('[data-session-time]').forEach(node => node.textContent = time(draft.elapsedMs / 1000));
   const timer = document.querySelector("#timer-value");
   if (timer) timer.textContent = time(draft.elapsedMs / 1000);
   const status = document.querySelector("#timer-state");
   if (status)
-    status.textContent = draft.running ? "正在专注" : draft.reason || "已暂停";
+    status.textContent = draft.running ? "练习中" : draft.reason || "已暂停";
   const pause = document.querySelector('[data-action="pause"]');
-  if (pause) pause.textContent = draft.running ? "暂停" : "继续练习";
+  if (pause) pause.textContent = draft.running ? "暂停练习" : "继续练习";
   document.body.classList.toggle("clock-running", !!draft.running);
 }
 function persist() {
@@ -316,33 +331,26 @@ function persist() {
   saveQueue = saveQueue.catch(() => {}).then(() => writeDraft(db, snapshot));
   return saveQueue;
 }
-async function pause(reason = "已暂停", { resumeWhenBack = false } = {}) {
-  if (!resumeWhenBack) returnSessionId = null;
-  else if (draft?.running && release && !draft.finishing) returnSessionId = draft.id;
+function stopPracticeMedia() {
+  sampleClock();
   pauseScore();
-  if (draft && release && (!resumeWhenBack || draft.running))
-    draft = pauseSession(draft, Date.now(), performance.now(), reason, metro.running ? metro.bpm : null);
   metro.stop();
-  const mb = document.querySelector('[data-action="metro-toggle"]');
-  if (mb) mb.textContent = "播放节拍";
+  stopTunerCapture();
+  const control = document.querySelector('[data-action="metro-toggle"]');
+  if (control) control.textContent = '播放节拍';
+}
+async function backgroundMedia() {
+  stopPracticeMedia();
+  if (draft && release) await persist();
+  updateClock();
+}
+async function pause(reason = '已暂停') {
+  sampleClock();
+  stopPracticeMedia();
   if (!draft || !release) return;
+  draft = pauseSession(draft, Date.now(), performance.now(), reason);
   updateClock();
   await persist();
-}
-async function resumeAfterReturn() {
-  if (!returnSessionId || !db || !release || document.hidden || route().name !== 'focus' ||
-      !draft || draft.id !== returnSessionId || draft.running || draft.finishing ||
-      draft.elapsedMs >= 86400000 || watchDraft || watchBusy || busy ||
-      document.querySelector('#tuner-dialog[open]')) return;
-  returnSessionId = null;
-  draft = resumeSession(draft, Date.now(), performance.now());
-  updateClock();
-  try { await persist(); }
-  catch (e) {
-    draft = recoverSession(draft);
-    updateClock();
-    throw e;
-  }
 }
 async function claimSession(id, expectedId = null) {
   if (!db) throw new Error(storageError || "无法打开练习存储");
@@ -379,13 +387,13 @@ async function claimSession(id, expectedId = null) {
   }
 }
 async function start(id, resume = false) {
-  returnSessionId = null;
   const alreadyFocusing = route().name === 'focus' && !!document.querySelector('#focus-clock');
   if (watchDraft) throw Error('请先确认或不计入这次看课时间，再继续练习');
   await claimSession(id);
   if (draft.finishing && !resume) { location.hash = "finish"; render(); return; }
   draft.finishing = false;
-  draft = resumeSession(draft, Date.now(), performance.now());
+  sampleClock();
+  if (!draft.running) draft = resumeSession(draft, Date.now(), performance.now());
   try {
     await persist();
   } catch (e) {
@@ -406,9 +414,9 @@ function materials(id, host = null) {
     a = task(id);
   const row = (v, label, start) => `<a ${v.id === e.id && start === undefined ? 'id="video-launch"' : ''} class="material-row" data-watch="${v.id}" href="${esc(videoUrl(course, v, start))}" target="_blank" rel="noopener noreferrer"><span><strong>${esc(label)}</strong><small>P${String(v.page).padStart(3, '0')} · ${esc(shortTitle(v))}${start === undefined ? '' : ` · ${time(start)}`}${v.legacy ? ' · 旧版' : ''}</small></span><span aria-hidden="true">↗</span></a>`;
   const related = relatedEntries(course, e);
-  const show = host ? html => { host.innerHTML = `<button class="button secondary tool-return" data-action="return-clock">返回计时</button>${html}`; } : openModal;
+  const show = host ? html => { host.innerHTML = html; } : openModal;
   show(
-    `<h2 id="record-title">课程资料</h2><p class="material-hint">点击直接打开。看课单独计时，返回后确认。</p><div class="material-list">${row(e, e.kind === 'lesson' ? '老师讲解' : KINDS[e.kind])}${a?.evidence ? row(e, '本课练习要求', a.evidence.from) : ''}</div>${related.length ? `<h3>示范与练习素材</h3><div class="material-list">${related.map(v => row(v, KINDS[v.kind])).join('')}</div>` : ''}${!db ? '<p>本地存储暂不可用，仍可打开视频，本次不记录看课时间。</p>' : ''}`,
+    `<h2 id="record-title">课程资料</h2><p class="material-hint">点击打开原课程。</p><div class="material-list">${row(e, e.kind === 'lesson' ? '老师讲解' : KINDS[e.kind])}${a?.evidence ? row(e, '本课练习要求', a.evidence.from) : ''}</div>${related.length ? `<h3>示范与练习素材</h3><div class="material-list">${related.map(v => row(v, KINDS[v.kind])).join('')}</div>` : ''}${!db ? '<p>本地存储暂不可用，仍可打开视频，本次不记录看课时间。</p>' : ''}`,
   );
 }
 function showPracticeReference(trigger) {
@@ -456,7 +464,6 @@ async function endWatch(interrupted = false) {
     const next = { ...stopWatch(watchDraft), interrupted };
     await writeWatch(db, next, watchDraft);
     watchDraft = next; watchAway = false;
-    if (draft && !draft.running) draft.reason = '看课已结束，练习已暂停';
     renderStudyPanel();
     updateClock();
   } finally { watchBusy = false; }
@@ -469,8 +476,11 @@ async function launchMaterial(el) {
   video.opener = null;
   watchBusy = true;
   try {
-    await pause('正在看课，练习计时已暂停', { resumeWhenBack: true });
-    if (db && navigator.locks) {
+    stopPracticeMedia();
+    if (draft?.running) {
+      // A running practice timer is explicit learner intent. Do not create overlapping viewing evidence.
+      await persist();
+    } else if (db && navigator.locks) {
       await acquireActivity();
       const next = beginWatch(el.dataset.watch);
       await writeWatch(db, next, null);
@@ -480,7 +490,7 @@ async function launchMaterial(el) {
     else notice('当前无法保存看课计时，本次仅打开视频');
     video.location.replace(el.href);
     modal.close(); renderStudyPanel();
-  } catch (error) { returnSessionId = null; video.close(); releaseWatchActivity(); throw error; }
+  } catch (error) { video.close(); releaseWatchActivity(); throw error; }
   finally { watchBusy = false; }
 }
 async function manage() {
@@ -516,7 +526,7 @@ document.addEventListener("click", async (ev) => {
     }
     if (el.hasAttribute("data-tuner")) {
 
-      await pause("调音中，计时已暂停");
+      stopPracticeMedia();
       if (!openPracticeTool('tuner', el, host => showTuner({host, onClose:returnToClock}), closeTuner)) showTuner();
       return;
     }
@@ -536,7 +546,6 @@ document.addEventListener("click", async (ev) => {
       metro.stop();
       const show = host => showScore(el.dataset.score, shortTitle(entry(el.dataset.score)), {
         host, onClose:returnToClock,
-        onPosition:() => showPracticeReference(document.querySelector('[data-position-reference]')),
       });
       if (!openPracticeTool('score', el, show, closeScore)) await showScore(el.dataset.score, shortTitle(entry(el.dataset.score)));
     }
@@ -574,6 +583,8 @@ document.addEventListener("click", async (ev) => {
       render();
     }
     switch (el.dataset.action) {
+      case 'practice-menu': practiceMenu(); break;
+      case 'client-update': modal.close(); document.querySelector('#client-update')?.click(); break;
       case 'return-clock': returnToClock(); break;
       case 'watch-stop': await endWatch(); break;
       case 'watch-discard':
@@ -583,7 +594,6 @@ document.addEventListener("click", async (ev) => {
           await acquireActivity(); await writeWatch(db, null, watchDraft);
           watchDraft = null; releaseWatchActivity(); renderStudyPanel();
         } finally { watchBusy = false; }
-        await resumeAfterReturn();
         break;
       case "retry-storage":
         if (connectionAttempt)
@@ -620,7 +630,7 @@ document.addEventListener("click", async (ev) => {
         {
           const panel = document.querySelector('#metro-panel'), home = panel.parentElement;
           if (!openPracticeTool('metronome', el, host => {
-            host.innerHTML = '<header class="embedded-heading"><h2>节拍器</h2><button class="button secondary" data-action="return-clock">返回计时</button></header>';
+            host.innerHTML = '<header class="embedded-heading"><h2>节拍器</h2></header>';
             host.append(panel); panel.hidden=false;
           }, () => { home.append(panel); panel.hidden=true; })) panel.hidden = !panel.hidden;
         }
@@ -733,7 +743,6 @@ document.addEventListener("submit", async (e) => {
       releaseWatchActivity(); render(); notice('看课时间已单独保存');
     } catch (error) { e.target.querySelector('.study-error').textContent = error.message; }
     finally { watchBusy = false; }
-    await resumeAfterReturn().catch(error => notice(error.message));
   }
   if(e.target.id==='result-form') {
     e.preventDefault();if(busy)return;busy=true;
@@ -780,52 +789,31 @@ modal.addEventListener(
   "close",
   () => lastTrigger?.isConnected && lastTrigger.focus(),
 );
-window.addEventListener("hashchange", async () => {
-  const leavingPractice = route().name !== 'focus';
-  closeTuner();
+window.addEventListener('hashchange', async () => {
   closeScore();
-  if (leavingPractice) {
-    try {
-      await pause('离开练习区，返回后自动继续', { resumeWhenBack: true });
-    } catch (e) {
-      notice(e.message);
-    }
-  }
-  try { await endWatch(); } catch (e) { notice(e.message); }
+  try { await backgroundMedia(); await endWatch(); } catch (e) { notice(e.message); }
   modal.close();
   render();
-  try { await resumeAfterReturn(); } catch (e) { notice(e.message); }
   window.scrollTo(0, 0);
 });
-document.addEventListener("visibilitychange", () => {
+document.addEventListener('visibilitychange', () => {
   if (document.hidden && watchDraft?.endedAt === null) watchAway = true;
   if (!document.hidden && watchAway) endWatch().catch(e => notice(e.message));
-  if (document.hidden)
-    pause("离开页面，返回后自动继续", { resumeWhenBack: true }).catch((e) => {
-      returnSessionId = null;
-      notice(e.message);
-    });
+  if (document.hidden) backgroundMedia().catch(e => notice(e.message));
   else if (db && !release)
     Promise.all([allLogs(db), readDraft(db), readGoals(db), readStudy(db)])
-      .then(([l, d, g, study]) => {
-        watches = study.records; watchDraft = study.draft;
-        goals = g;
-        logs = l;
-        draft = d ? recoverSession(d) : null;
-        render();
-      })
-      .catch((e) => notice(e.message));
-  else if (!document.hidden) resumeAfterReturn().catch(e => notice(e.message));
+      .then(([l,d,g,study]) => {
+        watches=study.records; watchDraft=study.draft; goals=g; logs=l;
+        draft=d ? recoverSession(d) : null; render();
+      }).catch(e => notice(e.message));
 });
+window.addEventListener('resize', renderSessionAccess);
 window.addEventListener('blur', () => { if (watchDraft?.endedAt === null) watchAway = true; });
 window.addEventListener('focus', () => {
   if (watchAway && !document.hidden) endWatch().catch(e => notice(e.message));
-  if (!document.hidden) resumeAfterReturn().catch(e => notice(e.message));
 });
-window.addEventListener("pagehide", () => {
-  pause().catch(() => {});
-});
-// Native shells invoke the same pause/capture cleanup as browser backgrounding.
+window.addEventListener('pagehide', () => { backgroundMedia().catch(() => {}); });
+// Installation and explicit finish may stop timing. Ordinary backgrounding only releases media.
 window.eguitarPrepareForUpdate = async () => {
   if (busy || draft?.finishing || watchDraft || watchBusy || modal.open)
     throw Error('请先保存或关闭当前编辑、练习结果和观看记录，再安装更新。');
@@ -834,23 +822,19 @@ window.eguitarPrepareForUpdate = async () => {
   await saveQueue;
   return true;
 };
-window.eguitarPauseForBackground = async () => {
-  closeTuner();
-  await pause('离开应用，返回后自动继续', { resumeWhenBack: true });
-};
+window.eguitarPauseForBackground = backgroundMedia;
 function sampleClock(withMetronome = true) {
   if (draft && release) draft = tickSession(draft, Date.now(), performance.now(), withMetronome && metro.running ? metro.bpm : null);
 }
 setInterval(async () => {
-  if (!draft?.running || !release || document.hidden) { updateClock(); return; }
+  if (!draft?.running || !release) { updateClock(); return; }
   sampleClock();
   if (!draft.running) metro.stop();
   updateClock();
   try {
     await persist();
   } catch (e) {
-    returnSessionId = null;
-    draft = recoverSession(draft);
+      draft = recoverSession(draft);
     metro.stop();
     updateClock();
     notice(e.message);
@@ -858,7 +842,6 @@ setInterval(async () => {
 }, 1000);
 function connectStorage() {
   if (connectionAttempt) return connectionAttempt;
-  returnSessionId = null;
   storageError = "正在连接本地练习记录…";
   render();
   connectionAttempt = (async () => {
@@ -909,3 +892,5 @@ async function init() {
   }
 }
 init();
+
+initClient();

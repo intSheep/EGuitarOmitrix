@@ -37,6 +37,7 @@ try {
     await page.screenshot({path:`/tmp/eguitar-materials-${width}.png`});
   }
   await page.keyboard.press('Escape');
+  await page.locator('[data-action=pause]').click(); // Explicitly choose separate viewing time.
   const popup = await launch();
   const paused = await practice();
   assert.equal(paused.running, false);
@@ -77,6 +78,8 @@ try {
   assert.equal((await study()).records[0].seconds, 1);
   assert.equal((await practice()).elapsedMs, paused.elapsedMs);
   await popup.close();
+  assert.equal((await practice()).running, false);
+  await page.locator('[data-action=pause]').click();
   await page.waitForFunction(async () => { const m=await import('/practice-store.js'); return (await m.readDraft(await m.openPracticeDB())).running; });
   await page.waitForTimeout(1200);
   await page.locator('[data-action=finish]').click();

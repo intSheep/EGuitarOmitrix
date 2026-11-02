@@ -58,7 +58,7 @@ try {
     assert.equal(await page.evaluate(() => window.__player.playerState), 0);
     assert.equal(await page.evaluate(() => document.querySelector("audio")?.paused ?? true), true);
     await page.waitForFunction(() => window.__plays?.length === 1);
-    await page.waitForFunction(() => document.querySelector("#score-play").textContent === "暂停");
+    await page.waitForFunction(() => document.querySelector("#score-play").textContent === "暂停播放");
     const timing = await page.evaluate(() => ({ clicks: window.__clicks, start: window.__plays[0] }));
     assert.equal(timing.clicks.length, expectedBeats);
     const elapsed = timing.start - timing.clicks[0].at;
@@ -81,23 +81,23 @@ try {
   await page.waitForFunction(() => window.__plays?.length === 1);
   await page.waitForFunction(() => window.__player.timePosition > 50);
   assert.equal(await page.evaluate(() => window.__clicks.length), 0);
-  await page.locator("#score-stop").click();
-  await page.locator("#score-count-in").check();
+  await (await reveal(page, "#score-stop")).click();
+  await (await reveal(page, "#score-count-in")).check();
   await run(4, 1000);
   await page.locator("#score-play").click(); // pause
   await run(4, 1000); // explicit resume receives its own preparation
-  await page.locator("#score-stop").click();
+  await (await reveal(page, "#score-stop")).click();
   await page.locator("#score-loop").check();
   await run(4, 1000);
   await page.waitForFunction(() => window.__player.timePosition > 3200);
   await page.waitForFunction(() => window.__player.timePosition < 1000);
   assert.equal(await page.evaluate(() => window.__clicks.length), 4);
-  await page.locator("#score-stop").click();
+  await (await reveal(page, "#score-stop")).click();
   await page.locator("#score-loop").uncheck();
   await cancel(() => page.locator("#score-play").click());
-  await cancel(() => page.locator("#score-stop").click());
-  await cancel(() => page.locator("#score-count-in").uncheck());
-  await page.locator("#score-count-in").check();
+  await cancel(async () => (await reveal(page, "#score-stop")).click());
+  await cancel(async () => (await reveal(page, "#score-count-in")).uncheck());
+  await (await reveal(page, "#score-count-in")).check();
   await cancel(async () => {
     await page.locator("#score-bpm").fill("200");
     await page.locator("#score-bpm").dispatchEvent("change");
@@ -116,16 +116,15 @@ try {
   await open(); await load();
   await cancel(() => load(xml(3, 4, 240)));
   await run(3, 750);
-  await page.locator("#score-stop").click();
+  await (await reveal(page, "#score-stop")).click();
   await load(xml(6, 8, 240)); await run(6, 750);
-  await page.locator("#score-stop").click();
+  await (await reveal(page, "#score-stop")).click();
   await load(backing(), "synthetic.gp");
   await page.locator("#score-bpm").fill("50"); await page.locator("#score-bpm").dispatchEvent("change");
   await run(4, 2000);
   await page.waitForFunction(() => document.querySelector("audio")?.currentTime > 0.1);
-  await page.locator("#score-stop").click();
-  await cancel(() => page.locator("[data-tuner]").click());
-  await page.keyboard.press("Escape");
+  await (await reveal(page, "#score-stop")).click();
+  await cancel(() => page.evaluate(() => window.eguitarPauseForBackground()));
   await page.locator("#score-close").click();
   await setup(); await open(); await load(); // persisted across reload
   assert.equal(await page.locator("#score-count-in").isChecked(), true);
@@ -139,10 +138,10 @@ try {
   }
   // Preference writes may fail: setting still works for this open app.
   await page.evaluate(() => { Storage.prototype.setItem = () => { throw Error("Synthetic storage denial"); }; });
-  await page.locator("#score-count-in").uncheck();
+  await (await reveal(page, "#score-count-in")).uncheck();
   assert.match(await page.locator("#score-status").innerText(), /本次有效/);
-  await page.locator("#score-count-in").check(); await run(4, 1000);
-  await page.locator("#score-stop").click();
+  await (await reveal(page, "#score-count-in")).check(); await run(4, 1000);
+  await (await reveal(page, "#score-stop")).click();
   await reset();
   await page.evaluate(() => {
     window.__resume = AudioContext.prototype.resume;
@@ -150,10 +149,16 @@ try {
   });
   await page.locator("#score-play").click();
   await page.locator("#score-status").filter({ hasText: "无法开始预备拍" }).waitFor();
-  assert.equal(await page.locator("#score-play").innerText(), "播放");
+  assert.equal(await page.locator("#score-play").innerText(), "播放乐谱");
   assert.equal(await page.evaluate(() => window.__plays.length), 0);
   await page.evaluate(() => { AudioContext.prototype.resume = window.__resume; });
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ result: "PASS", timings: results, coverage: "default off, synth/backing, 3/4 and 6/8, speed, resume, cancellation, tuner/background/navigation, persistence, storage denial, desktop/tablet/mobile" }, null, 2));
   await context.close();
 } finally { await browser.close(); }
+
+async function reveal(page, selector) {
+  const control=page.locator(selector);
+  if(!await control.isVisible()) await page.locator('.score-options summary').click();
+  return control;
+}

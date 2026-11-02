@@ -41,18 +41,18 @@ try {
     await p.locator("#score-loop").check();
     await p.locator("#score-play").click();
     await p.waitForFunction(
-      () => document.querySelector("#score-play").textContent === "暂停",
+      () => document.querySelector("#score-play").textContent === "暂停播放",
     );
     await p.waitForTimeout(500);
     await p.locator("#score-play").click();
     await p.waitForFunction(
-      () => document.querySelector("#score-play").textContent === "播放",
+      () => document.querySelector("#score-play").textContent === "播放乐谱",
     );
-    await p.locator("#score-source").click();
+    await (await reveal(p, "#score-source")).click();
     assert.equal(await p.locator("#score-images img").count(), images);
-    await p.locator("#score-source").click();
+    await (await reveal(p, "#score-source")).click();
     const download = p.waitForEvent("download");
-    await p.locator("#score-gp").click();
+    await (await reveal(p, "#score-gp")).click();
     const path = `/tmp/score-test-${id}.gp`;
     await (await download).saveAs(path);
     const score = alpha.importer.ScoreLoader.loadScoreFromBytes(
@@ -108,4 +108,10 @@ try {
   );
 } finally {
   await browser.close();
+}
+
+async function reveal(page, selector) {
+  const control=page.locator(selector);
+  if(!await control.isVisible()) await page.locator('.score-options summary').click();
+  return control;
 }

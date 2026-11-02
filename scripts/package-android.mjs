@@ -7,7 +7,7 @@ if (signed && (!process.env.EGUITAR_ANDROID_KEYSTORE || !process.env.EGUITAR_AND
 const majorMinorPatch = version.split('.').map(Number);
 if (majorMinorPatch.length !== 3 || majorMinorPatch.some(n => !Number.isInteger(n) || n < 0 || n > 99)) throw Error('Android versions require three components from 0 to 99');
 const versionCode = majorMinorPatch[0] * 10000 + majorMinorPatch[1] * 100 + majorMinorPatch[2] + 1;
-execFileSync(process.platform === 'win32' ? 'gradlew.bat' : './gradlew', ['--no-daemon', signed ? 'assembleRelease' : 'assembleDebug', `-PappVersionName=${version}`, `-PappVersionCode=${versionCode}`], {
+execFileSync(process.platform === 'win32' ? 'gradlew.bat' : './gradlew', ['--no-daemon', ':app:testDebugUnitTest', signed ? 'assembleRelease' : 'assembleDebug', `-PappVersionName=${version}`, `-PappVersionCode=${versionCode}`], {
   cwd: new URL('android/', root), stdio: 'inherit', shell: process.platform === 'win32',
 });
 await mkdir(new URL('release/android/', root), { recursive: true });
