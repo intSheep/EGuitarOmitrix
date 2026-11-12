@@ -1,0 +1,64 @@
+/* One practice context. Navigation, media controls and session controls have distinct homes. */
+[hidden] { display: none !important; }
+body.is-focusing { height: 100dvh; overflow: hidden; }
+.is-focusing .app-header, html[data-client] .is-focusing .app-header { display: none; }
+.is-focusing .workspace, html[data-client] .is-focusing .workspace { height: 100%; margin: 0; padding: 0 24px; max-width: none; }
+.is-focusing #main, .is-focusing #app { height: 100%; min-height: 0; overflow: hidden; }
+.focus-page, html[data-client] .focus-page { height: 100%; max-width: 1600px; margin: auto; padding: 0; display: flex; flex-direction: column; }
+.focus-page .focus-top, html[data-client] .focus-page .focus-top { display: flex; gap: 16px; align-items: center; min-height: 62px; margin: 0; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.focus-navigation { display: flex; gap: 22px; align-items: center; margin-right: auto; }
+.practice-menu-toggle { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px; font-weight: 650; }
+.practice-menu-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.practice-clock-label { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+#focus-back { min-height: 42px; display: inline-flex; align-items: center; white-space: nowrap; }
+.focus-page .focus-layout, html[data-client] .focus-page .focus-layout { display: flex; flex-direction: column; gap: 0; min-height: 0; flex: 1; }
+.focus-page .focus-tools, html[data-client] .focus-page .focus-tools { order: -1; position: static; padding: 8px 0; margin: 0; width: 100%; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; box-shadow: none; background: white; overflow-x: auto; flex: 0 0 auto; }
+.focus-page .tool-dock, html[data-client] .focus-page .tool-dock { display: flex; gap: 4px; }
+.focus-page .focus-tool, html[data-client] .focus-page .focus-tool { width: auto; flex: 0 0 auto; flex-direction: row; min-height: 44px; padding: 8px 16px; gap: 8px; border: 0; border-radius: 9px; background: transparent; font-size: 13px; }
+.focus-page .focus-tool svg { width: 20px; height: 20px; flex-basis: 20px; }
+.focus-page .focus-tool[aria-pressed=true] { color: var(--accent); background: var(--accent-soft); }
+.focus-page .focus-main, html[data-client] .focus-page .focus-main { display: flex; flex-direction: column; min-height: 0; flex: 1; order: 0; width: 100%; }
+.focus-page .client-focus-content { flex: 1; min-height: 0; overflow: auto; padding: 20px 0; }
+.focus-page .focus-main h1 { font-size: 24px; margin: 0 0 20px; text-align: left; }
+.focus-page .focus-actions, html[data-client] .focus-page .focus-actions { position: static; transform: none; width: 100%; max-width: none; display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex: 0 0 auto; padding: 12px 0; margin: 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; box-shadow: none; background: white; }
+.focus-page .focus-actions .button { min-width: 120px; min-height: 46px; }
+.focus-page #focus-tool-content { min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+.focus-page.has-focus-tool { padding-bottom: 0; }
+.focus-page #focus-tool-content .in-practice { border: 0; box-shadow: none; padding: 0; width: 100%; max-width: none; background: white; }
+.focus-page #focus-tool-content .score-controls { padding-top: 0; }
+.focus-page #focus-requirements { max-width: 700px; margin: 0 auto; text-align: left; }
+.focus-page .timer-orbit { margin: 16px auto 28px; }
+.score-controls { align-items: center; }
+.score-options { position: relative; margin-left: auto; }
+.score-options summary { cursor: pointer; list-style: none; padding: 10px 14px; border-radius: 8px; color: var(--muted); font-weight: 650; }
+.score-options summary::-webkit-details-marker { display: none; }
+.score-options summary::after { content: ' ⋯'; }
+.score-options-menu { position: absolute; top: 100%; right: 0; z-index: 8; display: flex; flex-direction: column; gap: 4px; width: 236px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: white; box-shadow: 0 8px 24px #17203a18; }
+.score-options-menu > button, .score-options-menu > label { display: flex; gap: 8px; align-items: center; min-height: 42px; padding: 8px 10px; margin: 0; border: 0; border-radius: 8px; font-weight: 500; text-align: left; background: transparent; }
+.score-options-menu > button:hover, .score-options-menu > label:hover { background: var(--accent-soft); }
+.score-options-menu .score-file { cursor: pointer; }
+.practice-menu { display: flex; flex-direction: column; gap: 4px; clear: both; }
+.practice-menu > a, .practice-menu > button { min-height: 48px; padding: 12px; text-align: left; border-radius: 10px; }
+.practice-menu > a:hover, .practice-menu > button:hover { background: var(--accent-soft); }
+#session-access { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+#session-access > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#session-access > a { flex: 0 0 auto; }
+html[data-client] .workspace:has(#session-access) { display: flex; flex-direction: column; }
+html[data-client] .workspace:has(#session-access) #main { flex: 1; min-height: 0; height: auto; }
+@media (max-width: 760px) {
+  .is-focusing .workspace, html[data-client] .is-focusing .workspace { padding: 0 12px; }
+  .focus-page .focus-top, html[data-client] .focus-page .focus-top { min-height: 56px; gap: 8px; }
+  .focus-navigation { gap: 10px; }
+  .practice-menu-toggle span { display: none; }
+  .focus-page .focus-tool, html[data-client] .focus-page .focus-tool { padding: 8px 10px; font-size: 12px; min-height: 42px; }
+  .focus-page .focus-tool svg { display: none; }
+  .focus-page .client-focus-content { padding: 14px 0; }
+  .focus-page .focus-main h1 { font-size: 20px; margin-bottom: 14px; }
+  .focus-page .focus-actions .button { flex: 1; min-width: 0; min-height: 44px; }
+  .focus-page .timer-orbit { width: 210px; height: 210px; margin: 8px auto 22px; }
+  .score-controls { gap: 10px; }
+  .score-controls #score-choice-label { width: 100%; }
+  .score-controls #score-choice { max-width: 100%; }
+  .score-controls #score-play { padding: 10px 14px; }
+  .score-controls #score-bpm { width: 64px; }
+}

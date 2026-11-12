@@ -159,6 +159,8 @@ async function start() {
   }
 }
 
+export function stopTunerCapture() { stop('麦克风已停止。点击开始调音重新开启。'); }
+
 export function closeTuner() {
   stop();
   if (panel?.open) panel.close();
@@ -191,6 +193,7 @@ export function showTuner({ host = null, onClose = null } = {}) {
   panel.classList.toggle('in-practice', !!host);
   panel.setAttribute('role', host ? 'region' : 'dialog');
   $('close').onclick = onClose || closeTuner;
+  $('close').hidden = !!host;
   stop('开启麦克风，开始调音。');
   if (host) panel.show(); else panel.showModal();
   devices(generation).catch(() => {});

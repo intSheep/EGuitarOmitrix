@@ -1,7 +1,7 @@
 {
   "name": "eguitar-omitrix-desktop",
   "productName": "帅帅练琴屋",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Local electric-guitar practice companion",
   "author": "intSheep",
   "private": true,

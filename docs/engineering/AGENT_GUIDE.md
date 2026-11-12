@@ -111,3 +111,24 @@ Do not recreate the selected tool or automatically restart sound/capture.
 ## Standardized private course packages
 
 The owner authorizes bundling the pinned course resources for repository-authorized testers under FR-023. Use `course-resources.md`; never weaken the default lightweight boundary or include arbitrary ignored files. Verify the outer pack hash, manifest hash, exact indexed file set and asset hashes before extraction. Fail the course build when the pinned pack is unavailable. Resource updates are explicit version/lock changes; installation must not overwrite learner storage or promote notation/audio review status.
+
+## Installed-client interaction boundary
+
+FR-024 and [ADR 0007](../decisions/0007-client-workspace-and-updates.md) supersede
+the identical browser/client layout decision. Keep navigation and session actions
+outside scrolling content. Test short windows and compact list/detail navigation.
+The desktop bridge exposes only a check-updates request; native code owns update
+metadata, download and installer decisions. Android updates require size/hash,
+package/version and installed-signer validation plus the existing draft-save
+barrier. Preserve IDs, origins, data directories and backup schemas.
+
+## Manual practice timing supersedes foreground/automatic-return rules
+
+Owner correction on 2026-11-02: ADR 0008 supersedes the foreground-only clock,
+automatic-return intent and tuner-induced timer pause described above. Navigation,
+blur/minimize and tool changes release media independently and preserve manual
+session run/pause intent. Matched wall/monotonic delays count; clock discontinuities
+exclude the gap without inventing a pause. Reload recovers the last saved draft
+paused. Separate viewing requires the learner to pause practice first; launching a
+lesson while running does not create overlapping watch evidence. Verify the single
+contextual return and unique session actions through `quiet-practice.spec.mjs`.

@@ -1,5 +1,5 @@
-// Main-process only. No renderer IPC, credentials, silent install or startup network call.
-function createUpdateController({ updater, ask, prepare, installing, failed = () => {} }) {
+// Main-process update authority. The renderer can request a check only; native dialogs control download/install.
+function createUpdateController({ updater, ask, prepare, installing, failed = () => {}, progress = () => {} }) {
   updater.autoDownload = false;
   updater.autoInstallOnAppQuit = false;
   updater.allowPrerelease = false;
@@ -10,11 +10,15 @@ function createUpdateController({ updater, ask, prepare, installing, failed = ()
   updater.on('update-not-available', () => { available = null; });
   // electron-updater also emits errors for rejected operations; handle the event.
   updater.on('error', () => {});
+  updater.on('download-progress', info => {
+    if (busy && Number.isFinite(info.percent)) progress(Math.max(0, Math.min(1, info.percent / 100)));
+  });
   return {
     async check() {
       if (busy) return;
       busy = true;
       try {
+        progress(2);
         available = null;
         const result = await updater.checkForUpdates();
         if (!result) throw Error('此安装方式暂不支持在线更新，请从下载页安装。');
@@ -26,7 +30,9 @@ function createUpdateController({ updater, ask, prepare, installing, failed = ()
           detail: '现在下载？下载完成后会再次询问是否安装，不会自动重启。',
           buttons: ['稍后', '下载更新'], defaultId: 0, cancelId: 0 });
         if (consent.response !== 1) return;
+        progress(0);
         await updater.downloadUpdate();
+        progress(-1);
         const install = await ask({ type: 'question', message: '更新已下载并校验',
           detail: '安装前将保存并暂停练习。建议先在练习回顾中导出备份。安装会退出应用。',
           buttons: ['稍后', '保存并安装'], defaultId: 0, cancelId: 0 });
@@ -39,7 +45,7 @@ function createUpdateController({ updater, ask, prepare, installing, failed = ()
         await ask({ type: 'error', message: '更新未完成',
           detail: '当前版本仍可使用。请检查网络或从下载页重试。\n' + error.message,
           buttons: ['好的'] });
-      } finally { busy = false; }
+      } finally { progress(-1); busy = false; }
     },
   };
 }

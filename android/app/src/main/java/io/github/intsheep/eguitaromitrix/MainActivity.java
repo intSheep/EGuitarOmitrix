@@ -16,8 +16,16 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(ExportFilePlugin.class);
+        registerPlugin(AppUpdatePlugin.class);
         super.onCreate(savedInstanceState);
         if (bridge == null) return;
+        getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() {
+                bridge.getWebView().evaluateJavascript("window.eguitarClientBack?.() === true", result -> {
+                    if (!"true".equals(result)) moveTaskToBack(true);
+                });
+            }
+        });
         bridge.getWebView().getSettings().setGeolocationEnabled(false);
         bridge.getWebView().getSettings().setMediaPlaybackRequiresUserGesture(true);
         bridge.getWebView().setWebViewClient(new BridgeWebViewClient(bridge) {

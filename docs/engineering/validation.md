@@ -283,3 +283,51 @@ All 55 unit/integration tests and the build passed. The central-tool browser sui
 passed at 1440/768/390 px, and the count-in browser suite passed synthesized and
 backing playback, meter/rate/resume, cancellation, tuner/background/navigation,
 persistence and storage-denial scenarios with synthetic inputs.
+
+## Installed-client workspace and online updates — 2026-11-02
+
+Synthetic profiles only, independent checkout based on public main `ed5ae6c`.
+Implemented FR-024 / ADR 0007. All 65 Node tests pass, including download failure,
+consent, persistence and bounded taskbar progress. Sanitized build succeeds.
+Playwright: the full regression had 14 passes and one course-pack-only skip in
+the lightweight build; the final focused client rerun passed all eight checks,
+including direct catalog-to-detail navigation.
+New checks cover 1280×720, 800×600, 390×700 and 390×560 client workspaces, anchored
+start/pause/finish, fixed navigation, internal scrolling, synthetic update bridge
+and Android Back. Browser-only regression, backup/restore, update-save barrier and
+unfinished result protection pass. Used installed Chromium 1247 through the
+configured executable override; CI uses the project's pinned browser download.
+
+Real Electron smoke passed using an isolated profile: bundled UI/score playback,
+sandbox configuration, microphone start/stop, camera denial, background cleanup,
+export, outbound allowlist and record persistence after restart. Production keeps
+sandboxing enabled; this nested Linux test used the existing test-only
+`EGUITAR_TEST_NO_SANDBOX=1` option. Actual client screenshots were visually inspected.
+
+Android update policy compiles with the local JDK; all three actual JUnit 4.13.2
+tests pass locally. These tests cover malformed
+versions, tampered/truncated/oversized payloads and signing identity mismatches;
+Android packaging now runs these tests before assembly. Full APK compilation and
+Windows packaged-runtime gates remain pending CI at this entry. No release was
+published and no owner profile was migrated, uninstalled or upgraded. Physical
+Android upgrade/installer/settings flows, physical audio and real Windows NSIS
+overwrite remain unverified. No claim of full native-widget rendering is made.
+
+## Quiet practice and manual-timer correction — 2026-11-02
+
+Owner screenshot review, FR-010/020/021/022/024 and ADR 0008. Local verification:
+67 Node tests pass; sanitized build passes; 20 Playwright checks pass with one
+course-pack-only skip. New synthetic-profile checks cover a single contextual
+return, one session-control pair, compact/desktop geometry, More disclosure,
+manual run/pause across all tools and menu routes, visibility/native background,
+Android Back, finish/return and non-overlapping viewing. Screenshots at 1280/800/390
+were visually inspected. The older automatic-return/floating-clock scripts now
+invoke the maintained owner-corrected suite; they no longer assert removed behavior.
+
+Real Electron smoke passed, including native background cleanup during live
+microphone capture while the same practice timer continues, score playback, export
+and restart persistence. Final native packaging CI will be reported in the PR.
+No device was upgraded, no release published, and no owner records modified. Physical
+sleep/process eviction, Windows installer overwrite and real Android/hardware audio
+remain unverified. Timer duration now follows learner intent rather than verified
+foreground playing; neither tuning nor playback implies proficiency.

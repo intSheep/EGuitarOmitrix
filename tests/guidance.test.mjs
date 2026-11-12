@@ -12,7 +12,7 @@ test('metronome evidence counts active intervals only and never infers stable BP
  const log=sessionLog(s,start+4000);validateLog(log);assert.equal(log.bpm,null);assert.equal(log.outcome,null);
  assert.throws(()=>validateLog({...log,tempoUsage:[{bpm:60,seconds:3}]}));
  s=resumeSession(recoverSession(s),start+5000,5000);s=tickSession(s,start+20000,20000,120);
- assert.equal(s.elapsedMs,2500);assert.equal(s.tempoUsage.length,2);
+ assert.equal(s.elapsedMs,17500);assert.deepEqual(s.tempoUsage.at(-1),{bpm:120,seconds:15});
 });
 test('resume keeps versions separate, honors fixed/no-metronome rules and ignores goal speed',()=>{
  const l={entryId:'123',assignmentVersion:'v1',practicedAt:'2026-01-01',bpm:70,bpmBasis:'self-reported-stable',outcome:'learning'};
