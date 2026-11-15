@@ -49,8 +49,13 @@ A failed save offers return, retry, or explicit discard. Concurrent close/quit
 requests share one barrier. No generic renderer filesystem capability is added.
 
 The existing preload additionally reports platform and update support, and exposes
-a narrow course-link action checked against the existing outbound URL allowlist. Unsigned
-Mac pilots do not invoke electron-updater; the release/download link remains.
+a narrow course-link action checked against the existing outbound URL allowlist.
+Owner-requested self-update support on macOS uses `createMacUpdater` in `desktop/updates.cjs`
+to check the latest GitHub Release (`mac-manifest.json`), verify `SHA-256` and byte length of
+`EGuitarOmitrix-<version>-mac-<arch>.zip`, enforce the practice-save barrier, unpack with
+`/usr/bin/ditto`, strip quarantine attributes (`/usr/bin/xattr -cr`), replace the `.app` bundle,
+and relaunch without requiring paid Apple Developer ID / Squirrel.Mac signing; the release/download
+link also remains accessible in the Help menu.
 Windows explicit update consent and Android native update validation are retained.
 macOS microphone permission is checked separately from app consent. Denial offers
 an explicit system-settings action; capture never restarts automatically.

@@ -100,10 +100,17 @@ else {
     powerMonitor.on('suspend', background);
     window.once('ready-to-show', () => window.show());
     await window.loadURL(ORIGIN + '/index.html');
-    const { createUpdateController } = require('./updates.cjs');
-    const updates = app.isPackaged && process.platform === 'win32'
+    const { createUpdateController, createMacUpdater } = require('./updates.cjs');
+    const updaterInstance = app.isPackaged
+      ? (process.platform === 'win32'
+        ? require('electron-updater').autoUpdater
+        : process.platform === 'darwin'
+          ? createMacUpdater({ currentVersion: app.getVersion() })
+          : null)
+      : null;
+    const updates = updaterInstance
       ? createUpdateController({
-        updater: require('electron-updater').autoUpdater,
+        updater: updaterInstance,
         ask: options => dialog.showMessageBox(window, options),
         prepare: () => window.webContents.executeJavaScript('window.eguitarPrepareForUpdate()'),
         installing: () => { quitting = true; },
@@ -135,11 +142,6 @@ else {
     });
     ipcMain.handle('eguitar:check-updates', async event => {
       if (event.sender !== window?.webContents || event.senderFrame !== window.webContents.mainFrame || !isAppURL(event.senderFrame.url)) throw Error('Untrusted update request');
-      if (!updates && process.platform === 'darwin') {
-        await background();
-        await shell.openExternal('https://github.com/intSheep/EGuitarOmitrix/releases');
-        return;
-      }
       if (!updates) throw Error('请使用已安装的正式版本检查更新');
       await updates.check();
     });

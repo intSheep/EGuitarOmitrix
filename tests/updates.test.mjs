@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
-import { createUpdateController } from '../desktop/updates.cjs';
+import { createHash } from 'node:crypto';
+import { createUpdateController, createMacUpdater, isNewerVersion, allowedReleaseURL } from '../desktop/updates.cjs';
 function fixture({ responses = [1, 1], downloadError, saveError, version = '0.5.0' } = {}) {
   const events = [], dialogs = [];
   const updater = new EventEmitter();
@@ -44,4 +45,57 @@ test('taskbar progress is bounded and always cleared after a failed download', a
   const controller = createUpdateController({updater, ask:async()=>({response:1}), prepare:async()=>true, installing:()=>assert.fail('must not install'), progress:value=>progress.push(value)});
   await controller.check();
   assert.deepEqual(progress, [2,0,.45,1,-1]);
+});
+
+test('mac updater verifies release manifest, SHA-256 and delegates bundle replacement after save barrier', async () => {
+  assert.equal(isNewerVersion('0.5.1', '0.5.0'), true);
+  assert.equal(isNewerVersion('0.5.0', '0.5.0'), false);
+  assert.equal(allowedReleaseURL('https://api.github.com/repos/intSheep/EGuitarOmitrix/releases/latest'), true);
+  assert.equal(allowedReleaseURL('https://evil.example.com/release.zip'), false);
+
+  const zipBytes = Buffer.from('SYNTHETIC_MAC_ZIP_PAYLOAD');
+  const sha256 = createHash('sha256').update(zipBytes).digest('hex');
+  const installed = [];
+  const fetchImpl = async url => {
+    if (url.endsWith('/releases/latest')) {
+      return {
+        status: 200, ok: true, headers: new Map(),
+        text: async () => JSON.stringify({
+          draft: false, prerelease: false, tag_name: 'v0.5.1',
+          assets: [
+            { name: 'mac-manifest.json', browser_download_url: 'https://github.com/intSheep/EGuitarOmitrix/releases/download/v0.5.1/mac-manifest.json' },
+            { name: 'EGuitarOmitrix-0.5.1-mac-arm64.zip', browser_download_url: 'https://objects.githubusercontent.com/synthetic/EGuitarOmitrix-0.5.1-mac-arm64.zip' },
+          ],
+        }),
+      };
+    }
+    if (url.endsWith('/mac-manifest.json')) {
+      return {
+        status: 200, ok: true, headers: new Map(),
+        text: async () => JSON.stringify({
+          version: '0.5.1', platform: 'mac',
+          artifacts: [{ name: 'EGuitarOmitrix-0.5.1-mac-arm64.zip', bytes: zipBytes.length, sha256 }],
+        }),
+      };
+    }
+    return {
+      status: 200, ok: true, headers: new Map(),
+      body: (async function* () { yield zipBytes; })(),
+    };
+  };
+  const updater = createMacUpdater({
+    currentVersion: '0.5.0', arch: 'arm64',
+    exePath: '/Applications/帅帅练琴屋.app/Contents/MacOS/帅帅练琴屋',
+    fetchImpl,
+    installBundle: info => installed.push(info),
+  });
+  const controller = createUpdateController({
+    updater,
+    ask: async () => ({ response: 1 }),
+    prepare: async () => true,
+    installing: () => {},
+  });
+  await controller.check();
+  assert.equal(installed.length, 1);
+  assert.equal(installed[0].bundle, '/Applications/帅帅练琴屋.app');
 });

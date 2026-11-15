@@ -59,21 +59,26 @@ jobs:
           pattern: android-*
           path: artifacts/android
           merge-multiple: true
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: mac-*
+          path: artifacts/mac
+          merge-multiple: true
       - name: Prepare release notes
         run: |
           cat > notes.md <<'EOF'
-          帅帅练琴屋 — public pilot. Windows installer is unsigned; Android APK uses the stable project release key.
+          帅帅练琴屋 — public pilot. Windows and macOS packages are unsigned; Android APK uses the stable project release key.
 
           Export a practice backup before upgrading. Earlier Android debug builds may require backup/uninstall/import for the first release-key installation. Later release builds retain the signing identity.
 
-          See each platform manifest's courseResources field for the bundled course version, item count and checksums. A null courseResources field identifies a lightweight package. Original course videos, preparation intermediates and learner records are excluded. Bundling preserves existing notation/review status; it does not certify musical accuracy or backing-track synchronization. Browser, desktop and phone profiles are separate; use backup export/import for transfer. No cloud sync. Windows: 帮助 → 检查更新, with explicit download/install confirmation. Versions before 0.4.0 need one manual upgrade. Android: download/install the newer APK.
+          See each platform manifest's courseResources field for the bundled course version, item count and checksums. A null courseResources field identifies a lightweight package. Original course videos, preparation intermediates and learner records are excluded. Bundling preserves existing notation/review status; it does not certify musical accuracy or backing-track synchronization. Browser, desktop and phone profiles are separate; use backup export/import for transfer. No cloud sync. Desktop (Windows/macOS): 检查更新 (or 帮助 → 检查更新), with explicit download/install confirmation. Versions before 0.4.0 need one manual upgrade. Android: 检查更新 or download/install the newer APK.
 
           Thanks to 「帅帅是把电吉他」老师: https://www.bilibili.com/video/BV1FT411Z7iu/ . Independent companion, not an official teacher product.
 
           See platform manifests for source commit, version and SHA-256 checksums. Native device/audio acceptance remains required before publishing. This workflow creates a draft release; publication is manual.
           EOF
       - name: Create public draft release
-        run: gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "帅帅练琴屋 $RELEASE_TAG" --notes-file notes.md artifacts/windows/* artifacts/android/*
+        run: gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "帅帅练琴屋 $RELEASE_TAG" --notes-file notes.md artifacts/windows/* artifacts/android/* artifacts/mac/*
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag }}

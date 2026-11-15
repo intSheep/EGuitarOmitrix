@@ -101,7 +101,9 @@ Vite uses a generated `build/public` allowlist and relative asset URLs.
 same sanitized distribution. No release is published. The macOS pilot workflow
 runs on relevant PRs/main changes and manual dispatch. Intel compilation is not
 Intel hardware acceptance; ARM64 smoke uses a disposable synthetic profile.
-Mac updates remain manual download/install while signing and notarization are
-deferred. Test closing a window, Dock activation, Cmd+Q, save failures, system
+Mac updates use the main-process GitHub Release manifest/SHA-256 verifier and
+`ditto` bundle replacement (`createMacUpdater`) with explicit download/install
+consent and a practice-save barrier while Apple Developer ID signing and
+notarization remain deferred. Test closing a window, Dock activation, Cmd+Q, save failures, system
 microphone denial, physical sleep and retained data during replacement on target
 hardware before claiming full client acceptance. See the dated validation entry.
