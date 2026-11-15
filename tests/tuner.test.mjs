@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { STRINGS, detectPitch, tuningReading } from '../app/tuner-model.js';
+import { STRINGS, detectPitch, tuningReading } from '../frontend/domain/tuner-model.ts';
 
 // Synthetic PCM only; no course or personal audio.
 const signal = (frequency, rate, harmonics = [0.3], noise = 0) => {

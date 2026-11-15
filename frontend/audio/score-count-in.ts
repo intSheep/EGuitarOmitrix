@@ -1,11 +1,44 @@
+interface Meter {
+  timeSignatureNumerator: number;
+  timeSignatureDenominator: number;
+}
+interface PlaybackTiming {
+  tickPosition: number;
+  playbackSpeed: number;
+  score?: { tempo: number; masterBars: Meter[] } | null;
+  tickCache?: {
+    masterBars: {
+      start: number;
+      end: number;
+      masterBar: Meter;
+      tempoChanges: { tick: number; tempo: number }[];
+    }[];
+  } | null;
+}
+interface Position {
+  currentTick: number;
+  modifiedTempo: number;
+  speed: number;
+}
+interface CountRun {
+  resolve: (completed: boolean) => void;
+  reject: (error: unknown) => void;
+  nodes: OscillatorNode[];
+  audio?: AudioContext;
+  timer?: ReturnType<typeof setInterval>;
+}
 // Playback preparation only: this does not change the score or practice evidence.
 export const COUNT_IN_KEY = "eguitar.score-count-in.v1";
 
-export function countInTiming(player, position) {
+export function countInTiming(
+  player: PlaybackTiming,
+  position?: Position | null,
+) {
   const tick = player.tickPosition;
-  const lookup = player.tickCache?.masterBars.find(
-    (bar) => tick >= bar.start && tick < bar.end,
-  ) || player.tickCache?.masterBars[0];
+  const lookup =
+    player.tickCache?.masterBars.find(
+      (bar) => tick >= bar.start && tick < bar.end,
+    ) || player.tickCache?.masterBars[0];
   const bar = lookup?.masterBar || player.score?.masterBars?.[0];
   const changes = lookup?.tempoChanges.filter((change) => change.tick <= tick);
   let tempo = changes?.at(-1)?.tempo || player.score?.tempo;
@@ -15,28 +48,44 @@ export function countInTiming(player, position) {
     tempo = position.modifiedTempo / position.speed;
   const beats = bar?.timeSignatureNumerator;
   const denominator = bar?.timeSignatureDenominator;
-  const bpm = tempo * player.playbackSpeed;
-  if (!Number.isInteger(beats) || beats <= 0 ||
-      !Number.isInteger(denominator) || denominator <= 0 ||
-      !Number.isFinite(bpm) || bpm <= 0)
+  const bpm = (tempo ?? NaN) * player.playbackSpeed;
+  if (
+    beats === undefined ||
+    !Number.isInteger(beats) ||
+    beats <= 0 ||
+    denominator === undefined ||
+    !Number.isInteger(denominator) ||
+    denominator <= 0 ||
+    !Number.isFinite(bpm) ||
+    bpm <= 0
+  )
     throw Error("无法确定当前拍号或速度，请关闭预备拍或重新载入乐谱");
   return { beats, beatSeconds: (60 / bpm) * (4 / denominator) };
 }
 
 export class ScoreCountIn {
-  constructor(createAudio = () => {
-    const Audio = globalThis.AudioContext || globalThis.webkitAudioContext;
-    if (!Audio) throw Error("当前浏览器不支持预备拍声音");
-    return new Audio();
-  }) {
+  createAudio: () => AudioContext;
+  run: CountRun | null;
+  constructor(
+    createAudio = () => {
+      const Audio = globalThis.AudioContext || window.webkitAudioContext;
+      if (!Audio) throw Error("当前浏览器不支持预备拍声音");
+      return new Audio();
+    },
+  ) {
     this.createAudio = createAudio;
     this.run = null;
   }
-  get active() { return this.run !== null; }
-  start({ beats, beatSeconds }, onBeat) {
+  get active() {
+    return this.run !== null;
+  }
+  start(
+    { beats, beatSeconds }: { beats: number; beatSeconds: number },
+    onBeat: (beat: number, total: number) => void,
+  ) {
     this.stop();
-    return new Promise((resolve, reject) => {
-      const run = { resolve, reject, nodes: [] };
+    return new Promise<boolean>((resolve, reject) => {
+      const run: CountRun = { resolve, reject, nodes: [] };
       this.run = run;
       const prepare = async () => {
         try {
@@ -44,12 +93,14 @@ export class ScoreCountIn {
           run.audio = audio;
           await audio.resume();
           if (this.run !== run) return;
-          if (audio.state !== "running") throw Error("声音尚未启用，请再点一次播放");
+          if (audio.state !== "running")
+            throw Error("声音尚未启用，请再点一次播放");
           const start = audio.currentTime + 0.05;
           const end = start + beats * beatSeconds;
           for (let beat = 0; beat < beats; beat++) {
             const at = start + beat * beatSeconds;
-            const osc = audio.createOscillator(), gain = audio.createGain();
+            const osc = audio.createOscillator(),
+              gain = audio.createGain();
             run.nodes.push(osc);
             osc.frequency.value = beat === 0 ? 1100 : 740;
             gain.gain.setValueAtTime(0, at);
@@ -59,12 +110,18 @@ export class ScoreCountIn {
             gain.connect(audio.destination);
             osc.start(at);
             osc.stop(at + 0.05);
-            osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+            osc.onended = () => {
+              osc.disconnect();
+              gain.disconnect();
+            };
           }
           let lastBeat = -1;
           run.timer = setInterval(() => {
             if (this.run !== run) return;
-            if (audio.state !== "running") { this.stop(); return; }
+            if (audio.state !== "running") {
+              this.stop();
+              return;
+            }
             const now = audio.currentTime;
             if (now >= end) {
               // A stalled/backgrounded page must not launch delayed playback.
@@ -84,11 +141,15 @@ export class ScoreCountIn {
       prepare();
     });
   }
-  finish(run, completed, error) {
+  finish(run: CountRun, completed: boolean, error?: unknown) {
     if (this.run !== run) return;
     this.run = null;
     clearInterval(run.timer);
-    for (const node of run.nodes) { try { node.stop(); } catch {} }
+    for (const node of run.nodes) {
+      try {
+        node.stop();
+      } catch { /* The oscillator may already have stopped. */ }
+    }
     run.audio?.close().catch(() => {});
     if (error) run.reject(error);
     else run.resolve(completed);

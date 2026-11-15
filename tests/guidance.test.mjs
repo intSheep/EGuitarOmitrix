@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createSession,resumeSession,tickSession,pauseSession,recoverSession,sessionLog} from '../app/session.js';
-import {emptyGoals,validateGoals,mergeGoals,resumeGuidance,optionalNumber} from '../app/guidance.js';
-import {validateLog,validateBackup} from '../app/practice-store.js';
+import {createSession,resumeSession,tickSession,pauseSession,recoverSession,sessionLog} from '../frontend/domain/session.ts';
+import {emptyGoals,validateGoals,mergeGoals,resumeGuidance,optionalNumber} from '../frontend/domain/guidance.ts';
+import {validateLog,validateBackup} from '../frontend/storage/practice-store.ts';
 const start=Date.parse('2026-01-01T00:00:00Z');
 function session(){return resumeSession(createSession('123','v1',start,'synthetic'),start,0);}
 test('metronome evidence counts active intervals only and never infers stable BPM or mastery',()=>{

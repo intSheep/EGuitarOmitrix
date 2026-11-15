@@ -1,4 +1,4 @@
-import { STRINGS, detectPitch, tuningReading } from './tuner-model.js';
+import { STRINGS, detectPitch, tuningReading } from '../frontend/domain/tuner-model.ts';
 
 let panel, stream, audio, source, analyser, loop, generation = 0;
 let samples, history = [], lastAnnouncement = '';
@@ -166,6 +166,7 @@ export function closeTuner() {
   if (panel?.open) panel.close();
 }
 
+/** @param {{host?: HTMLElement | null, onClose?: (() => void) | null}} [options] */
 export function showTuner({ host = null, onClose = null } = {}) {
   if (panel?.open) return;
   if (!panel) {

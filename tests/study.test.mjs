@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { beginWatch, stopWatch, watchSeconds, confirmWatch, totalWatchSeconds, validateWatch, parseWatchTime } from '../app/study.js';
-import { validateBackup, mergePreview } from '../app/practice-store.js';
-import { emptyGoals } from '../app/guidance.js';
+import { beginWatch, stopWatch, watchSeconds, confirmWatch, totalWatchSeconds, validateWatch, parseWatchTime } from '../frontend/domain/study.ts';
+import { validateBackup, mergePreview } from '../frontend/storage/practice-store.ts';
+import { emptyGoals } from '../frontend/domain/guidance.ts';
 const start = Date.parse('2026-01-01T00:00:00Z');
 const stopped = () => stopWatch(beginWatch('123', start, 'synthetic-watch'), start + 90000);
 test('external viewing survives hidden time and freezes on return without becoming practice', () => {

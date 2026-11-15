@@ -88,3 +88,20 @@ because those versions have no update checker. Future versions must retain the
 release signing key, app ID and origin. Do not uninstall to bypass a signer mismatch.
 API/network failures or unavailable stable Android assets leave the current app
 usable. No background startup checks or silent installation are configured.
+
+## React build and macOS pilot — 2026-11-12
+
+ADR 0009 supersedes the buildless frontend path. `npm run typecheck`, `npm run lint`
+and `npm run test:ui` are required in addition to the existing unit, build and
+browser checks. Node 24 is required by the pinned frontend toolchain. Development
+serves the generated distribution; local ignored media is never implicitly copied.
+Vite uses a generated `build/public` allowlist and relative asset URLs.
+
+`npm run package:mac` produces unsigned ARM64 and x64 DMG/ZIP artifacts from the
+same sanitized distribution. No release is published. The macOS pilot workflow
+runs on relevant PRs/main changes and manual dispatch. Intel compilation is not
+Intel hardware acceptance; ARM64 smoke uses a disposable synthetic profile.
+Mac updates remain manual download/install while signing and notarization are
+deferred. Test closing a window, Dock activation, Cmd+Q, save failures, system
+microphone denial, physical sleep and retained data during replacement on target
+hardware before claiming full client acceptance. See the dated validation entry.

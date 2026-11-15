@@ -1,6 +1,6 @@
-const { app, BrowserWindow, dialog, ipcMain, Menu, net, protocol, session, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Menu, net, powerMonitor, protocol, session, shell, systemPreferences } = require('electron');
 const path = require('node:path');
-const { realpath } = require('node:fs/promises');
+const { realpath, mkdir, writeFile } = require('node:fs/promises');
 const { pathToFileURL } = require('node:url');
 const { ORIGIN, CSP, isAppURL, resourcePath, externalURL, audioOnly } = require('./security.cjs');
 
@@ -12,6 +12,12 @@ app.setPath('userData', process.env.EGUITAR_TEST_PROFILE || path.join(app.getPat
 let window;
 let quitting = false;
 let prompting = false;
+let closePending = false;
+const { createCloseBarrier } = require('./lifecycle.cjs');
+const persistBeforeClose = createCloseBarrier({
+  prepare: () => window && !window.isDestroyed() ? window.webContents.executeJavaScript('window.eguitarPrepareForClose ? window.eguitarPrepareForClose() : window.eguitarPauseForBackground?.()') : Promise.resolve(),
+  ask: options => dialog.showMessageBox(window, options),
+});
 const background = () => window && !window.isDestroyed()
   ? window.webContents.executeJavaScript('window.eguitarPauseForBackground?.()').catch(() => {})
   : Promise.resolve();
@@ -49,6 +55,14 @@ else {
         buttons: ['取消', '允许本次使用'], defaultId: 0, cancelId: 0,
       });
       approved = result.response === 1;
+      if (approved && process.platform === 'darwin') {
+        const status = systemPreferences.getMediaAccessStatus('microphone');
+        approved = status === 'granted' || (status === 'not-determined' && await systemPreferences.askForMediaAccess('microphone'));
+        if (!approved) {
+          const answer = await dialog.showMessageBox(window, { type: 'info', message: 'macOS 尚未允许麦克风访问', detail: '请在系统设置的隐私与安全性 → 麦克风中允许帅帅练琴屋，然后重新点击开始调音。', buttons: ['取消', '打开系统设置'], defaultId: 0, cancelId: 0 });
+          if (answer.response === 1) await shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone');
+        }
+      }
       } catch { /* Closing a native dialog denies access. */ }
       finally { prompting = false; }
       callback(approved && !contents.isDestroyed() && isAppURL(contents.getURL()) && !window.isDestroyed() && window.isVisible() && !window.isMinimized());
@@ -56,7 +70,8 @@ else {
     local.setDevicePermissionHandler(() => false);
     window = new BrowserWindow({
       width: 1280, height: 900, minWidth: 390, minHeight: 600, show: false,
-      title: '帅帅练琴屋', backgroundColor: '#ffffff', icon: path.join(__dirname, 'icon.png'), autoHideMenuBar: true,
+      title: '帅帅练琴屋', backgroundColor: '#f4f6fb', icon: path.join(__dirname, 'icon.png'), autoHideMenuBar: true,
+      ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset', trafficLightPosition: { x: 18, y: 18 } } : {}),
       webPreferences: { preload: path.join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, webviewTag: false, backgroundThrottling: false },
     });
     const openExternal = value => {
@@ -73,12 +88,20 @@ else {
     window.on('close', event => {
       if (quitting) return;
       event.preventDefault();
-      background().finally(() => { quitting = true; window.close(); });
+      if (closePending) return;
+      closePending = true;
+      persistBeforeClose().then(saved => {
+        if (!saved) return;
+        if (process.platform === 'darwin') window.hide();
+        else { quitting = true; app.quit(); }
+      }).finally(() => { closePending = false; });
     });
+    app.on('activate', () => { if (!window.isDestroyed()) { window.show(); window.focus(); } });
+    powerMonitor.on('suspend', background);
     window.once('ready-to-show', () => window.show());
     await window.loadURL(ORIGIN + '/index.html');
     const { createUpdateController } = require('./updates.cjs');
-    const updates = app.isPackaged && ['win32', 'darwin'].includes(process.platform)
+    const updates = app.isPackaged && process.platform === 'win32'
       ? createUpdateController({
         updater: require('electron-updater').autoUpdater,
         ask: options => dialog.showMessageBox(window, options),
@@ -87,6 +110,29 @@ else {
         failed: () => { quitting = false; },
         progress: value => { if (!window.isDestroyed()) window.setProgressBar(value); },
       }) : null;
+    ipcMain.handle('eguitar:open-guitar-pro', async (event, bytes) => {
+      if (event.sender !== window?.webContents || event.senderFrame !== window.webContents.mainFrame || !isAppURL(event.senderFrame.url)) throw Error('Untrusted score request');
+      if (!(bytes instanceof Uint8Array) || bytes.length < 4 || bytes.length > 32 * 1024 * 1024) throw Error('Invalid score payload');
+      const folder = path.join(app.getPath('userData'), 'score-cache');
+      await mkdir(folder, { recursive: true });
+      const hash = require('node:crypto').createHash('sha256').update(bytes).digest('hex');
+      const file = path.join(folder, hash + '.gp');
+      await writeFile(file, bytes);
+      await background();
+      if (process.platform === 'darwin') {
+        await new Promise((resolve, reject) => require('node:child_process').execFile('/usr/bin/open', ['-a', 'Guitar Pro 8', file], error => error ? reject(Error('无法打开 Guitar Pro 8，请确认已安装。')) : resolve()));
+      } else {
+        const error = await shell.openPath(file);
+        if (error) throw Error(error);
+      }
+    });
+    ipcMain.handle('eguitar:open-course', async (event, value) => {
+      if (event.sender !== window?.webContents || event.senderFrame !== window.webContents.mainFrame || !isAppURL(event.senderFrame.url)) throw Error('Untrusted course request');
+      const url = externalURL(value);
+      if (!url) throw Error('Unsupported course URL');
+      await background();
+      await shell.openExternal(url);
+    });
     ipcMain.handle('eguitar:check-updates', async event => {
       if (event.sender !== window?.webContents || event.senderFrame !== window.webContents.mainFrame || !isAppURL(event.senderFrame.url)) throw Error('Untrusted update request');
       if (!updates) throw Error('请使用已安装的正式版本检查更新');
@@ -94,6 +140,7 @@ else {
     });
     Menu.setApplicationMenu(Menu.buildFromTemplate([
       ...(process.platform === 'darwin' ? [{ role: 'appMenu' }] : []),
+      { role: 'editMenu' }, { role: 'viewMenu' }, { role: 'windowMenu' },
       { label: '帮助', submenu: [
         { label: '检查更新', enabled: !!updates, click: () => updates.check() },
         { label: '下载与版本说明', click: () => { background(); shell.openExternal('https://github.com/intSheep/EGuitarOmitrix/releases').catch(() => {}); } },
@@ -103,5 +150,10 @@ else {
     window.setAutoHideMenuBar(false);
     window.setMenuBarVisibility(true);
   }).catch(error => { dialog.showErrorBox('EGuitarOmitrix', '应用无法启动：' + error.message); app.exit(1); });
-  app.on('window-all-closed', () => app.quit());
+  app.on('before-quit', event => {
+    if (quitting) return;
+    event.preventDefault();
+    persistBeforeClose().then(saved => { if (saved) { quitting = true; app.quit(); } });
+  });
+  app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 }

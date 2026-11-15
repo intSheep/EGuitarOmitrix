@@ -35,6 +35,7 @@ for (const viewport of [{width:1280,height:720},{width:800,height:600},{width:39
     await expect(page.locator('[data-session-time]')).not.toHaveText('00:00');
     await page.locator('[data-action=finish]').click();
     await expect(page.locator('#finish-form')).toBeVisible();
+    await within(page.locator('#finish-form button[type=submit]'));
     expect(errors).toEqual([]);
     await page.screenshot({path:`test-results/client-${viewport.width}-${viewport.height}.png`});
   });

@@ -145,3 +145,72 @@ session-control footer. Rejected generated ASIO status, invented notation/advice
 bar-loop claims and nested teaching cards. This supersedes the floating-clock
 interaction and redundant score shortcuts. See ADR 0008 for the page-by-page audit
 and changed manual-timer rules; runtime screenshots and tests are separate evidence.
+
+## React migration and quiet client flow — 2026-11-12
+
+Stitch project `6723020998384701419`, session `2567116146983537638`, screen
+`6ce4f3064dcb4ffa9450798eec3529a4` generated a four-state exploration; its screenshot
+was retrieved and visually inspected. Retained: list-detail selection, a single
+primary start/continue action, optional finish fields, and brief saved-return
+feedback. Rejected: generated four-step navigation, invented ASIO/48 kHz and local
+sync status, waveform/tap-tempo features, oversized nested panels, finger-angle
+advice, example prescriptions and generated timestamps. No generated course
+content entered the app.
+
+PR #53 merged during implementation. Its ADR 0007/0008 client geometry, manual
+timing, flat tool strip, contextual return and single pause/finish pair take
+precedence over this exploration and the initial migration plan. Confirmation
+omits repeated dose/playback panels; persisted evidence remains accessible in
+history. Compact installed windows anchor save/return below scrollable inputs.
+The shared white/black/royal-blue appearance is retained; React is an implementation
+change, not a new visual identity. Screenshots and tests are recorded separately
+from the generated design.
+
+## macOS workbench correction — 2026-11-12
+
+The owner rejected the enlarged webpage feel of the installed focus screen and
+authorized a design-first implementation. Stitch project `6723020998384701419`,
+screen `27e2d69421f64c4e829023e734006c02`, explores a compact desktop workbench.
+Retained: restrained toolbar, compact segmented tool/position choices, complete
+six-string canvas, persistent bottom transport and white/royal-blue palette.
+Rejected: fabricated ASIO/48kHz, 40 BPM, open-position labeling, generated notes,
+course-to-scale associations, decorative pulsing and fake traffic-light controls.
+The generated image is a layout concept, not musical evidence or a native UI test.
+
+Implementation consolidates course title/context in one top row and moves the
+passive clock into the transport bar. The fretboard uses both available height
+and width, retaining the verified existing position data. Desktop buttons use
+smaller sizes and lighter borders; compact touch windows retain larger targets.
+Desktop workspace preserves list/detail and gives the lesson more width. Real
+screenshots and geometry checks at 1440/1280/800/390 validate the result separately.
+
+## macOS Brilliant tactile studio refinement (Scheme C1) — 2026-11-14
+
+The owner reviewed interactive HTML simulations comparing top-bar, floating-card,
+and native macOS left-sidebar compositions, followed by three high-craft visual
+variants (C1 Brilliant Tactile Studio, C2 Neo-Hardware Acoustic Studio, C3 Swiss
+Editorial Grid). The owner selected **Scheme C1 (Brilliant Tactile Studio)** and
+rejected C2 (dark hardware theme) and C3 (editorial serif grid) as primary themes.
+
+Retained in the React + TypeScript implementation (`codex/react-typescript-mac`):
+- **macOS Left Sidebar (`html[data-client="desktop"]` at `>= 761px`)**: replaces the
+  web-like top navigation bar on desktop clients with a dedicated 224 px vertical
+  sidebar housing the brand identity, tactile 3D navigation items (`练习台`,
+  `课程目录`, `练习回顾`), and the bottom-pinned `检查更新` control, plus native
+  `hiddenInset` window title bar spacing on macOS (`darwin`).
+- **Tactile Brilliant Controls & Blueprint Lesson Hero**: restores 2 px outlined
+  surfaces and 3D bottom-bevel tactile buttons on desktop instead of flat 1 px
+  borders, pairs the selected lesson header with a subtle royal-blue blueprint grid
+  and geometric fretboard illustration (`.detail-hero`), and formats source-backed
+  instructor dose and BPM ranges into side-by-side specification cards
+  (`.prescription-specs`) without inventing values.
+- **60-Tick Acoustic Timer Ring & Crafted Fretboard Reference**: adds a 60-tick
+  radial SVG dial inside `.timer-orbit` on the focus stage and upgrades the C-major
+  5-position SVG diagram with fret-number pills, neck frame, fret-marker inlays
+  (`3, 5, 7, 9, 12, 15`), graduated string gauges, and 3D root/scale tokens while
+  bounding SVG height so wide desktop windows never distort or overflow.
+- **Quiet Practice & ADR 0007/0008 Invariants**: `.is-focusing` still hides
+  `.app-header` completely, preserves the single `← 返回计时` action, single corner
+  menu, and single pause/finish pair, and keeps all interactive controls within the
+  bounded client viewport.
+

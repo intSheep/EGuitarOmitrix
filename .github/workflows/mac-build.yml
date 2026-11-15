@@ -1,35 +1,48 @@
-name: Experimental macOS packages
+name: macOS pilot validation
 on:
+  pull_request:
+    paths: ['frontend/**', 'app/**', 'desktop/**', 'scripts/**', 'tests/**', '*config*', 'package*.json', '.github/workflows/mac-build.yml']
+  push:
+    branches: [main]
+    paths: ['frontend/**', 'app/**', 'desktop/**', 'scripts/**', 'tests/**', '*config*', 'package*.json', '.github/workflows/mac-build.yml']
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: mac-pilot-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: macos-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
-        with:
-          persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm run typecheck && npm run lint && npm run test:ui
       - run: npm run desktop:setup
-      - run: node scripts/download-course-resources.mjs
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - run: npm run package:mac
+      - name: Package unsigned ARM64 and Intel pilots
+        run: npm run package:mac
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Verify packaged resources
+        run: |
+          node scripts/verify-distribution.mjs 'release/mac/mac-arm64/帅帅练琴屋.app/Contents/Resources/web'
+          node scripts/verify-distribution.mjs 'release/mac/mac/帅帅练琴屋.app/Contents/Resources/web'
+      - name: Isolated packaged ARM64 smoke
+        if: runner.arch == 'ARM64'
+        run: npm run test:desktop
+        env:
+          EGUITAR_PACKAGED_EXECUTABLE: release/mac/mac-arm64/帅帅练琴屋.app/Contents/MacOS/帅帅练琴屋
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: experimental-mac-unsigned-${{ github.run_id }}
+          name: mac-pilot-unsigned-${{ github.run_id }}
           path: |
             release/mac/*.dmg
             release/mac/*.zip
-            release/mac/*.yml
             release/mac/*-manifest.json
             release/mac/*-SHA256SUMS.txt
           retention-days: 3

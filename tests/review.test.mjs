@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {reviewGroups,chartCoordinates} from '../app/review-model.js';
-import {lessonReview} from '../app/review-view.js';
+import {reviewGroups,chartCoordinates} from '../frontend/domain/review-model.ts';
 const log=(id,extra={})=>({id,entryId:'lesson',assignmentVersion:'v1',practicedAt:`2026-01-${id.padStart(2,'0')}T10:00:00Z`,createdAt:'2026-01-01T10:00:00Z',minutes:5,outcome:null,bpm:null,...extra});
 test('review preserves versions, exact timer seconds and deleted history',()=>{
  const logs=[log('1',{source:'timer',seconds:61}),log('2'),log('3',{assignmentVersion:'v0'}),log('4',{deletedAt:'today'})];
@@ -25,10 +24,4 @@ test('coordinates use date spacing and handle single or coincident observations'
  const p=chartCoordinates([{at:'2026-01-01',value:0},{at:'2026-01-02',value:10},{at:'2026-01-11',value:20}],{zero:true});
  assert.equal(p[0].y,176);assert.ok(Math.abs(p[1].x-110.8)<.01);
  assert.ok(chartCoordinates([{at:'2026-01-01',value:0},{at:'2026-01-01',value:0}]).every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));
-});
-test('detail separates BPM points, escapes labels and paginates exact records',()=>{
- const logs=Array.from({length:21},(_,i)=>log(String(i+1),{bpm:60,bpmBasis:'self-reported-stable',assignmentVersion:'<unsafe>'}));
- const html=lessonReview(logs,{entries:[]},[],new URLSearchParams({lesson:'lesson',version:'<unsafe>'}));
- assert.ok(html.includes('&lt;unsafe&gt;'));assert.ok(html.includes('下一页'));
- const tempo=html.split('tempo-chart')[1].split('</svg>')[0];assert.ok(!tempo.includes('polyline'));assert.equal((tempo.match(/<circle/g)||[]).length,21);
 });

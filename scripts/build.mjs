@@ -1,4 +1,4 @@
-import { mkdir, rm, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, rm, readFile, writeFile, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { copyPublicApp, inventory } from './build-lib.mjs';
@@ -9,7 +9,22 @@ const pkg = JSON.parse(await readFile(root + 'package.json', 'utf8'));
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
-let files = await copyPublicApp(root + 'app', out);
+const staged = root + 'build/public';
+await rm(staged, { recursive: true, force: true });
+await mkdir(staged, { recursive: true });
+await copyPublicApp(root + 'app', staged, { resourcesOnly: true });
+const { build } = await import('vite');
+await build();
+async function paths(dir, prefix = '') {
+  const results = [];
+  for (const item of await readdir(dir, { withFileTypes: true })) {
+    const path = prefix + item.name;
+    if (item.isDirectory()) results.push(...await paths(dir + '/' + item.name, path + '/'));
+    else results.push(path);
+  }
+  return results.sort();
+}
+let files = await paths(out);
 let courseResources = null;
 if (process.env.EGUITAR_COURSE_PACK) {
   const bundled = await bundleCourse(out, process.env.EGUITAR_COURSE_PACK);

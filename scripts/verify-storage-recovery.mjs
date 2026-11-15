@@ -11,7 +11,7 @@ const base = process.env.EGUITAR_QA_URL || "http://localhost:5173";
 try {
   const ctx = await browser.newContext();
   const old = await ctx.newPage();
-  await old.route("**/app.js", (r) =>
+  await old.route("**/index.js", (r) =>
     r.fulfill({ contentType: "text/javascript", body: "" }),
   );
   await old.goto(base);

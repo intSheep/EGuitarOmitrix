@@ -93,11 +93,10 @@ try {
     await page.locator('[data-action="metro-toggle"]').click();
     await open(page);
     assert.match(await page.locator('#timer-state').innerText(), /练习中/);
-    assert.equal(await page.locator('[data-action="metro-toggle"]').innerText(), '播放节拍');
+    await released(page); // The replaced React tool unmounts; its audio must already be closed.
     const time = await page.locator('#timer-value').innerText();
     await listen(page);
-    await page.waitForTimeout(1100);
-    assert.notEqual(await page.locator('#timer-value').innerText(), time);
+    await page.waitForFunction(previous => document.querySelector('#timer-value').textContent !== previous, time);
     await page.locator('#tuner-stop').click(); await released(page);
     assert.equal(await page.locator('#tuner-note').innerText(), '—');
     await listen(page);
@@ -144,9 +143,9 @@ try {
     assert.match(await page.locator('#tuner-status').innerText(), /断开/); await released(page);
     await listen(page);
     await page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, value: true }); document.dispatchEvent(new Event('visibilitychange')); });
-    await released(page); assert.match(await page.locator('#tuner-status').innerText(), /页面已离开/);
+    await released(page); assert.match(await page.locator('#tuner-status').innerText(), /麦克风已停止/);
     await ctx.close();
   }
   assert.deepEqual(errors, []);
-  console.log('Tuner: real Chromium capture/WebAudio with synthetic A2/harmonics, automatic six-string detection/tighten-loosen guidance, input switching, paused practice/metronome, stop/Escape/navigation/background/disconnect/delayed grant, permission/missing/busy/silent states and responsive focus passed. No real instrument accuracy claim.');
+  console.log('Tuner: real Chromium capture/WebAudio with synthetic A2/harmonics, automatic six-string detection/tighten-loosen guidance, input switching, manual practice intent and stopped metronome, stop/Escape/navigation/background/disconnect/delayed grant, permission/missing/busy/silent states and responsive focus passed. No real instrument accuracy claim.');
 } finally { await browser.close(); }

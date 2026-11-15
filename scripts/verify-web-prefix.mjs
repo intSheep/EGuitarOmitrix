@@ -2,6 +2,7 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
+import { syntheticScore } from '../tests/fixtures/synthetic-score.mjs';
 import { chromium, expect } from '@playwright/test';
 const root = resolve('dist');
 const prefix = '/EGuitarOmitrix/';
@@ -31,6 +32,9 @@ try {
   if (requests.some(url => /\.(gp|musicxml|sf2)(\?|$)/.test(url))) throw Error('Course files eagerly loaded on startup');
   await page.locator('[data-start]').click();
   await page.locator('[data-score]').click();
+  const info = await (await page.request.get(`http://127.0.0.1:${server.address().port}${prefix}build-info.json`)).json();
+  await expect(page.locator('#score-file')).toBeEnabled();
+  if (!info.courseResources) await page.locator('#score-file').setInputFiles({ name: 'synthetic.musicxml', mimeType: 'application/xml', buffer: Buffer.from(syntheticScore) });
   await expect(page.locator('#score-render svg').first()).toBeVisible({ timeout: 20000 });
   if (failures.length) throw Error(failures.join('\n'));
   if (!await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)) throw Error('Mobile overflow');

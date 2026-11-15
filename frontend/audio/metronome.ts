@@ -1,5 +1,16 @@
 export class Metronome {
-  constructor(onBeat) {
+  onBeat: (beat: number) => void;
+  bpm: number;
+  beats: number;
+  volume: number;
+  nodes: Set<OscillatorNode>;
+  audio: AudioContext | null = null;
+  next = 0;
+  beat = 0;
+  running = false;
+  scheduler: ReturnType<typeof setInterval> | undefined;
+  timeouts: ReturnType<typeof setTimeout>[] = [];
+  constructor(onBeat: (beat: number) => void) {
     this.onBeat = onBeat;
     this.bpm = 60;
     this.beats = 4;
@@ -23,7 +34,7 @@ export class Metronome {
     this.schedule();
   }
   schedule() {
-    if (!this.running) return;
+    if (!this.running || !this.audio) return;
     // Do not replay a backlog of clicks after a stalled main thread.
     if (this.next < this.audio.currentTime - 0.1)
       this.next = this.audio.currentTime + 0.05;
@@ -67,7 +78,7 @@ export class Metronome {
     for (const node of this.nodes) {
       try {
         node.stop();
-      } catch {}
+      } catch { /* The oscillator may already have stopped. */ }
     }
     this.nodes.clear();
     if (this.audio) {

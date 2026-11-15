@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { countInTiming, ScoreCountIn } from "../app/score-count-in.js";
+import { countInTiming, ScoreCountIn } from "../frontend/audio/score-count-in.ts";
 
 const bar = (start, end, numerator, denominator, tempo) => ({
   start, end,

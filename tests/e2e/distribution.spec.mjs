@@ -57,7 +57,8 @@ test('built app saves, exports and restores one actual session in isolated stora
   await page.locator('[data-action=finish]').click();
   await expect(page.locator('#stable-bpm')).toHaveValue('');
   await page.locator('#finish-form button[type=submit]').click();
-  await expect(page.locator('.completion')).toBeVisible();
+  await expect(page.locator('.saved-feedback')).toBeVisible();
+  await page.locator('.saved-feedback a').click();
   await page.locator('[data-action=manage]').click();
   const downloading = page.waitForEvent('download');
   await page.locator('[data-action=export]').click();

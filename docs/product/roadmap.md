@@ -39,3 +39,13 @@ Issue #10 adds the assignment/manual-record/resume loop on top of PR #8. All 72 
 ## Focus revision — issue #12
 
 The owner subsequently authorized timed focus sessions and effort review. ADR 0003 replaces new manual duration entry while preserving old records. The simple metronome and consolidated materials are part of this slice. Automatic planning, offline shell and score conversion remain deferred.
+
+## React and Mac pilot refinement — 2026-11-12
+
+Owner-authorized implementation is based on PR #53 and ADR 0009. Shared React/TS
+pages, domain/storage migration and sanitized Vite release entry are implemented.
+Unsigned ARM64/Intel Mac packages and an isolated packaged ARM64 smoke have local
+evidence; see `../engineering/validation.md`. Remaining delivery gates are real
+M-series microphone/sleep/install/overwrite acceptance, Windows packaged-runtime
+CI and Android APK/device acceptance. Intel execution is unverified. Public signed
+Mac distribution remains a later milestone; no SwiftUI fork is planned.

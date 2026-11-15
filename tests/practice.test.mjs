@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { validateLog, activeLogs, latestLog, validateBackup, mergePreview } from '../app/practice-store.js';
+import { validateLog, activeLogs, latestLog, validateBackup, mergePreview } from '../frontend/storage/practice-store.ts';
 // Synthetic records only. No real learner history.
 const log=(id='synthetic-1',extra={})=>({id,entryId:'123',assignmentVersion:'test',minutes:5,outcome:'learning',bpm:null,practicedAt:'2026-01-01T00:00:00.000Z',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-01-01T00:00:00.000Z',note:'Synthetic fixture',nextFocus:'Synthetic next step',deletedAt:null,...extra});
 test('actual duration and self-report reject invalid values without assigning defaults',()=>{

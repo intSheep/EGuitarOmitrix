@@ -435,3 +435,16 @@ Crash/reload recovery, storage failure, the 24-hour bound and consented finish/u
 retain their existing integrity safeguards. A running practice session does not
 create overlapping automatic viewing time on external lesson launch. Existing
 viewing records, source/plan/result separation and backup schemas remain unchanged.
+
+## Frontend and Mac delivery refinement — 2026-11-12
+
+The owner authorizes React + strict TypeScript + Vite migration with shared
+Electron Windows/macOS and Capacitor Android delivery. Preserve the approved
+Brilliant design and ADR 0007 installed-client layout. Quiet practice navigation
+and manual run/pause semantics follow ADR 0008, including during backgrounding
+and tuning. End-of-session optional results are explicitly saved, then the app
+returns to the lesson with brief feedback and a record link. Existing records,
+versions, goals, viewing evidence and backups remain compatible without a schema
+migration. ARM64 macOS is an unsigned self-use pilot; x64 builds do not establish
+Intel acceptance. Signing/notarization, stores, iOS and automatic planning remain
+out of this revision. Architecture and acceptance boundaries: ADR 0009.

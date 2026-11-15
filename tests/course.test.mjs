@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { validateCourse, videoUrl, primaryLessons, filterEntries, relatedEntries, readCursor, rememberVideo } from '../app/course.js';
+import { validateCourse, videoUrl, primaryLessons, filterEntries, relatedEntries, readCursor, rememberVideo } from '../frontend/domain/course.ts';
 
 const course = JSON.parse(await readFile(new URL('../app/data/course.json', import.meta.url), 'utf8'));
 

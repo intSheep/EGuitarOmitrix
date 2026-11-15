@@ -1,10 +1,11 @@
-// Manual-session accounting: navigation and delayed callbacks retain the learner's run/pause intent.
+import type { SessionDraft, PracticeLog, DurationRecord } from "./types.ts";
+// Manual intent survives navigation; uncertain clock gaps are excluded (ADR 0008).
 export function createSession(
-  entryId,
-  assignmentVersion,
+  entryId: string,
+  assignmentVersion: string,
   now = Date.now(),
-  id = crypto.randomUUID(),
-) {
+  id: string = crypto.randomUUID(),
+): SessionDraft {
   return {
     id,
     entryId,
@@ -18,13 +19,22 @@ export function createSession(
     reason: "",
   };
 }
-export function resumeSession(s, wall, mono) {
+export function resumeSession(
+  s: SessionDraft,
+  wall: number,
+  mono: number,
+): SessionDraft {
   return { ...s, running: true, lastWall: wall, lastMono: mono, reason: "" };
 }
-export function tickSession(s, wall, mono, metronomeBpm = null) {
+export function tickSession(
+  s: SessionDraft,
+  wall: number,
+  mono: number,
+  metronomeBpm: number | null = null,
+): SessionDraft {
   if (!s.running) return s;
-  const dw = wall - s.lastWall,
-    dm = mono - s.lastMono;
+  const dw = wall - (s.lastWall ?? wall),
+    dm = mono - (s.lastMono ?? mono);
   if (dw < 0 || dm < 0 || Math.abs(dw - dm) > 1000)
     return {
       ...s,
@@ -33,19 +43,25 @@ export function tickSession(s, wall, mono, metronomeBpm = null) {
       reason: "时钟已校准，中断间隔未计入",
     };
   const counted = Math.min(dw, 86400000 - s.elapsedMs);
-  wall = s.lastWall + counted;
+  wall = (s.lastWall ?? wall) + counted;
   const intervals = s.intervals.map((i) => ({ ...i }));
   if (dw > 0) {
     const last = intervals.at(-1);
     if (last && last.end === s.lastWall) last.end = wall;
-    else intervals.push({ start: s.lastWall, end: wall });
+    else intervals.push({ start: s.lastWall ?? wall, end: wall });
   }
   const elapsedMs = s.elapsedMs + counted;
-  const tempoUsage = (s.tempoUsage || []).map(x => ({...x}));
-  if (counted > 0 && Number.isInteger(metronomeBpm) && metronomeBpm >= 20 && metronomeBpm <= 300) {
-    const item = tempoUsage.find(x => x.bpm === metronomeBpm);
+  const tempoUsage = (s.tempoUsage || []).map((x) => ({ ...x }));
+  if (
+    counted > 0 &&
+    metronomeBpm !== null &&
+    Number.isInteger(metronomeBpm) &&
+    metronomeBpm >= 20 &&
+    metronomeBpm <= 300
+  ) {
+    const item = tempoUsage.find((x) => x.bpm === metronomeBpm);
     if (item) item.seconds += counted / 1000;
-    else tempoUsage.push({bpm: metronomeBpm, seconds: counted / 1000});
+    else tempoUsage.push({ bpm: metronomeBpm, seconds: counted / 1000 });
   }
   return {
     ...s,
@@ -58,7 +74,13 @@ export function tickSession(s, wall, mono, metronomeBpm = null) {
     reason: elapsedMs >= 86400000 ? "本次练习已达24小时，请结束保存" : "",
   };
 }
-export function pauseSession(s, wall, mono, reason = "已暂停", metronomeBpm = null) {
+export function pauseSession(
+  s: SessionDraft,
+  wall: number,
+  mono: number,
+  reason = "已暂停",
+  metronomeBpm: number | null = null,
+): SessionDraft {
   return {
     ...tickSession(s, wall, mono, metronomeBpm),
     running: false,
@@ -67,7 +89,7 @@ export function pauseSession(s, wall, mono, reason = "已暂停", metronomeBpm =
     reason,
   };
 }
-export function recoverSession(s) {
+export function recoverSession(s: SessionDraft): SessionDraft {
   return {
     ...s,
     running: false,
@@ -76,7 +98,7 @@ export function recoverSession(s) {
     reason: "上次练习尚未结束",
   };
 }
-export function sessionLog(s, now = Date.now()) {
+export function sessionLog(s: SessionDraft, now = Date.now()): PracticeLog {
   if (s.elapsedMs < 1000) throw new Error("练习不足1秒，暂不计入总结");
   return {
     id: s.id,
@@ -99,12 +121,12 @@ export function sessionLog(s, now = Date.now()) {
     deletedAt: null,
   };
 }
-export function dayKey(time) {
+export function dayKey(time: string | number | Date) {
   const d = new Date(time);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
-export function dailySeconds(logs) {
-  const days = {};
+export function dailySeconds(logs: DurationRecord[]) {
+  const days: Record<string, number> = {};
   for (const l of logs.filter((l) => !l.deletedAt)) {
     if (l.source === "timer" && l.intervals?.length) {
       for (const i of l.intervals) {

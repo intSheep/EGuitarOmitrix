@@ -1,0 +1,669 @@
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
+@import "../app/styles.css";
+@import "../app/client.css";
+@import "../app/practice.css";
+@theme {
+  --color-primary: #3f5cf0;
+  --color-background: #fff;
+  --color-foreground: #101114;
+}
+#root {
+  min-height: 100dvh;
+}
+html[data-client] #root {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.is-focusing #root {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.client-back {
+  display: none;
+}
+.saved-feedback {
+  padding: 10px 0;
+  flex-shrink: 0;
+  color: var(--ink);
+}
+.saved-feedback a {
+  color: var(--accent);
+  margin-left: 12px;
+}
+.focus-page > h1 {
+  font-size: 22px;
+  margin: 14px 0;
+  flex-shrink: 0;
+}
+.focus-page > .tool-dock {
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.focus-page .focus-main {
+  overflow: auto;
+  padding: 16px 0;
+}
+#focus-clock {
+  text-align: center;
+  margin: auto;
+  width: min(100%, 700px);
+}
+#timer-value {
+  display: block;
+  font-size: clamp(46px, 8vw, 76px);
+  font-variant-numeric: tabular-nums;
+}
+#focus-clock details {
+  text-align: left;
+  margin-top: 20px;
+}
+#focus-clock summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  border: 2px solid #e1e5f0;
+  border-radius: 14px;
+  background: #f9faff;
+  font-weight: 700;
+}
+.focus-top {
+  position: relative;
+  justify-content: space-between;
+}
+.focus-top .practice-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 30;
+  min-width: 200px;
+  padding: 12px;
+  background: white;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px #17203a1c;
+}
+.passive-clock {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  padding: 0 8px 8px;
+}
+#focus-tool-content {
+  flex: 1;
+}
+.finish-page {
+  padding: 24px 16px;
+}
+.toast {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.toast button {
+  padding: 6px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Keep the result action reachable in compact installed windows. */
+.finish-inputs {
+  display: grid;
+  gap: 18px;
+}
+html[data-client] [data-client-route="finish"] #app {
+  overflow: hidden;
+}
+html[data-client] .finish-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+html[data-client] .finish-page > h1,
+html[data-client] .finish-page > p,
+html[data-client] .finish-time {
+  flex-shrink: 0;
+}
+html[data-client] .finish-time {
+  margin: 12px 0;
+}
+html[data-client] #finish-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  margin-top: 12px;
+  gap: 8px;
+}
+html[data-client] .finish-inputs {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 4px;
+}
+html[data-client] .finish-actions {
+  flex-shrink: 0;
+  flex-direction: row;
+  margin: 8px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+/* Scheme C1 · Brilliant Tactile Studio: shared enhancements (Blueprint Hero, Prescription Specs, Acoustic Clock, Fretboard) */
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.brand-subtitle {
+  display: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0;
+  margin-top: 2px;
+}
+.stage-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 2px solid #dfe3ec;
+  border-radius: 12px;
+  background: #fff;
+  color: #4f5666;
+  font-size: 13px;
+  font-weight: 750;
+  box-shadow: 0 3px 0 #e4e7f0;
+}
+.stage-pill:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.stage-pill[aria-current="step"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: #2c46d4;
+  box-shadow: 0 3px 0 #2137a8;
+}
+.stage-pill-title {
+  font-size: 12px;
+  font-weight: 650;
+  opacity: 0.92;
+}
+.detail-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  border: 2px solid #dbe2ff;
+  border-radius: 18px;
+  background-color: #f4f7ff;
+  background-image:
+    linear-gradient(to right, rgba(63, 92, 240, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(63, 92, 240, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.detail-hero-text {
+  min-width: 0;
+  flex: 1;
+}
+.detail-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  background: #e1e8ff;
+  color: #2943c4;
+  font-size: 11px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+.detail-hero h2 {
+  margin: 0 !important;
+  font-size: 22px;
+  line-height: 1.35;
+}
+.detail-hero .detail-art,
+html[data-client] .detail-hero .detail-art {
+  float: none;
+  width: 84px;
+  height: 74px;
+  margin: 0;
+  flex-shrink: 0;
+}
+.prescription-specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+.spec-card {
+  padding: 11px 14px;
+  border: 2px solid #e2e6f0;
+  border-radius: 14px;
+  background: #f8f9fd;
+}
+.spec-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.spec-card p {
+  margin: 0 !important;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.45;
+}
+.goal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-top: 14px;
+  border: 2px dashed #dce2f2;
+  border-radius: 14px;
+  background: #fafbff;
+  font-size: 12px;
+  color: #4f5668;
+}
+.timer-dial {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Desktop practice workbench: compact chrome, bounded content, stable transport. */
+.focus-page .focus-top,
+html[data-client] .focus-page .focus-top {
+  min-height: 56px;
+  padding: 8px 0;
+  flex: 0 0 auto;
+}
+.focus-course {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.focus-course > span {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #edf1ff;
+  color: #2d47c7;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.focus-page .focus-course h1 {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focus-page .tool-dock,
+html[data-client] .focus-page .tool-dock {
+  justify-content: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  margin: 0;
+  gap: 8px;
+}
+.focus-page .focus-main {
+  padding: 12px 0;
+}
+.focus-page .focus-actions .passive-clock {
+  margin-right: auto;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+.focus-actions [data-session-time] {
+  font-weight: 800;
+  color: var(--accent);
+}
+.focus-page #focus-tool-content[data-tool="position"] {
+  height: 100%;
+  min-height: 0;
+}
+.focus-page #position-dialog.in-practice {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  max-width: 920px;
+  margin: 0 auto;
+  text-align: left;
+}
+.focus-page .position-heading h2 {
+  font-size: 18px;
+  line-height: 1.4;
+}
+.focus-page .position-choices {
+  display: flex;
+  align-self: flex-start;
+  gap: 6px;
+  margin: 12px 0 10px;
+  padding: 4px;
+  background: #eff2fa;
+  border: 2px solid #dfe4f2;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.focus-page .position-choices .button {
+  padding: 5px 16px;
+  min-height: 32px;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 750;
+}
+.focus-page .position-choices [aria-pressed="true"] {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 0 #2137a8;
+}
+.focus-page .position-meta {
+  font-size: 12px;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.focus-page #position-dialog svg {
+  flex: 1;
+  min-height: 0;
+  max-height: 310px;
+  width: 100%;
+  height: auto;
+  margin: 6px auto;
+}
+.focus-page .position-legend {
+  font-size: 12px;
+  flex-shrink: 0;
+  color: var(--muted);
+  padding-top: 4px;
+}
+
+/* Scheme C1 Desktop Client Architecture: Left Sidebar + Brilliant Tactile Studio */
+@media (min-width: 761px) {
+  html[data-client="desktop"] body:not(.is-focusing) #root {
+    display: grid;
+    grid-template-columns: 224px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    height: 100dvh;
+    overflow: hidden;
+  }
+  html[data-client="desktop"] body:not(.is-focusing) .app-header {
+    grid-column: 1;
+    grid-row: 1;
+    height: 100dvh;
+    flex: none;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 20px 14px 16px;
+    gap: 20px;
+    background: #f4f6fb;
+    border-right: 2px solid #e2e6f0;
+    border-bottom: 0;
+    z-index: 15;
+  }
+  html[data-client="desktop"][data-platform="darwin"]
+    body:not(.is-focusing)
+    .app-header {
+    padding-top: 42px;
+  }
+  html[data-client="desktop"] body:not(.is-focusing) .brand {
+    padding: 6px 8px;
+    gap: 11px;
+    font-size: 17px;
+  }
+  html[data-client="desktop"] body:not(.is-focusing) .brand-subtitle {
+    display: block;
+  }
+  html[data-client="desktop"] body:not(.is-focusing) .navigation {
+    flex-direction: column;
+    align-self: stretch;
+    gap: 6px;
+  }
+  html[data-client="desktop"] body:not(.is-focusing) .navigation a {
+    padding: 10px 13px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    font-size: 14px;
+    font-weight: 750;
+    color: #4b5263;
+  }
+  html[data-client="desktop"] body:not(.is-focusing) .navigation a:hover {
+    background: #eaeff9;
+    color: var(--ink);
+  }
+  html[data-client="desktop"]
+    body:not(.is-focusing)
+    .navigation
+    a[aria-current="page"] {
+    background: var(--accent);
+    color: #fff;
+    border-color: #2b45d2;
+    box-shadow: 0 3px 0 #2137a8;
+  }
+  html[data-client="desktop"]
+    body:not(.is-focusing)
+    .navigation
+    a[aria-current="page"]::after {
+    display: none;
+  }
+  html[data-client="desktop"] body:not(.is-focusing) #client-update {
+    margin-top: auto;
+    margin-left: 0;
+    width: 100%;
+    min-height: 38px;
+    font-size: 13px;
+  }
+  html[data-client="desktop"] body:not(.is-focusing) .workspace {
+    grid-column: 2;
+    grid-row: 1;
+    height: 100dvh;
+    padding: 0 24px 16px;
+    background: #fbfcfe;
+  }
+  html[data-client="desktop"].is-focusing .workspace,
+  html[data-client="desktop"] .is-focusing .workspace {
+    padding-top: 8px;
+  }
+  html[data-client="desktop"][data-platform="darwin"]
+    .is-focusing
+    .focus-page
+    .focus-top {
+    padding-left: 68px;
+  }
+  html[data-client="desktop"] .button {
+    min-height: 38px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 750;
+    border-radius: 12px;
+  }
+  html[data-client="desktop"] .button.primary {
+    border: 2px solid #2b45d2;
+    box-shadow: 0 4px 0 #2137a8;
+  }
+  html[data-client="desktop"] .button.primary:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #2137a8;
+  }
+  html[data-client="desktop"] .button.secondary {
+    border: 2px solid #dfe3ec;
+    background: #fff;
+    color: #252b3b;
+    box-shadow: 0 3px 0 #e4e7f0;
+  }
+  html[data-client="desktop"] .button.secondary:hover {
+    border-color: var(--accent-border);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  html[data-client="desktop"] .page-heading {
+    padding: 14px 0 10px;
+  }
+  html[data-client="desktop"] .page-heading h1 {
+    font-size: 24px;
+  }
+  html[data-client="desktop"] .stage-pills {
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+  }
+  html[data-client="desktop"] .practice-layout {
+    grid-template-columns: minmax(240px, 0.78fr) minmax(380px, 1.45fr);
+    gap: 18px;
+  }
+  html[data-client="desktop"] .exercise-list,
+  html[data-client="desktop"] .lesson-detail {
+    border: 2px solid #e2e6f0;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 4px 0 #edf0f7;
+  }
+  html[data-client="desktop"] .focus-page {
+    max-width: none;
+  }
+  html[data-client="desktop"] .focus-page .focus-tool {
+    min-height: 38px;
+    padding: 6px 14px;
+    border: 2px solid #e1e5f0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 3px 0 #e6eaf3;
+  }
+  html[data-client="desktop"] .focus-page .focus-tool[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+    border-color: #2b45d2;
+    box-shadow: 0 3px 0 #2137a8;
+  }
+  html[data-client="desktop"] .focus-page .focus-tool[aria-pressed="true"] svg {
+    color: #fff;
+  }
+  html[data-client="desktop"] .focus-page .focus-actions .button {
+    min-height: 40px;
+    min-width: 112px;
+  }
+  html[data-client="desktop"] #focus-back {
+    min-height: 38px;
+  }
+  .focus-page #position-dialog.in-practice {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    column-gap: 24px;
+  }
+  .focus-page .position-heading {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .focus-page .position-choices {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+  }
+  .focus-page .position-meta {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 8px;
+  }
+  .focus-page #position-dialog svg {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  .focus-page .position-legend {
+    grid-column: 1 / -1;
+    grid-row: 4;
+  }
+}
+
+@media (max-width: 760px) {
+  .stage-pill-title {
+    display: none;
+  }
+  .detail-hero {
+    padding: 14px 16px;
+  }
+  .detail-hero .detail-art,
+  html[data-client] .detail-hero .detail-art {
+    width: 64px;
+    height: 56px;
+  }
+  .focus-course {
+    display: block;
+    text-align: center;
+  }
+  .focus-page .focus-course h1 {
+    max-width: 42vw;
+    font-size: 13px;
+  }
+  .focus-course > span {
+    font-size: 10px;
+  }
+  .focus-page .focus-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .focus-page .focus-actions .passive-clock {
+    flex-basis: 100%;
+  }
+  .focus-page .position-choices {
+    align-self: stretch;
+  }
+  .focus-page .position-choices .button {
+    flex: 1;
+    padding: 6px 4px;
+  }
+  .focus-page .focus-main {
+    padding: 6px 0;
+  }
+  .focus-page .position-heading h2 {
+    margin: 0;
+    font-size: 17px;
+  }
+  .focus-page .position-choices {
+    margin: 6px 0;
+  }
+  .focus-page .position-meta .button {
+    min-height: 30px;
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  .focus-page .position-legend {
+    font-size: 10px;
+  }
+}

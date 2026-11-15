@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {teacherPrescription,todayPractice} from '../app/prescription.js';
+import {teacherPrescription,todayPractice} from '../frontend/domain/prescription.ts';
 const a={entryId:'123',version:'synthetic',dailyMinutes:5,tempo:'固定 40 BPM，不加速',evidence:{sha256:'a'.repeat(64),from:0,to:10}};
 const at=(d,h=12)=>new Date(2026,9,d,h).getTime();
 const log=(id,date,seconds,extra={})=>({id,entryId:'123',assignmentVersion:'synthetic',source:'timer',minutes:seconds/60,practicedAt:new Date(date).toISOString(),intervals:[{start:date,end:date+seconds*1000}],...extra});

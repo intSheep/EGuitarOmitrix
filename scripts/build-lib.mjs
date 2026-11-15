@@ -3,7 +3,7 @@ import { resolve, dirname, sep } from 'node:path';
 import { createHash } from 'node:crypto';
 
 // Public application assets only. Local score indexes/media and arbitrary data never ship.
-export async function copyPublicApp(app, out) {
+export async function copyPublicApp(app, out, { resourcesOnly = false } = {}) {
   const root = await realpath(app);
   const copied = [];
   async function copy(relative) {
@@ -18,7 +18,7 @@ export async function copyPublicApp(app, out) {
       copied.push(relative);
     }
   }
-  for (const name of (await readdir(root)).sort()) {
+  if (!resourcesOnly) for (const name of (await readdir(root)).sort()) {
     if (/^[a-z][a-z0-9-]*\.(?:js|css|html)$/.test(name)) await copy(name);
   }
   for (const relative of ['assets/mark.svg', 'assets/fretboard.svg', 'assets/tuner-electric-guitar.png', 'data/course.json', 'data/assignments.json']) await copy(relative);

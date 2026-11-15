@@ -9,8 +9,8 @@ import {
   sessionLog,
   dailySeconds,
   dayKey,
-} from "../app/session.js";
-import { validateLog } from "../app/practice-store.js";
+} from "../frontend/domain/session.ts";
+import { validateLog } from "../frontend/storage/practice-store.ts";
 const epoch = new Date(2026, 0, 1, 23, 59, 59).getTime();
 const fresh = () =>
   resumeSession(createSession("123", "test", epoch, "synthetic"), epoch, 0);

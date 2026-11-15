@@ -132,3 +132,14 @@ exclude the gap without inventing a pause. Reload recovers the last saved draft
 paused. Separate viewing requires the learner to pause practice first; launching a
 lesson while running does not create overlapping watch evidence. Verify the single
 contextual return and unique session actions through `quiet-practice.spec.mjs`.
+
+## Current frontend architecture — 2026-11-12
+
+ADR 0009 replaces the historical buildless implementation described above.
+React/TypeScript pages subscribe to one session controller; pure rules and storage
+are independently typed/tested. Never instantiate timing or capture from render.
+Preserve ADR 0008 manual timer intent when adapting tools or native lifecycle.
+Use the resource staging allowlist before Vite, then inventory the actual output.
+Keep database/schema/origin identities unchanged. Run typecheck, lint, UI tests,
+Node tests, sanitized build and relevant browser/native checks. Tests use synthetic
+profiles, not the owner's installed-app records.

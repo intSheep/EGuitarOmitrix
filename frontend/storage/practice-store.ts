@@ -1,5 +1,13 @@
-import { emptyGoals, validateGoals, mergeGoals } from "./guidance.js";
-import { validateWatches } from './study.js';
+import {
+  logSchema,
+  type PracticeLog,
+  type Goals,
+  type WatchRecord,
+  type SessionDraft,
+  type Backup,
+} from "../domain/types.ts";
+import { emptyGoals, validateGoals, mergeGoals } from "../domain/guidance.ts";
+import { validateWatches } from "../domain/study.ts";
 export const OUTCOMES = {
   learning: "还不熟",
   slow: "能慢速完成",
@@ -8,7 +16,8 @@ export const OUTCOMES = {
   review: "可以复习",
 };
 export const DB_NAME = "eguitar-practice-v1";
-export function validateLog(log) {
+export function validateLog(input: unknown): PracticeLog {
+  const log = logSchema.parse(input);
   if (
     !log ||
     typeof log.id !== "string" ||
@@ -19,7 +28,7 @@ export function validateLog(log) {
     log.minutes <= 0 ||
     log.minutes > 1440 ||
     !(
-      Object.hasOwn(OUTCOMES, log.outcome) ||
+      (log.outcome !== null && Object.hasOwn(OUTCOMES, log.outcome)) ||
       (log.source === "timer" && log.outcome === null)
     ) ||
     (log.bpm !== null &&
@@ -40,8 +49,8 @@ export function validateLog(log) {
   if (log.source === "timer") {
     if (
       !Number.isFinite(log.seconds) ||
-      log.seconds < 1 ||
-      Math.abs(log.minutes * 60 - log.seconds) > 0.001 ||
+      log.seconds! < 1 ||
+      Math.abs(log.minutes * 60 - log.seconds!) > 0.001 ||
       !Array.isArray(log.intervals) ||
       log.intervals.length === 0
     )
@@ -60,17 +69,39 @@ export function validateLog(log) {
       sum += i.end - i.start;
       previous = i.end;
     }
-    if (Math.abs(sum / 1000 - log.seconds) > 0.001)
+    if (Math.abs(sum / 1000 - log.seconds!) > 0.001)
       throw new Error("计时总量不一致");
   }
-  if (log.bpmBasis !== undefined && log.bpmBasis !== 'self-reported-stable') throw Error('BPM 来源无效');
+  if (log.bpmBasis !== undefined && log.bpmBasis !== "self-reported-stable")
+    throw Error("BPM 来源无效");
   if (log.tempoUsage !== undefined) {
-    if (!Array.isArray(log.tempoUsage) || log.tempoUsage.length > 281 || log.tempoUsage.some(x => !x || !Number.isInteger(x.bpm) || x.bpm < 20 || x.bpm > 300 || !Number.isFinite(x.seconds) || x.seconds <= 0) || new Set(log.tempoUsage.map(x=>x.bpm)).size !== log.tempoUsage.length || log.tempoUsage.reduce((n,x)=>n+x.seconds,0) > log.minutes * 60 + .001) throw Error('节拍器使用记录无效');
+    if (
+      !Array.isArray(log.tempoUsage) ||
+      log.tempoUsage.length > 281 ||
+      log.tempoUsage.some(
+        (x) =>
+          !x ||
+          !Number.isInteger(x.bpm) ||
+          x.bpm < 20 ||
+          x.bpm > 300 ||
+          !Number.isFinite(x.seconds) ||
+          x.seconds <= 0,
+      ) ||
+      new Set(log.tempoUsage.map((x) => x.bpm)).size !==
+        log.tempoUsage.length ||
+      log.tempoUsage.reduce((n, x) => n + x.seconds, 0) >
+        log.minutes * 60 + 0.001
+    )
+      throw Error("节拍器使用记录无效");
   }
-  if (log.goal != null) validateGoals({weeklySessions:null,lessons:{[log.entryId]:log.goal}});
+  if (log.goal != null)
+    validateGoals({
+      weeklySessions: null,
+      lessons: { [log.entryId]: log.goal },
+    });
   return log;
 }
-export function activeLogs(logs) {
+export function activeLogs(logs: PracticeLog[]) {
   return logs
     .filter((l) => !l.deletedAt)
     .sort(
@@ -79,10 +110,10 @@ export function activeLogs(logs) {
         Date.parse(b.createdAt) - Date.parse(a.createdAt),
     );
 }
-export function latestLog(logs, entryId) {
+export function latestLog(logs: PracticeLog[], entryId?: string) {
   return activeLogs(logs).find((l) => !entryId || l.entryId === entryId);
 }
-export function validateBackup(value, entryIds) {
+export function validateBackup(value: Backup, entryIds: Set<string>) {
   if (
     ![1, 2, 3].includes(value?.schemaVersion) ||
     value.app !== "EGuitarOmitrix" ||
@@ -101,7 +132,10 @@ export function validateBackup(value, entryIds) {
   }
   return value.logs;
 }
-export function mergePreview(existing, incoming) {
+export function mergePreview<T extends { id: string }>(
+  existing: T[],
+  incoming: T[],
+) {
   const byId = new Map(existing.map((l) => [l.id, l]));
   const additions = [];
   let duplicates = 0;
@@ -112,12 +146,12 @@ export function mergePreview(existing, incoming) {
       JSON.stringify(
         Object.keys(old)
           .sort()
-          .map((k) => [k, old[k]]),
+          .map((k) => [k, (old as Record<string, unknown>)[k]]),
       ) ===
       JSON.stringify(
         Object.keys(log)
           .sort()
-          .map((k) => [k, log[k]]),
+          .map((k) => [k, (log as Record<string, unknown>)[k]]),
       )
     )
       duplicates++;
@@ -128,7 +162,9 @@ export function mergePreview(existing, incoming) {
   }
   return { additions, duplicates };
 }
-export function openPracticeDB({ onBlocked = () => {} } = {}) {
+export function openPracticeDB({
+  onBlocked = () => {},
+} = {}): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, 3);
     req.onupgradeneeded = () => {
@@ -136,8 +172,8 @@ export function openPracticeDB({ onBlocked = () => {} } = {}) {
         req.result.createObjectStore("logs", { keyPath: "id" });
       if (!req.result.objectStoreNames.contains("session"))
         req.result.createObjectStore("session");
-      if (!req.result.objectStoreNames.contains('watches'))
-        req.result.createObjectStore('watches', { keyPath: 'id' });
+      if (!req.result.objectStoreNames.contains("watches"))
+        req.result.createObjectStore("watches", { keyPath: "id" });
     };
     req.onerror = () =>
       reject(new Error("无法打开本地练习数据库。请检查浏览器存储权限。"));
@@ -149,7 +185,7 @@ export function openPracticeDB({ onBlocked = () => {} } = {}) {
     };
   });
 }
-export function allLogs(db) {
+export function allLogs(db: IDBDatabase): Promise<PracticeLog[]> {
   return new Promise((resolve, reject) => {
     const tx = db.transaction("logs", "readonly");
     const req = tx.objectStore("logs").getAll();
@@ -158,7 +194,11 @@ export function allLogs(db) {
     tx.onabort = () => reject(tx.error);
   });
 }
-export function saveLog(db, log, expectedUpdatedAt = null) {
+export function saveLog(
+  db: IDBDatabase,
+  log: PracticeLog,
+  expectedUpdatedAt: string | null = null,
+): Promise<PracticeLog> {
   validateLog(log);
   return new Promise((resolve, reject) => {
     const tx = db.transaction("logs", "readwrite"),
@@ -189,28 +229,47 @@ export function saveLog(db, log, expectedUpdatedAt = null) {
       );
   });
 }
-export function importLogs(db, logs, goals = null, watches = []) {
+export function importLogs(
+  db: IDBDatabase,
+  logs: PracticeLog[],
+  goals: Goals | null = null,
+  watches: WatchRecord[] = [],
+): Promise<void> {
   logs.forEach(validateLog);
-  validateWatches(watches, new Set(watches.map(r => r.entryId)));
+  validateWatches(watches, new Set(watches.map((r) => r.entryId)));
   return new Promise((resolve, reject) => {
     const tx = db.transaction(["logs", "session", "watches"], "readwrite"),
       store = tx.objectStore("logs");
-    let failure;
+    let failure: unknown;
     const req = store.getAll();
     req.onsuccess = () => {
       try {
-        const { additions } = mergePreview(req.result, logs);
+        const { additions } = mergePreview<PracticeLog>(req.result, logs);
         additions.forEach((l) => store.add(l));
-        const watchStore = tx.objectStore('watches'), watchRequest = watchStore.getAll();
+        const watchStore = tx.objectStore("watches"),
+          watchRequest = watchStore.getAll();
         watchRequest.onsuccess = () => {
-          try { mergePreview(watchRequest.result, watches).additions.forEach(r => watchStore.add(r)); }
-          catch (e) { failure = e; tx.abort(); }
+          try {
+            mergePreview(watchRequest.result, watches).additions.forEach((r) =>
+              watchStore.add(r),
+            );
+          } catch (e) {
+            failure = e;
+            tx.abort();
+          }
         };
         if (goals) {
-          const request = tx.objectStore('session').get('goals');
+          const request = tx.objectStore("session").get("goals");
           request.onsuccess = () => {
-            try { tx.objectStore('session').put(mergeGoals(request.result || emptyGoals(), goals), 'goals'); }
-            catch(e) { failure = e; tx.abort(); }
+            try {
+              tx.objectStore("session").put(
+                mergeGoals(request.result || emptyGoals(), goals),
+                "goals",
+              );
+            } catch (e) {
+              failure = e;
+              tx.abort();
+            }
           };
         }
       } catch (e) {
@@ -225,7 +284,7 @@ export function importLogs(db, logs, goals = null, watches = []) {
   });
 }
 
-export function readDraft(db) {
+export function readDraft(db: IDBDatabase): Promise<SessionDraft | null> {
   return new Promise((resolve, reject) => {
     const tx = db.transaction("session");
     const r = tx.objectStore("session").get("active");
@@ -233,18 +292,21 @@ export function readDraft(db) {
     tx.onabort = () => reject(tx.error);
   });
 }
-export function writeDraft(db, draft) {
+export function writeDraft(
+  db: IDBDatabase,
+  draft: SessionDraft | null,
+): Promise<void> {
   return new Promise((resolve, reject) => {
     const tx = db.transaction("session", "readwrite");
     const store = tx.objectStore("session");
     if (draft) store.put(draft, "active");
     else store.delete("active");
-    tx.oncomplete = resolve;
+    tx.oncomplete = () => resolve();
     tx.onerror = () => reject(new Error("练习进度未能保存，请重试"));
     tx.onabort = () => reject(new Error("练习进度未能保存，请重试"));
   });
 }
-export function finishDraft(db, log) {
+export function finishDraft(db: IDBDatabase, log: PracticeLog): Promise<void> {
   validateLog(log);
   return new Promise((resolve, reject) => {
     const tx = db.transaction(["logs", "session"], "readwrite"),
@@ -260,9 +322,11 @@ export function finishDraft(db, log) {
       try {
         store.add(log);
         tx.objectStore("session").delete("active");
-      } catch { tx.abort(); }
+      } catch {
+        tx.abort();
+      }
     };
-    tx.oncomplete = resolve;
+    tx.oncomplete = () => resolve();
     tx.onerror = () => reject(new Error("保存失败，本次练习仍保留，请重试"));
     tx.onabort = () =>
       reject(
@@ -275,18 +339,41 @@ export function finishDraft(db, log) {
   });
 }
 
-export function readGoals(db) {
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction('session'),r=tx.objectStore('session').get('goals');
-    tx.oncomplete=()=>resolve(r.result || emptyGoals()); tx.onabort=()=>reject(tx.error);
+export function readGoals(db: IDBDatabase): Promise<Goals> {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("session"),
+      r = tx.objectStore("session").get("goals");
+    tx.oncomplete = () => resolve(r.result || emptyGoals());
+    tx.onabort = () => reject(tx.error);
   });
 }
-export function saveGoals(db, goals, expected) {
+export function saveGoals(
+  db: IDBDatabase,
+  goals: Goals,
+  expected: Goals,
+): Promise<void> {
   validateGoals(goals);
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction('session','readwrite'),store=tx.objectStore('session'),r=store.get('goals');
-    let conflict=false;
-    r.onsuccess=()=>{ if(JSON.stringify(r.result || emptyGoals())!==JSON.stringify(expected)){conflict=true;tx.abort();}else store.put(goals,'goals'); };
-    tx.oncomplete=resolve;tx.onabort=()=>reject(Error(conflict?'目标已在另一窗口更改，请重新打开':'目标保存失败，请重试'));
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("session", "readwrite"),
+      store = tx.objectStore("session"),
+      r = store.get("goals");
+    let conflict = false;
+    r.onsuccess = () => {
+      if (
+        JSON.stringify(r.result || emptyGoals()) !== JSON.stringify(expected)
+      ) {
+        conflict = true;
+        tx.abort();
+      } else store.put(goals, "goals");
+    };
+    tx.oncomplete = () => resolve();
+    tx.onabort = () =>
+      reject(
+        Error(
+          conflict
+            ? "目标已在另一窗口更改，请重新打开"
+            : "目标保存失败，请重试",
+        ),
+      );
   });
 }

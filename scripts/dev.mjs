@@ -1,0 +1,11 @@
+import { mkdir, rm } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { createServer } from 'vite';
+import { copyPublicApp } from './build-lib.mjs';
+const staged = resolve('build/public');
+await rm(staged, { recursive: true, force: true });
+await mkdir(staged, { recursive: true });
+await copyPublicApp(resolve('app'), staged, { resourcesOnly: true });
+const server = await createServer({ server: { host: '127.0.0.1', port: 5173 } });
+await server.listen();
+server.printUrls();

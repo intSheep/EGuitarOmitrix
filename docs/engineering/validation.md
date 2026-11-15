@@ -331,3 +331,82 @@ No device was upgraded, no release published, and no owner records modified. Phy
 sleep/process eviction, Windows installer overwrite and real Android/hardware audio
 remain unverified. Timer duration now follows learner intent rather than verified
 foreground playing; neither tuning nor playback implies proficiency.
+
+## React/TypeScript migration and Mac pilot — 2026-11-12
+
+Based on main `8dad555` (PR #53). ADR 0008 manual timer intent is preserved:
+background/tools release media independently, while explicit close/quit persists
+a paused draft. This entry describes local uncommitted work, not a published release.
+
+Restored Node 24.22.3/npm using a checksum-verified official ARM64 runtime.
+Strict TypeScript, ESLint, 69 Node tests and 3 React Testing Library/Vitest tests
+pass. The sanitized Vite build contains 31 inventoried assets with no course pack.
+The complete browser suite passes 24 tests with one course-pack-only skip.
+Synthetic fixtures cover old records/goals/watch/drafts and backup versions,
+transactional recovery/conflicts, cross-window locking, optional finish inputs,
+failed saves/retry/reload, duplicate saving and background events during commit.
+Browser tests also cover manual clock intent, Android export/back/update adapters,
+reduced-motion responsive layouts and tool capture cleanup. The 390×560 finish
+screenshot was inspected: results scroll separately and save/return stay visible.
+
+Unsigned ARM64 and Intel DMG/ZIP packages were generated successfully; both
+packaged resource inventories pass verification. The actual packaged ARM64
+executable passes Electron smoke using an isolated temporary synthetic profile:
+sandbox/context isolation, offline score rendering/playback, microphone capture
+cleanup, camera denial, native outbound allowlist, export, close/Dock activation,
+paused-draft persistence and record persistence after restart. No owner's records
+or installed application were opened or modified. Intel was packaged, not run.
+
+Acceptance still pending: actual microphone/guitar accuracy and audio latency,
+physical sleep/wake, installer launch and data-preserving overwrite on an M-series
+Mac; Windows packaged execution/installer; Android APK compilation/device/export
+picker and upgrade. This host has no Java runtime or Android SDK. The existing
+Windows/Android CI gates and new Mac workflow are configured, but have not been
+claimed as completed Actions runs. The excluded pinned course pack needs its own
+content gate. Signing, notarization, store publication and automatic Mac updates
+are outside this pilot. No release/tag was published.
+
+React now owns application pages, forms, navigation and session subscription.
+Remaining imperative notation/tuner/position surfaces are bounded adapters;
+alphaTab is unchanged. Pure tuner analysis, metronome/count-in, storage and domain
+models are TypeScript. This is not a claim that third-party notation code or every
+specialized adapter has been rewritten in React.
+
+Additional final checks pass: synthetic tuner capture/error/device-switch cases,
+repository-subpath lazy alphaTab loading, count-in playback/cancellation with 3/4,
+6/8 and speed changes, and `npm run android:sync`. Successful Capacitor sync only
+establishes asset/plugin integration, not APK compilation or native-device acceptance.
+
+### Owner-authorized local installation and Guitar Pro handoff
+
+The owner requested installation on this Mac and direct opening in Guitar Pro.
+The ARM64 application was installed in `/Applications/帅帅练琴屋.app`.
+Desktop score export now uses a narrow IPC action to write a bounded GP payload
+under the application's `score-cache` directory and open Guitar Pro 8 on macOS.
+No URI handler or file association is registered. Web/Android keep file download.
+Cached scores remain local and are not included in builds. The application bundle
+was rebuilt for this follow-up; the earlier DMG/ZIP do not include this addition.
+Installed handoff routing passes an isolated test with intercepted process launch
+and synthetic bytes: cache path and `/usr/bin/open -a 'Guitar Pro 8'` arguments.
+Actual Guitar Pro parsing/playback is not asserted by this test. The post-install
+full smoke encountered a synthetic second-microphone-capture timeout; earlier
+packaged smoke passed, but the post-install full run is not recorded as passing.
+
+### Scheme C1 macOS Brilliant tactile studio refinement — 2026-11-15
+
+Following owner approval of Scheme C1 (`mac-redesign-simulations.html`), updated the
+React + TypeScript desktop/web workspace and focus stage:
+- Desktop clients (`html[data-client="desktop"]` at `>= 761px`) use a 224 px left
+  sidebar with `hiddenInset` macOS title-bar spacing, 3D royal-blue active navigation,
+  and bottom-pinned update check; `.is-focusing` continues to hide `.app-header`.
+- Restored inline SVG icon sprites, tactile 2 px panel borders and 3D button bevels,
+  blueprint-grid lesson hero card (`.detail-hero`), source-backed prescription spec
+  cards (`.prescription-specs`), 60-tick radial timer dial (`.timer-dial`), and
+  inlay/fret-pill C-major 5-position fretboard SVG with bounded height.
+- Verification: `tsc --noEmit`, `eslint frontend`, `vitest run` (3 passed), 68/69 Node
+  unit tests pass (`tests/audio-score.test.mjs` requires local `ffmpeg` binary not
+  installed in this environment), `npm run test:web` passes 28/29 Playwright E2E
+  tests (1 course-pack-only skip) across `1440×900`, `1280×720`, `800×600`, `390×700`,
+  and `390×560` viewports, and `npm run package:mac` builds and verifies both
+  `mac-arm64` and `mac-x64` DMG/ZIP distributions (`0.5.0`).
+

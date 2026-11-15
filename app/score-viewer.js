@@ -1,5 +1,5 @@
-import { saveFile } from "./file-export.js";
-import { COUNT_IN_KEY, ScoreCountIn, countInTiming } from "./score-count-in.js";
+import { saveFile } from "../frontend/platform/file-export.ts";
+import { COUNT_IN_KEY, ScoreCountIn, countInTiming } from "../frontend/audio/score-count-in.ts";
 let sdk,
   api,
   generation = 0,
@@ -44,6 +44,11 @@ export function closeScore() {
 function download(bytes, name, type) {
   return saveFile(new Blob([bytes], { type }), name);
 }
+/**
+ * @param {string} entryId
+ * @param {string} title
+ * @param {{host?: HTMLElement | null, onClose?: (() => void) | null}} [options]
+ */
 export async function showScore(entryId, title, { host = null, onClose = null } = {}) {
   if (!dialog) {
     dialog = document.createElement("dialog");
@@ -64,7 +69,7 @@ export async function showScore(entryId, title, { host = null, onClose = null } 
   if (!dialog.open) { if (host) dialog.show(); else dialog.showModal(); }
   const status = dialog.querySelector("#score-status");
   try {
-    sdk ??= await import("./vendor/alphatab/alphaTab.min.mjs");
+    sdk ??= await import(/* @vite-ignore */ new URL("./vendor/alphatab/alphaTab.min.mjs", document.baseURI).href);
     if (token !== generation) return;
     api = new sdk.AlphaTabApi(dialog.querySelector("#score-render"), {
       core: { fontDirectory: "./vendor/alphatab/font/", useWorkers: false },
@@ -201,10 +206,17 @@ export async function showScore(entryId, title, { host = null, onClose = null } 
       }
       player.playbackSpeed = rate ? bpm / 100 : bpm / player.score.tempo;
     };
+    if (window.eguitarDesktop?.openGuitarPro) dialog.querySelector("#score-gp").textContent = "用 Guitar Pro 打开";
     dialog.querySelector("#score-gp").onclick = async () => {
       try {
+        const bytes = gpBytes || new sdk.exporter.Gp7Exporter().export(player.score);
+        if (window.eguitarDesktop?.openGuitarPro) {
+          await window.eguitarDesktop.openGuitarPro(new Uint8Array(bytes));
+          status.textContent = "已交给 Guitar Pro 打开";
+          return;
+        }
         await download(
-          gpBytes || new sdk.exporter.Gp7Exporter().export(player.score),
+          bytes,
           "practice.gp",
           "application/octet-stream",
         );

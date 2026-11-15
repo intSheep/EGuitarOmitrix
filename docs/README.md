@@ -25,3 +25,6 @@ Implementation decision: [ADR 0001](decisions/0001-local-first-video-navigator.m
 - Human review: [Assignment inventory](product/assignment-inventory.md).
 - Engineering: [Manual record persistence](decisions/0002-manual-practice-records.md).
 - Runtime data: `app/data/assignments.json`; authored notes: `content/assignment-notes.json` and `content/visual-assignment-notes.json`.
+
+- Current frontend/platform decision: [ADR 0009 — React/TypeScript and Mac pilot](decisions/0009-react-typescript-and-macos-pilot.md).
+- Current local migration and packaging evidence: [validation record](engineering/validation.md#reacttypescript-migration-and-mac-pilot--2026-11-12).

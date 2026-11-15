@@ -23,13 +23,14 @@ try {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   const flags = await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences());
   assert.equal(flags.nodeIntegration, false); assert.equal(flags.contextIsolation, true); assert.equal(flags.sandbox, true); assert.equal(flags.webSecurity, true);
-  assert.deepEqual(await page.evaluate(() => Object.keys(eguitarDesktop)), ['checkUpdates']);
+  assert.deepEqual(await page.evaluate(() => Object.keys(eguitarDesktop)), ['platform', 'updatesSupported', 'checkUpdates', 'openGuitarPro', 'openCourse']);
   assert.equal(await page.locator('html').getAttribute('data-client'), 'desktop');
   assert.deepEqual(await page.evaluate(() => [isSecureContext, typeof require, typeof process, !!navigator.locks]), [true, 'undefined', 'undefined', true]);
   assert.equal(await page.evaluate(async () => (await fetch('./local-scores/p999/score.musicxml')).status), 404);
   const course = await page.evaluate(async () => (await (await fetch('./build-info.json')).json()).courseResources);
-  await application.evaluate(({ dialog, shell, session }, profile) => {
+  await application.evaluate(({ dialog, shell, session, systemPreferences }, profile) => {
     global.testOpened = [];
+    if (process.platform === 'darwin') systemPreferences.getMediaAccessStatus = () => 'granted';
     dialog.showMessageBox = async () => ({ response: 1 });
     shell.openExternal = async url => { global.testOpened.push(url); };
     session.defaultSession.on('will-download', (_, item) => item.setSavePath(profile + '/synthetic-backup.json'));
@@ -86,7 +87,8 @@ try {
   await page.locator('#focus-back').click();
   await page.locator('[data-action=finish]').click();
   await page.locator('#finish-form button[type=submit]').click();
-  await page.locator('.completion').waitFor();
+  await page.locator('.saved-feedback').waitFor();
+  await page.locator('.saved-feedback a').click();
   await page.locator('[data-action=manage]').click();
   await page.locator('[data-action=export]').click();
   await expect.poll(async () => { try { return JSON.parse(await readFile(join(profile, 'synthetic-backup.json'), 'utf8')).logs.length; } catch { return 0; } }).toBe(1);
@@ -94,10 +96,24 @@ try {
   await page.evaluate(() => { window.open('https://www.bilibili.com/video/BV1FT411Z7iu/?p=3'); window.open('file:///etc/passwd'); });
   await expect.poll(() => application.evaluate(() => global.testOpened.length)).toBe(1);
   assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length), 1);
+  assert.equal(await page.evaluate(() => eguitarDesktop.openCourse('file:///etc/passwd').then(() => false, () => true)), true);
+  await page.evaluate(() => eguitarDesktop.openCourse('https://www.bilibili.com/video/BV1FT411Z7iu/?p=3'));
+  await expect.poll(() => application.evaluate(() => global.testOpened.length)).toBe(2);
   assert.deepEqual(errors, []);
   await mkdir('test-results', { recursive: true });
   await page.screenshot({ path: 'test-results/desktop.png' });
   await writeFile('test-results/desktop-runtime.json', JSON.stringify(await application.evaluate(() => ({ versions: process.versions, platform: process.platform })), null, 2));
+  if (process.platform === 'darwin') {
+    await page.locator('[data-nav=practice]').click();
+    await page.locator('[data-start]').click();
+    await expect.poll(async () => (await draft())?.elapsedMs || 0).toBeGreaterThan(1000);
+    await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].close());
+    await expect.poll(() => application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);
+    assert.equal((await draft()).running, false);
+    await application.evaluate(({ app }) => app.emit('activate'));
+    await expect.poll(() => application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].isVisible())).toBe(true);
+    assert.equal((await draft()).running, false);
+  }
   await application.close(); application = null;
   launched = await launch(); application = launched.instance;
   const persisted = await launched.page.evaluate(async () => { const m = await import('./practice-store.js'), db = await m.openPracticeDB(); const logs = await m.allLogs(db); db.close(); return logs.length; });
