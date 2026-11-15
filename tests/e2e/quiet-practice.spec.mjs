@@ -30,8 +30,8 @@ for(const width of [1280,800,390]) {
     await page.locator('#score-file').setInputFiles({name:'synthetic.musicxml',mimeType:'application/xml',buffer:Buffer.from(syntheticScore)});
     await expect(page.locator('#score-play')).toBeEnabled();
     await page.locator('.score-options summary').click();
+    await expect(page.locator('#score-gp')).toBeVisible();
     if(width===1280) {
-      await page.locator('.score-options summary').click();
       const downloaded=page.waitForEvent('download');await page.locator('#score-gp').click();
       expect((await downloaded).suggestedFilename()).toBe('practice.gp');
     }

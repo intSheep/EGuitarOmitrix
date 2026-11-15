@@ -127,7 +127,14 @@ else {
       await writeFile(file, bytes);
       await background();
       if (process.platform === 'darwin') {
-        await new Promise((resolve, reject) => require('node:child_process').execFile('/usr/bin/open', ['-a', 'Guitar Pro 8', file], error => error ? reject(Error('无法打开 Guitar Pro 8，请确认已安装。')) : resolve()));
+        await new Promise((resolve, reject) =>
+          require('node:child_process').execFile('/usr/bin/open', ['-a', 'Guitar Pro 8', file], error => {
+            if (!error) return resolve();
+            require('node:child_process').execFile('/usr/bin/open', ['-a', 'Guitar Pro', file], error2 =>
+              error2 ? reject(Error('无法打开 Guitar Pro 8，请确认已安装。')) : resolve()
+            );
+          })
+        );
       } else {
         const error = await shell.openPath(file);
         if (error) throw Error(error);
