@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 for (const viewport of [{width:1280,height:720},{width:800,height:600},{width:390,height:700},{width:390,height:560}]) {
   test(`client keeps navigation and primary actions visible at ${viewport.width}x${viewport.height}`, async ({page}) => {
     await page.setViewportSize(viewport);
-    await page.addInitScript(() => { window.eguitarDesktop = {checkUpdates: async () => { window.updateChecks = (window.updateChecks || 0) + 1; }}; });
+    await page.addInitScript(() => { window.eguitarMinPracticeMs = 1000; window.eguitarDesktop = {checkUpdates: async () => { window.updateChecks = (window.updateChecks || 0) + 1; }}; });
     const errors=[]; page.on('pageerror', e=>errors.push(e.message));
     await page.goto('/');
     await expect(page.locator('[data-start]')).toBeEnabled();

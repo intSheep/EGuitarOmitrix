@@ -74,10 +74,23 @@ test('manual run/pause survives tools, menu routes, visibility and native backgr
   await page.waitForTimeout(1200);
   expect((await draft(page)).running).toBe(false);expect((await draft(page)).elapsedMs).toBe(paused);
   await page.locator('[data-action=pause]').click();await expect.poll(async()=>(await draft(page)).elapsedMs).toBeGreaterThan(paused);
+  await page.evaluate(()=>{window.eguitarMinPracticeMs=1000;});
   await page.locator('[data-action=finish]').click();await expect(page.locator('#finish-form')).toBeVisible();
+  await expect(page.locator('[data-action=discard-finish]')).toBeVisible();
   await page.locator('[data-action=resume-finish]').click();await expect(page.locator('[data-action=finish]')).toHaveCount(1);
   expect((await draft(page)).id).toBe(id);expect((await draft(page)).running).toBe(true);
+  await page.locator('[data-action=finish]').click();await expect(page.locator('#finish-form')).toBeVisible();
+  await page.locator('[data-action=discard-finish]').click();
+  await expect(page.locator('#notice')).toContainText('已放弃本次练习');
+  expect(await draft(page)).toBeNull();
   expect(errors).toEqual([]);
+});
+test('sessions under 1 minute exit without recording by default',async({page})=>{
+  await begin(page);
+  await page.locator('[data-action=finish]').click();
+  await expect(page.locator('#notice')).toContainText('练习不足 1 分钟，本次未计入记录');
+  expect(await draft(page)).toBeNull();
+  expect(await page.evaluate(async()=>{const m=await import('./practice-store.js'),db=await m.openPracticeDB();const logs=await m.allLogs(db);db.close();return logs.length;})).toBe(0);
 });
 test('running practice does not create overlapping automatic viewing time',async({page,context})=>{
   await context.route('https://www.bilibili.com/**',r=>r.fulfill({contentType:'text/html',body:'Synthetic external lesson'}));

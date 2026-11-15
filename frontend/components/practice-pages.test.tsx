@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   save: vi.fn(),
   update: vi.fn(),
   start: vi.fn(),
+  discard: vi.fn(),
   snapshot: {
     draft: {
       id: "synthetic",
@@ -28,6 +29,7 @@ vi.mock("../controllers/practice", () => ({
   updateReview: mocks.update,
   saveResult: mocks.save,
   start: mocks.start,
+  discard: mocks.discard,
   run: (fn: () => unknown) => fn(),
 }));
 afterEach(cleanup);
@@ -60,5 +62,10 @@ describe("quiet finish confirmation", () => {
     await waitFor(() =>
       expect(mocks.save).toHaveBeenLastCalledWith(65, "steady"),
     );
+  });
+  it("allows discarding the session from the finish confirmation page", () => {
+    render(<Finish />);
+    fireEvent.click(screen.getByRole("button", { name: "放弃本次练习" }));
+    expect(mocks.discard).toHaveBeenCalledTimes(1);
   });
 });

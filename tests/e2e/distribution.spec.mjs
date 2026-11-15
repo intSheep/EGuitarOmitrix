@@ -48,6 +48,7 @@ test('bundled XML-only notation and source diagrams load without manual file imp
   await expect(page.locator('#score-play')).toBeDisabled();
 });
 test('built app saves, exports and restores one actual session in isolated storage', async ({ page, browser }) => {
+  await page.addInitScript(() => { window.eguitarMinPracticeMs = 1000; });
   await page.goto('/');
   await page.locator('[data-start]:enabled').click();
   await expect.poll(async () => page.evaluate(async () => {
@@ -108,6 +109,7 @@ test('update preparation persists a paused draft and does not resume on focus or
 });
 
 test('update cannot discard an unfinished result form', async ({ page }) => {
+  await page.addInitScript(() => { window.eguitarMinPracticeMs = 1000; });
   await page.goto('/');
   await page.locator('[data-start]').click();
   await expect.poll(() => page.evaluate(async () => {

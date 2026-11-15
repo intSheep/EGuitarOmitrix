@@ -85,6 +85,7 @@ try {
   await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].emit('blur'));
   await expect(page.locator('#score-play')).toHaveText('播放乐谱');
   await page.locator('#focus-back').click();
+  await page.evaluate(() => { window.eguitarMinPracticeMs = 1000; });
   await page.locator('[data-action=finish]').click();
   await page.locator('#finish-form button[type=submit]').click();
   await page.locator('.saved-feedback').waitFor();

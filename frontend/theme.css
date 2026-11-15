@@ -160,6 +160,17 @@ html[data-client] .finish-actions {
   padding: 12px 0 0;
   border-top: 1px solid var(--line);
 }
+.finish-actions .finish-discard {
+  color: #9f1239;
+  border-color: #fecdd3;
+  background: #fff1f2;
+}
+.finish-actions .finish-discard:hover,
+html[data-client="desktop"] .finish-actions .button.finish-discard:hover {
+  color: #881337;
+  border-color: #fda4af;
+  background: #ffe4e6;
+}
 
 /* Scheme C1 · Brilliant Tactile Studio: shared enhancements (Blueprint Hero, Prescription Specs, Acoustic Clock, Fretboard) */
 .brand-copy {

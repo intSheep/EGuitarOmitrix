@@ -6,6 +6,7 @@ declare global {
     eguitarPrepareForUpdate?: () => Promise<boolean>;
     eguitarPrepareForClose?: () => Promise<void>;
     eguitarClientBack?: () => boolean;
+    eguitarMinPracticeMs?: number;
     eguitarDesktop?: {
       checkUpdates: () => Promise<void>;
       openGuitarPro?: (bytes: Uint8Array) => Promise<void>;

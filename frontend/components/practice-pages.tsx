@@ -563,6 +563,15 @@ export function Finish() {
           >
             返回练习
           </Button>
+          <Button
+            type="button"
+            className="finish-discard"
+            data-action="discard-finish"
+            disabled={s.busy}
+            onClick={() => c.run(c.discard)}
+          >
+            放弃本次练习
+          </Button>
         </div>
       </form>
     </section>

@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
 const draft=page=>page.evaluate(async()=>{const m=await import('./practice-store.js'),db=await m.openPracticeDB();const d=await m.readDraft(db);db.close();return d;});
+test.beforeEach(async({page})=>{await page.addInitScript(()=>{window.eguitarMinPracticeMs=1000;});});
 test('finish inputs survive reload, save once, and return to the quiet workspace',async({page})=>{
  await page.goto('/');await page.locator('[data-start]').click();await expect.poll(async()=>(await draft(page))?.elapsedMs||0).toBeGreaterThan(1000);
  await page.locator('[data-action=finish]').click();await page.locator('#stable-bpm').fill('65');await page.getByLabel('基本顺畅',{exact:true}).check();

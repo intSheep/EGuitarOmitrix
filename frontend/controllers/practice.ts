@@ -283,16 +283,47 @@ export async function start(id: string, resume = false) {
     navigate("focus");
   });
 }
+export const MIN_PRACTICE_MS = 60_000;
 export async function finish() {
   await exclusive(async () => {
-    await claim(draft().entryId, draft().id);
+    const current = draft();
+    await claim(current.entryId, current.id);
     await pause();
     await queue;
+    const minMs = window.eguitarMinPracticeMs ?? MIN_PRACTICE_MS;
+    if (draft().elapsedMs < minMs) {
+      const entryId = draft().entryId;
+      await writeDraft(database(), null);
+      patch({ draft: null, saved: null });
+      release?.();
+      release = null;
+      setTool(null);
+      navigate(`practice?lesson=${entryId}`);
+      notify("练习不足 1 分钟，本次未计入记录");
+      return;
+    }
     sessionLog(draft());
     patch({ draft: { ...draft(), finishing: true } });
     await persist();
     setTool(null);
     navigate("finish");
+  });
+}
+export async function discard() {
+  await exclusive(async () => {
+    await reviewQueue;
+    const current = draft();
+    await claim(current.entryId, current.id);
+    await pause();
+    await queue;
+    const entryId = draft().entryId;
+    await writeDraft(database(), null);
+    patch({ draft: null, saved: null });
+    release?.();
+    release = null;
+    setTool(null);
+    navigate(`practice?lesson=${entryId}`);
+    notify("已放弃本次练习");
   });
 }
 export function updateReview(bpm: string, outcome: Outcome | null) {
