@@ -275,11 +275,6 @@ export function Focus() {
     <section className={`focus-page ${s.tool ? "has-focus-tool" : ""}`}>
       <div className="focus-top">
         <div className="focus-top-left">
-          {s.tool && (
-            <Button id="focus-back" onClick={() => c.setTool(null)}>
-              ← 返回计时
-            </Button>
-          )}
           <div className="focus-course">
             <span>
               W{e.stage} · EX{e.exercises[0]}
@@ -287,17 +282,24 @@ export function Focus() {
             <h1>{shortTitle(e)}</h1>
           </div>
         </div>
-        <Button
-          className="practice-menu-toggle"
-          data-action="practice-menu"
-          aria-expanded={s.dialog?.kind === "menu"}
-          onClick={() => c.setDialog({ kind: "menu" })}
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <span>菜单</span>
-        </Button>
+        <div className="focus-top-actions">
+          {s.tool && (
+            <Button id="focus-back" onClick={() => c.setTool(null)}>
+              ← 返回计时
+            </Button>
+          )}
+          <Button
+            className="practice-menu-toggle"
+            data-action="practice-menu"
+            aria-expanded={s.dialog?.kind === "menu"}
+            onClick={() => c.setDialog({ kind: "menu" })}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <span>菜单</span>
+          </Button>
+        </div>
       </div>
       <div className="tool-dock" aria-label="练习工具">
         {tools

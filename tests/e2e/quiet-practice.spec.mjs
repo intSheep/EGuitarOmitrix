@@ -15,7 +15,10 @@ for(const width of [1280,800,390]) {
     await expect(page.locator('[data-action=finish]')).toHaveCount(1);
     await expect(page.locator('[data-action=pause]')).toHaveCount(1);
     await expect(page.locator('[data-start]')).toHaveCount(0);
+    await page.locator('[data-position-reference]').click();
+    await expect(page.locator('#position-dialog')).toBeVisible();
     await page.locator('[data-score]').click();
+    await expect(page.locator('#position-dialog')).toBeHidden();
     await expect(page.locator('#focus-back')).toBeVisible();
     await expect(page.getByRole('button',{name:'← 返回计时',exact:true})).toHaveCount(1);
     await expect(page.locator('#score-dialog [data-tuner]')).toHaveCount(0);

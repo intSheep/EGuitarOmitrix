@@ -17,7 +17,13 @@ export function positionNotes(index) {
   }));
 }
 let panel, selected = 0, noteNames = false;
-export function closePositionReference() { if (panel?.open) panel.close(); }
+export function closePositionReference() {
+  if (panel?.open) panel.close();
+  if (panel) {
+    panel.classList.remove('in-practice');
+    document.body.append(panel);
+  }
+}
 /** @param {{host?: HTMLElement | null, onClose?: (() => void) | null}} [options] */
 export function showPositionReference({ host = null, onClose = null } = {}) {
   if (!panel) {

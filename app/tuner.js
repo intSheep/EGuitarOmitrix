@@ -164,6 +164,10 @@ export function stopTunerCapture() { stop('麦克风已停止。点击开始调�
 export function closeTuner() {
   stop();
   if (panel?.open) panel.close();
+  if (panel) {
+    panel.classList.remove('in-practice');
+    document.body.append(panel);
+  }
 }
 
 /** @param {{host?: HTMLElement | null, onClose?: (() => void) | null}} [options] */

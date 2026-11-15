@@ -39,6 +39,10 @@ export function pauseScore() {
 }
 export function closeScore() {
   if (dialog?.open) dialog.close();
+  if (dialog) {
+    dialog.classList.remove("in-practice");
+    document.body.append(dialog);
+  }
   dispose();
 }
 function download(bytes, name, type) {

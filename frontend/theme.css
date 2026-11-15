@@ -299,15 +299,45 @@ html[data-client] .detail-hero .detail-art {
 /* Desktop practice workbench: compact chrome, bounded content, stable transport. */
 .focus-page .focus-top,
 html[data-client] .focus-page .focus-top {
-  min-height: 56px;
-  padding: 8px 0;
+  min-height: 52px;
+  padding: 6px 0;
   flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.focus-top-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+.focus-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+#focus-back {
+  background: #eef2ff;
+  color: #2b45d2;
+  border: 2px solid #c7d2fe;
+  box-shadow: 0 3px 0 #dbe4ff;
+  font-weight: 750;
+}
+#focus-back:hover {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #1e36b0;
 }
 .focus-course {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 .focus-course > span {
   display: inline-flex;
@@ -352,11 +382,14 @@ html[data-client] .focus-page .tool-dock {
   font-weight: 800;
   color: var(--accent);
 }
+#focus-tool-content .in-practice:not([open]) {
+  display: none !important;
+}
 .focus-page #focus-tool-content[data-tool="position"] {
   height: 100%;
   min-height: 0;
 }
-.focus-page #position-dialog.in-practice {
+.focus-page #position-dialog.in-practice[open] {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -364,6 +397,51 @@ html[data-client] .focus-page .tool-dock {
   max-width: 920px;
   margin: 0 auto;
   text-align: left;
+}
+.focus-page #focus-tool-content .score-controls {
+  padding: 12px 16px;
+  margin: 4px 0 14px;
+  background: #f8faff;
+  border: 2px solid #e2e7f4;
+  border-radius: 14px;
+  gap: 14px;
+  align-items: center;
+}
+.focus-page #focus-tool-content .score-controls label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #363d4e;
+  margin: 0;
+}
+.focus-page #focus-tool-content .score-controls input[type="number"] {
+  width: 68px;
+  height: 36px;
+  padding: 4px 8px;
+  border: 2px solid #d8dff0;
+  border-radius: 10px;
+  background: #fff;
+  font-weight: 750;
+  text-align: center;
+}
+.focus-page #focus-tool-content .score-options summary {
+  padding: 7px 13px;
+  border: 2px solid #dfe3ec;
+  border-radius: 10px;
+  background: #fff;
+  color: #252b3b;
+  font-size: 13px;
+  font-weight: 750;
+  box-shadow: 0 2px 0 #e4e7f0;
+}
+.focus-page #focus-tool-content #score-status {
+  padding: 14px 18px;
+  margin: 0 0 14px;
+  border: 2px dashed #dce2f2;
+  border-radius: 14px;
+  background: #fafbff;
+  color: #4f5668;
+  font-size: 13px;
+  font-weight: 650;
 }
 .focus-page .position-heading h2 {
   font-size: 18px;
@@ -389,9 +467,11 @@ html[data-client] .focus-page .tool-dock {
   font-size: 13px;
   font-weight: 750;
 }
-.focus-page .position-choices [aria-pressed="true"] {
+.focus-page .position-choices [aria-pressed="true"],
+html[data-client="desktop"] .focus-page .position-choices .button[aria-pressed="true"] {
   background: var(--accent);
   color: white;
+  border-color: #2b45d2;
   box-shadow: 0 2px 0 #2137a8;
 }
 .focus-page .position-meta {
@@ -580,11 +660,21 @@ html[data-client] .focus-page .tool-dock {
   }
   html[data-client="desktop"] #focus-back {
     min-height: 38px;
+    background: #eef2ff;
+    color: #2b45d2;
+    border-color: #c7d2fe;
+    box-shadow: 0 3px 0 #dbe4ff;
   }
-  .focus-page #position-dialog.in-practice {
+  html[data-client="desktop"] #focus-back:hover {
+    background: #e0e7ff;
+    border-color: #a5b4fc;
+    color: #1e36b0;
+  }
+  .focus-page #position-dialog.in-practice[open] {
     display: grid;
     grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto minmax(0, auto) auto;
+    align-content: start;
     column-gap: 24px;
   }
   .focus-page .position-heading {
