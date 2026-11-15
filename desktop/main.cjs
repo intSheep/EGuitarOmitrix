@@ -135,6 +135,11 @@ else {
     });
     ipcMain.handle('eguitar:check-updates', async event => {
       if (event.sender !== window?.webContents || event.senderFrame !== window.webContents.mainFrame || !isAppURL(event.senderFrame.url)) throw Error('Untrusted update request');
+      if (!updates && process.platform === 'darwin') {
+        await background();
+        await shell.openExternal('https://github.com/intSheep/EGuitarOmitrix/releases');
+        return;
+      }
       if (!updates) throw Error('请使用已安装的正式版本检查更新');
       await updates.check();
     });

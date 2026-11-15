@@ -4,6 +4,12 @@ export const isClient = () => !!window.eguitarDesktop || isAndroid();
 export async function checkUpdates() {
   if (window.eguitarDesktop) {
     if (window.eguitarDesktop.updatesSupported === false) {
+      if (window.eguitarDesktop.openCourse) {
+        await window.eguitarDesktop.openCourse(
+          "https://github.com/intSheep/EGuitarOmitrix/releases",
+        );
+        return;
+      }
       window.open(
         "https://github.com/intSheep/EGuitarOmitrix/releases",
         "_blank",

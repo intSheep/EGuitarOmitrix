@@ -18,7 +18,9 @@ function resourcePath(root, value) {
 function externalURL(value) {
   try {
     const url = new URL(value);
-    if (url.protocol === 'https:' && url.hostname === 'www.bilibili.com' && !url.username && !url.password && !url.port) return url.href;
+    if (url.protocol !== 'https:' || url.username || url.password || url.port) return null;
+    if (url.hostname === 'www.bilibili.com') return url.href;
+    if (url.hostname === 'github.com' && (url.pathname === '/intSheep/EGuitarOmitrix/releases' || url.pathname.startsWith('/intSheep/EGuitarOmitrix/releases/'))) return url.href;
   } catch { /* Unsupported links are blocked. */ }
   return null;
 }

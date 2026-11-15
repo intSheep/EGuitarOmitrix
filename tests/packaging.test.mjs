@@ -34,7 +34,8 @@ test('desktop restricts resources, outbound navigation and microphone media type
   assert.equal(security.resourcePath(root, 'eguitar://app/'), join(root, 'index.html'));
   for (const url of ['https://example.com/', 'eguitar://app.evil/index.html', 'eguitar://name@app/index.html', 'eguitar://app/%2e%2e%2fsecret', 'eguitar://app/%5csecret', 'eguitar://app/%00']) assert.throws(() => security.resourcePath(root, url));
   assert.ok(security.externalURL('https://www.bilibili.com/video/BV1FT411Z7iu/?p=3'));
-  for (const url of ['file:///etc/passwd', 'javascript:alert(1)', 'https://www.bilibili.com.evil/', 'https://name@www.bilibili.com/', 'http://www.bilibili.com/', 'ms-settings:']) assert.equal(security.externalURL(url), null);
+  assert.ok(security.externalURL('https://github.com/intSheep/EGuitarOmitrix/releases'));
+  for (const url of ['file:///etc/passwd', 'javascript:alert(1)', 'https://www.bilibili.com.evil/', 'https://name@www.bilibili.com/', 'http://www.bilibili.com/', 'https://github.com/evil/repo/releases', 'ms-settings:']) assert.equal(security.externalURL(url), null);
   assert.equal(security.audioOnly(['audio']), true);
   for (const types of [[], ['audio', 'video'], ['video'], undefined]) assert.equal(security.audioOnly(types), false);
 });
