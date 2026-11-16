@@ -48,22 +48,17 @@ else {
         callback(false); return;
       }
       prompting = true;
-      let approved = false;
-      try { const result = await dialog.showMessageBox(window, {
-        type: 'question', title: '开启麦克风', message: '允许帅帅练琴屋使用麦克风调音吗？',
-        detail: '声音仅在本机分析，不录音、不上传。关闭调音器或离开应用即停止。',
-        buttons: ['取消', '允许本次使用'], defaultId: 0, cancelId: 0,
-      });
-      approved = result.response === 1;
-      if (approved && process.platform === 'darwin') {
-        const status = systemPreferences.getMediaAccessStatus('microphone');
-        approved = status === 'granted' || (status === 'not-determined' && await systemPreferences.askForMediaAccess('microphone'));
-        if (!approved) {
-          const answer = await dialog.showMessageBox(window, { type: 'info', message: 'macOS 尚未允许麦克风访问', detail: '请在系统设置的隐私与安全性 → 麦克风中允许帅帅练琴屋，然后重新点击开始调音。', buttons: ['取消', '打开系统设置'], defaultId: 0, cancelId: 0 });
-          if (answer.response === 1) await shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone');
+      let approved = true;
+      try {
+        if (process.platform === 'darwin') {
+          const status = systemPreferences.getMediaAccessStatus('microphone');
+          approved = status === 'granted' || (status === 'not-determined' && await systemPreferences.askForMediaAccess('microphone'));
+          if (!approved) {
+            const answer = await dialog.showMessageBox(window, { type: 'info', message: 'macOS 尚未允许麦克风访问', detail: '请在系统设置的隐私与安全性 → 麦克风中允许帅帅练琴屋，然后重新点击开始调音。', buttons: ['取消', '打开系统设置'], defaultId: 0, cancelId: 0 });
+            if (answer.response === 1) await shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone');
+          }
         }
-      }
-      } catch { /* Closing a native dialog denies access. */ }
+      } catch { approved = false; }
       finally { prompting = false; }
       callback(approved && !contents.isDestroyed() && isAppURL(contents.getURL()) && !window.isDestroyed() && window.isVisible() && !window.isMinimized());
     });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { STRINGS, detectPitch, tuningReading } from '../frontend/domain/tuner-model.ts';
+import { STRINGS, detectPitch, tuningReading, TunerTracker } from '../frontend/domain/tuner-model.ts';
 
 // Synthetic PCM only; no course or personal audio.
 const signal = (frequency, rate, harmonics = [0.3], noise = 0) => {
@@ -39,4 +39,28 @@ test('automatic target preserves measured octave and large deviations without fo
   assert.equal(value.note, 'E3');
   assert.equal(tuningReading(null), null);
   assert.equal(tuningReading(Infinity), null);
+});
+test('tracker smooths pitch, holds last reading during decay, and emits audio cues', () => {
+  const tracker = new TunerTracker({ holdMs: 3000 });
+  const flatA2 = STRINGS[1].frequency * 2 ** (-18 / 1200);
+  tracker.step(flatA2, 1000);
+  tracker.step(flatA2, 1060);
+  const third = tracker.step(flatA2, 1120);
+  assert.equal(third.reading.target.string, 5);
+  assert.equal(third.reading.direction, 'flat');
+  assert.equal(third.cue, 'flat');
+  // Signal drops out as string decays: reading stays held for 3 seconds instead of flashing away.
+  const held = tracker.step(null, 2500);
+  assert.equal(held.held, true);
+  assert.equal(held.reading.target.string, 5);
+  assert.equal(held.reading.direction, 'flat');
+  // After 3 seconds of silence, reading clears.
+  const expired = tracker.step(null, 4200);
+  assert.equal(expired.reading, null);
+  assert.equal(expired.held, false);
+  // Reaching in-tune emits in-tune lock cue.
+  tracker.step(STRINGS[1].frequency, 5000);
+  const locked = tracker.step(STRINGS[1].frequency, 5060);
+  assert.equal(locked.lockedInTune, true);
+  assert.equal(locked.cue, 'in-tune');
 });

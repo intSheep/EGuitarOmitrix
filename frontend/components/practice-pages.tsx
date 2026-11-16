@@ -232,10 +232,10 @@ export function Workspace() {
                   : g.last
                     ? "接着练"
                     : "开始练习"}
+                {s.draft && s.draft.entryId !== e.id
+                  ? ` · ${shortTitle(c.lesson(s.draft.entryId))}`
+                  : ""}
               </Button>
-              {s.draft && s.draft.entryId !== e.id && (
-                <p>{shortTitle(c.lesson(s.draft.entryId))}</p>
-              )}
             </div>
             <Button
               className="wide"

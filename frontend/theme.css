@@ -454,6 +454,51 @@ html[data-client] .focus-page .tool-dock {
   font-size: 13px;
   font-weight: 650;
 }
+.tuner-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tuner-inline-btn {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #2b45d2;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tuner-inline-btn:hover {
+  background: #e0e7ff;
+}
+.tuner-string-status li {
+  cursor: pointer;
+  user-select: none;
+  border-radius: 8px 8px 0 0;
+  transition: background-color 120ms, color 120ms;
+}
+.tuner-string-status li:hover {
+  background: #f4f7ff;
+  color: #2b45d2;
+}
+.tuner-string-status li[data-locked="true"] {
+  background: #eef2ff;
+  color: #2b45d2;
+  border-bottom-color: #3f5cf0;
+}
+#tuner-needle {
+  transition: left 90ms ease-out;
+}
+#tuner-readout[data-direction="in-tune"] #tuner-note,
+#tuner-readout[data-direction="in-tune"] #tuner-direction {
+  color: #15803d;
+}
+#tuner-readout[data-direction="flat"] #tuner-direction {
+  color: #d97706;
+}
+#tuner-readout[data-direction="sharp"] #tuner-direction {
+  color: #dc2626;
+}
 .focus-page .position-heading h2 {
   font-size: 18px;
   line-height: 1.4;
@@ -506,6 +551,38 @@ html[data-client="desktop"] .focus-page .position-choices .button[aria-pressed="
 }
 
 /* Scheme C1 Desktop Client Architecture: Left Sidebar + Brilliant Tactile Studio */
+html[data-client] .client-lesson-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px 15px;
+}
+html[data-client] .client-lesson-actions .single-start {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+}
+html[data-client] .client-lesson-actions .button,
+html[data-client] .client-lesson-actions .button.wide,
+html[data-client] .client-lesson-actions .button.primary.wide,
+html[data-client] .client-lesson-actions .button.secondary.wide,
+html[data-client="desktop"] .client-lesson-actions .button.primary.wide,
+html[data-client="desktop"] .client-lesson-actions .button.secondary.wide {
+  min-height: 42px;
+  height: 42px;
+  padding: 0 16px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 @media (min-width: 761px) {
   html[data-client="desktop"] body:not(.is-focusing) #root {
     display: grid;
@@ -644,6 +721,12 @@ html[data-client="desktop"] .focus-page .position-choices .button[aria-pressed="
     border-radius: 18px;
     background: #fff;
     box-shadow: 0 4px 0 #edf0f7;
+  }
+  html[data-client="desktop"] .client-lesson-actions .button.primary.wide {
+    box-shadow: 0 3px 0 #2137a8;
+  }
+  html[data-client="desktop"] .client-lesson-actions .button.secondary.wide {
+    box-shadow: 0 3px 0 #e4e7f0;
   }
   html[data-client="desktop"] .focus-page {
     max-width: none;

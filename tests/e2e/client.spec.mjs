@@ -19,6 +19,10 @@ for (const viewport of [{width:1280,height:720},{width:800,height:600},{width:39
       await within(page.locator('.client-back'));
     }
     await within(page.locator('[data-start]'));
+    const startRect = await page.locator('[data-start]').boundingBox();
+    const materialRect = await page.locator('.client-lesson-actions [data-material]').boundingBox();
+    expect(Math.abs(startRect.y - materialRect.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(startRect.height - materialRect.height)).toBeLessThanOrEqual(1);
     await page.locator('.client-lesson-content').evaluate(e => e.scrollTop=e.scrollHeight);
     await within(page.locator('[data-start]'));
     expect(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight)).toBe(true);
