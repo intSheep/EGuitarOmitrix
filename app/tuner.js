@@ -1,4 +1,4 @@
-import { STRINGS, detectPitch, tuningReading, TunerTracker } from '../frontend/domain/tuner-model.ts';
+import { STRINGS, detectPitch, tuningReading, TunerTracker, microphoneErrorMessage } from '../frontend/domain/tuner-model.ts';
 
 let panel, stream, audio, toneAudio, source, analyser, loop, generation = 0;
 let samples, lastAnnouncement = '', ignoreInputUntil = 0;
@@ -170,10 +170,7 @@ function stop(message = '麦克风已停止') {
 }
 
 function failure(error) {
-  if (error.name === 'NotAllowedError' || error.name === 'SecurityError') return '未获得麦克风权限。请在系统设置或浏览器地址栏允许访问后重试。';
-  if (error.name === 'NotFoundError' || error.name === 'OverconstrainedError') return '找不到所选输入设备。请连接麦克风或声卡，再重新开启。';
-  if (error.name === 'NotReadableError' || error.name === 'AbortError') return '无法读取输入设备。请检查设备连接及其他应用的占用，再重试。';
-  return '麦克风未能启动。请检查浏览器和设备后重试。';
+  return microphoneErrorMessage(error);
 }
 
 async function devices(token) {

@@ -851,3 +851,404 @@ html[data-client="desktop"] .client-lesson-actions .button.secondary.wide {
     font-size: 10px;
   }
 }
+
+/* Chromatic ear-training pitch playground on the white focus canvas */
+.pitch-launch-row {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+.pitch-launch-row .button.pitch-launch-btn {
+  border: 2px solid #c7d2fe;
+  border-radius: 14px;
+  background: #eef2ff;
+  color: #2b45d2;
+  font-weight: 750;
+  box-shadow: 0 3px 0 #dbe4ff;
+}
+.pitch-launch-row .button.pitch-launch-btn:hover {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #1e36b0;
+}
+.focus-page.has-pitch-stage .focus-main {
+  overflow: hidden;
+  padding: 10px 0;
+}
+#focus-clock[data-pitch-stage="true"] {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.pitch-stage {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 10px;
+}
+.pitch-stage-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  flex: 0 0 auto;
+}
+.pitch-timer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 13px;
+  border: 2px solid #e2e6f0;
+  border-radius: 999px;
+  background: #f8faff;
+  font-variant-numeric: tabular-nums;
+}
+.pitch-timer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+.pitch-timer-dot.is-running {
+  background: #3f5cf0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pitch-timer-dot.is-running {
+    animation: pitch-dot-pulse 1.8s ease-in-out infinite;
+  }
+}
+@keyframes pitch-dot-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.pitch-timer-chip #timer-state {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b5263;
+}
+.pitch-timer-chip #timer-value {
+  display: inline;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.pitch-stage-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  flex: 1;
+  min-width: 0;
+}
+.pitch-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 10px;
+  border: 2px solid #e2e6f0;
+  border-radius: 12px;
+  background: #fff;
+}
+.pitch-device-select {
+  max-width: 170px;
+  min-width: 0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  color: #3f4656;
+  border: 0;
+  background: transparent;
+  text-overflow: ellipsis;
+}
+.pitch-level {
+  width: 44px;
+  height: 5px;
+  flex: none;
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  background: #edf0f7;
+  overflow: hidden;
+}
+.pitch-level::-webkit-meter-bar {
+  border: 0;
+  border-radius: 999px;
+  background: #edf0f7;
+  height: 5px;
+}
+.pitch-level::-webkit-meter-optimum-value {
+  background: #3f5cf0;
+  border-radius: 999px;
+}
+.pitch-level::-moz-meter-bar {
+  background: #3f5cf0;
+}
+.pitch-stage-status {
+  font-size: 12px;
+  font-weight: 650;
+  color: #64748b;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pitch-stage-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.pitch-stage-board {
+  position: relative;
+  flex: 1;
+  min-height: 220px;
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid #e2e6f0;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 4px 0 #edf0f7;
+}
+.pitch-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.pitch-hero {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 222px;
+  padding: 20px 18px 16px;
+  border: 2px solid #e2e6f0;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 0.92);
+  backdrop-filter: blur(8px);
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 8px 28px rgb(23 32 58 / 0.06);
+}
+.pitch-hero.has-reading {
+  border-color: #c7d2fe;
+}
+.pitch-hero-caption {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+}
+.pitch-hero-note {
+  font-size: clamp(54px, 7vw, 76px);
+  line-height: 1.05;
+  font-weight: 850;
+  letter-spacing: -0.05em;
+  color: #101114;
+  margin: 6px 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+.pitch-hero.has-reading .pitch-hero-note {
+  color: #2943c4;
+}
+.pitch-hero-note sub {
+  font-size: 0.38em;
+  vertical-align: baseline;
+  margin-left: 4px;
+  letter-spacing: 0;
+  color: #64748b;
+  font-weight: 750;
+}
+.pitch-hero-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 24px;
+  margin-bottom: 10px;
+}
+.pitch-solfege-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #edf1ff;
+  color: #2d47c7;
+  font-size: 12px;
+  font-weight: 750;
+}
+.pitch-hz {
+  font-size: 12px;
+  font-weight: 650;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+}
+.pitch-cents-track {
+  position: relative;
+  width: 104px;
+  height: 10px;
+  margin: 0 auto 6px;
+  border-radius: 999px;
+  background: #eef1fa;
+  border: 1px solid #dce3f6;
+}
+.pitch-cents-center {
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  bottom: 1px;
+  width: 18px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #dbe3ff;
+}
+.pitch-cents-thumb {
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: #3f5cf0;
+  transition: opacity 120ms ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pitch-cents-thumb {
+    transition:
+      transform 80ms linear,
+      opacity 120ms ease;
+  }
+}
+.pitch-cents-readout {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  font-variant-numeric: tabular-nums;
+}
+.pitch-last-note {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f5;
+  font-size: 11px;
+  font-weight: 650;
+  color: #64748b;
+}
+.pitch-privacy-tag {
+  position: absolute;
+  right: 22px;
+  bottom: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b919d;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .focus-page.has-pitch-stage .focus-main {
+    padding: 6px 0;
+  }
+  .pitch-stage-top {
+    gap: 6px 8px;
+  }
+  .pitch-stage-controls {
+    display: contents;
+  }
+  .pitch-timer-chip {
+    order: 1;
+  }
+  .pitch-stage-actions {
+    order: 2;
+    margin-left: auto;
+  }
+  .pitch-input-wrap {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+  .pitch-stage-status {
+    order: 4;
+    flex-basis: 100%;
+    max-width: none;
+    white-space: normal;
+  }
+  [data-pitch-status="listening"] .pitch-stage-status {
+    display: none;
+  }
+  .pitch-device-select {
+    max-width: none;
+    flex: 1;
+  }
+}
+
+@media (max-width: 639px) {
+  .pitch-privacy-tag {
+    right: auto;
+    left: 14px;
+    bottom: 10px;
+  }
+  .pitch-hero {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    transform: none;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 2px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    text-align: left;
+  }
+  .pitch-hero-caption {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 11px;
+  }
+  .pitch-hero-note {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 34px;
+    margin: 0;
+  }
+  .pitch-hero-meta {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin: 0;
+    gap: 6px;
+  }
+  .pitch-cents-track {
+    grid-column: 3;
+    grid-row: 1;
+    width: 84px;
+    margin: 0;
+  }
+  .pitch-cents-readout {
+    grid-column: 3;
+    grid-row: 2;
+    text-align: right;
+    font-size: 11px;
+  }
+  .pitch-last-note {
+    display: none;
+  }
+}
