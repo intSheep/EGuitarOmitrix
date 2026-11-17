@@ -43,6 +43,7 @@ import {
   type Backup,
 } from "../domain/types";
 import { Metronome } from "../audio/metronome";
+import { stopPitchCapture } from "../audio/pitch-capture";
 import { pauseScore, closeScore } from "../../app/score-viewer.js";
 import { closeTuner, stopTunerCapture } from "../../app/tuner.js";
 import { saveFile } from "../platform/file-export";
@@ -362,6 +363,7 @@ export function setTool(tool: Tool) {
   if (state.tool === tool) return;
   closeScore();
   closeTuner();
+  stopPitchCapture();
   metro.stop();
   patch({ tool, metroPlaying: false });
 }
@@ -487,6 +489,7 @@ export async function launchMaterial(id: string, from?: number) {
     sample();
     stopSound();
     stopTunerCapture();
+    stopPitchCapture();
     if (state.draft?.running) {
       await persist();
     } else if (db && navigator.locks) {
@@ -607,6 +610,7 @@ export async function restoreBackup(
 export async function prepareForBackground() {
   sample();
   stopTunerCapture();
+  stopPitchCapture("页面已离开，麦克风已停止。返回后可重新开启。");
   stopSound();
   // A finish transaction owns the draft until commit; a late background write
   // must not recreate the active draft after finishDraft deletes it.
@@ -619,6 +623,7 @@ export async function prepareForClose() {
     throw Error("请先保存或关闭当前编辑，再退出应用。");
   await reviewQueue;
   stopTunerCapture();
+  stopPitchCapture();
   await pause("应用已关闭，练习已暂停");
   await queue;
 }
@@ -700,6 +705,7 @@ export async function initialize() {
 export function disposeController() {
   clearInterval(timer);
   closeTuner();
+  stopPitchCapture();
   closeScore();
   metro.stop();
   release?.();

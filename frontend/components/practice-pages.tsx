@@ -19,6 +19,8 @@ import {
   closePositionReference,
 } from "../../app/position-reference.js";
 import { Materials } from "./records";
+import { PitchStage } from "./pitch-stage";
+import { startPitchCapture, stopPitchCapture } from "../audio/pitch-capture";
 
 const toolIcons: Record<Exclude<c.Tool, null>, ReactNode> = {
   tuner: (
@@ -262,6 +264,7 @@ const tools: [Exclude<c.Tool, null>, string][] = [
 export function Focus() {
   const s = usePractice(),
     d = s.draft;
+  const [pitchOpen, setPitchOpen] = useState(false);
   if (!d)
     return (
       <>
@@ -271,8 +274,11 @@ export function Focus() {
     );
   const e = c.lesson(d.entryId),
     p = teacherPrescription(c.assignment(e.id));
+  const showPitchStage = pitchOpen && !s.tool;
   return (
-    <section className={`focus-page ${s.tool ? "has-focus-tool" : ""}`}>
+    <section
+      className={`focus-page ${s.tool ? "has-focus-tool" : ""} ${showPitchStage ? "has-pitch-stage" : ""}`}
+    >
       <div className="focus-top">
         <div className="focus-top-left">
           <div className="focus-course">
@@ -318,7 +324,11 @@ export function Focus() {
                     : key === "tuner"
                       ? { "data-tuner": "" }
                       : { "data-action": "metronome" })}
-              onClick={() => c.run(() => c.openTool(key))}
+              onClick={() => {
+                setPitchOpen(false);
+                stopPitchCapture();
+                c.run(() => c.openTool(key));
+              }}
             >
               {toolIcons[key]}
               <span>{label}</span>
@@ -329,38 +339,65 @@ export function Focus() {
         <div
           id="focus-clock"
           className={d.running ? "clock-running" : ""}
+          data-pitch-stage={showPitchStage ? "true" : undefined}
           hidden={!!s.tool}
         >
-          <div className="timer-orbit">
-            <div className="ambient-orbit" />
-            <svg
-              className="timer-dial"
-              viewBox="0 0 280 280"
-              aria-hidden="true"
-            >
-              <circle
-                cx="140"
-                cy="140"
-                r="134"
-                fill="none"
-                stroke="#e2e8f0"
-                strokeWidth="2"
-              />
-              {dialTicks}
-            </svg>
-            <div className="timer-content">
-              <p id="timer-state" role="status">
-                {d.running ? "练习中" : d.reason || "已暂停"}
-              </p>
-              <strong id="timer-value" role="timer" aria-label="练习时间">
-                {clock(d.elapsedMs / 1000)}
-              </strong>
-              <span>练习时间</span>
-            </div>
-          </div>
-          <div id="focus-requirements">
-            <Requirements id={e.id} />
-          </div>
+          {showPitchStage ? (
+            <PitchStage
+              running={d.running}
+              reason={d.reason}
+              elapsedMs={d.elapsedMs}
+              onClose={() => setPitchOpen(false)}
+            />
+          ) : (
+            <>
+              <div className="timer-orbit">
+                <div className="ambient-orbit" />
+                <svg
+                  className="timer-dial"
+                  viewBox="0 0 280 280"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="140"
+                    cy="140"
+                    r="134"
+                    fill="none"
+                    stroke="#e2e8f0"
+                    strokeWidth="2"
+                  />
+                  {dialTicks}
+                </svg>
+                <div className="timer-content">
+                  <p id="timer-state" role="status">
+                    {d.running ? "练习中" : d.reason || "已暂停"}
+                  </p>
+                  <strong id="timer-value" role="timer" aria-label="练习时间">
+                    {clock(d.elapsedMs / 1000)}
+                  </strong>
+                  <span>练习时间</span>
+                </div>
+              </div>
+              <div className="pitch-launch-row">
+                <Button
+                  className="pitch-launch-btn"
+                  data-action="pitch-open"
+                  onClick={() => {
+                    setPitchOpen(true);
+                    void startPitchCapture();
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+                    <path d="M4 12h2l2-5 3 10 3-8 2 5 2-2h2" />
+                  </svg>
+                  <span>开启实时音高（模唱）</span>
+                </Button>
+              </div>
+              <div id="focus-requirements">
+                <Requirements id={e.id} />
+              </div>
+            </>
+          )}
         </div>
         {s.tool && <ToolSurface tool={s.tool} id={e.id} />}
       </div>

@@ -410,3 +410,17 @@ React + TypeScript desktop/web workspace and focus stage:
   and `390×560` viewports, and `npm run package:mac` builds and verifies both
   `mac-arm64` and `mac-x64` DMG/ZIP distributions (`0.5.0`).
 
+
+### Live pitch and singing practice — 2026-11-17
+
+The focus screen plots detected monophonic guitar or voice pitch locally using
+microphone input. Pitch readings stay transient and do not populate session
+results or proficiency. The tool releases capture separately from the manual
+practice clock.
+
+Type checking, frontend lint, five React tests, seven tuner unit tests and the
+sanitized distribution inventory passed. Ten targeted Chromium checks passed
+with synthetic audio and isolated profiles. They cover note changes, silence,
+permission denial, viewport fit, capture cleanup and manual timing across tool
+and lifecycle changes. Physical microphone and installed-device behavior were
+outside these local checks.
