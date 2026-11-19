@@ -40,8 +40,11 @@ try {
     const capture = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
     navigator.mediaDevices.getUserMedia = async constraints => { const stream = await capture(constraints); testStreams.push(stream); return stream; };
   });
+  await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].focus());
   await page.locator('[data-tuner]').first().click();
-  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-dialog')).toBeVisible();
+  if (await page.locator('#tuner-start').isVisible()) await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-stop')).toBeVisible();
   await expect.poll(() => page.evaluate(() => testStreams.length)).toBe(1);
   await page.keyboard.press('Escape');
   await expect.poll(() => page.evaluate(() => testStreams.every(stream => stream.getTracks().every(track => track.readyState === 'ended')))).toBe(true);
@@ -51,8 +54,11 @@ try {
   const draft = () => page.evaluate(async () => { const m = await import('./practice-store.js'), db = await m.openPracticeDB(); const d = await m.readDraft(db); db.close(); return d; });
   await expect.poll(async () => (await draft())?.elapsedMs || 0).toBeGreaterThan(1000);
   // Capture cleanup is independent of the practice timer.
+  await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].focus());
   await page.locator('[data-tuner]').click();
-  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-dialog')).toBeVisible();
+  if (await page.locator('#tuner-start').isVisible()) await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-stop')).toBeVisible();
   await expect.poll(() => page.evaluate(() => testStreams.length)).toBe(2);
   // Xvfb/WSLg may not have a window manager; simulate the native background signal.
   await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].emit('blur'));
