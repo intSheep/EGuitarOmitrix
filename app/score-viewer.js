@@ -5,6 +5,7 @@ let sdk,
   generation = 0,
   urls = [];
 let dialog;
+let resizeCleanup = () => {};
 let cancelPreparation = () => {};
 let countInEnabled = false;
 try { countInEnabled = localStorage.getItem(COUNT_IN_KEY) === "true"; } catch {}
@@ -25,6 +26,8 @@ const localPath = (p) => {
   return "./local-scores/" + p;
 };
 function dispose() {
+  resizeCleanup();
+  resizeCleanup = () => {};
   cancelPreparation();
   cancelPreparation = () => {};
   generation++;
@@ -51,9 +54,9 @@ function download(bytes, name, type) {
 /**
  * @param {string} entryId
  * @param {string} title
- * @param {{host?: HTMLElement | null, onClose?: (() => void) | null}} [options]
+ * @param {{host?: HTMLElement | null, onClose?: (() => void) | null, onPlayStart?: (() => void) | null}} [options]
  */
-export async function showScore(entryId, title, { host = null, onClose = null } = {}) {
+export async function showScore(entryId, title, { host = null, onClose = null, onPlayStart = null } = {}) {
   if (!dialog) {
     dialog = document.createElement("dialog");
     dialog.id = "score-dialog";
@@ -105,6 +108,27 @@ export async function showScore(entryId, title, { host = null, onClose = null } 
       defaultBpm = null,
       selection = 0,
       manualSelected = false;
+    const renderHost = dialog.querySelector("#score-render");
+    let lastRenderWidth = renderHost.clientWidth || 0;
+    let resizeTimer = null;
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(() => {
+        if (token !== generation || !loaded || renderHost.hidden) return;
+        const w = renderHost.clientWidth;
+        if (!w || Math.abs(w - lastRenderWidth) < 24) return;
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (token !== generation || !loaded || renderHost.hidden) return;
+          lastRenderWidth = renderHost.clientWidth;
+          try { player.render(); } catch {}
+        }, 140);
+      });
+      ro.observe(renderHost);
+      resizeCleanup = () => {
+        clearTimeout(resizeTimer);
+        ro.disconnect();
+      };
+    }
     const update = () => {
       dialog.querySelector("#score-play").disabled = !(loaded && ready);
       dialog.querySelector("#score-stop").disabled = !loaded;
@@ -129,6 +153,7 @@ export async function showScore(entryId, title, { host = null, onClose = null } 
       loaded = true;
       position = null;
       dialog.querySelector("#score-render").hidden = false;
+      lastRenderWidth = renderHost.clientWidth || lastRenderWidth;
       dialog.querySelector("#score-loop").disabled = false;
       const tempo = score.tempo;
       const bpm = dialog.querySelector("#score-bpm");
@@ -167,6 +192,7 @@ export async function showScore(entryId, title, { host = null, onClose = null } 
         player.pause();
         return;
       }
+      onPlayStart?.();
       if (!countInEnabled) { player.play(); return; }
       const request = ++playRequest;
       try {

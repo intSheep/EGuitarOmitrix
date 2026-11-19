@@ -90,6 +90,7 @@ public class AppUpdatePlugin extends Plugin {
     }
     @PluginMethod
     public void check(PluginCall call) {
+        boolean automatic = call.getBoolean("automatic", false);
         ui(() -> {
             if (busy) { call.reject("正在处理更新，请稍候"); return; }
             busy = true;
@@ -101,6 +102,7 @@ public class AppUpdatePlugin extends Plugin {
                     long code = UpdatePolicy.versionCode(version);
                     PackageInfo installed = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
                     if (code <= packageVersion(installed)) {
+                        if (automatic) { ui(() -> done(call)); return; }
                         ui(() -> { dialog = new AlertDialog.Builder(getActivity()).setTitle("已是最新版本")
                             .setMessage("当前版本 " + installed.versionName).setPositiveButton("好的", (d,w) -> {})
                             .setOnDismissListener(d -> done(call)).show(); }); return;
@@ -127,7 +129,9 @@ public class AppUpdatePlugin extends Plugin {
                             .setPositiveButton("下载更新", (d,w) -> download(call, target, url, code))
                             .setOnCancelListener(d -> done(call)).show();
                     });
-                } catch (Exception error) { fail(call, error); }
+                } catch (Exception error) {
+                    if (automatic) ui(() -> done(call)); else fail(call, error);
+                }
             });
         });
     }

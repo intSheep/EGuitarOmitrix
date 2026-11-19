@@ -107,3 +107,11 @@ consent and a practice-save barrier while Apple Developer ID signing and
 notarization remain deferred. Test closing a window, Dock activation, Cmd+Q, save failures, system
 microphone denial, physical sleep and retained data during replacement on target
 hardware before claiming full client acceptance. See the dated validation entry.
+
+## Update interaction refinement — 2026-11-17
+
+Native clients show the installed version beneath the product name. An automatic
+check on launch is quiet unless a newer compatible release is available. Manual
+checks are in desktop **帮助 → 检查更新** and Android **练习回顾 → 备份与管理**.
+On macOS, **保存并重启** saves and pauses the practice draft before verified
+same-volume staging and replacement. Errors surface in a native dialog.

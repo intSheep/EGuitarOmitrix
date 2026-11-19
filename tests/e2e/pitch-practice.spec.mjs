@@ -1,5 +1,6 @@
 // Synthetic WebAudio pitch fixtures; never touches the owner's profile or real microphone.
 import { test, expect } from "@playwright/test";
+import { syntheticScore } from "../fixtures/synthetic-score.mjs";
 
 const draft = (page) =>
   page.evaluate(async () => {
@@ -163,8 +164,106 @@ for (const viewport of [
     await expect(page.locator("[data-pitch-note]")).toHaveText("—");
     await expect(page.locator("[data-pitch-last]")).toContainText("D4");
 
-    // Switching tools releases microphone capture without pausing manual practice timing.
+    // Opening metronome keeps pitch stage open and capture alive simultaneously.
+    await page.evaluate(() => window.pitchQA.setTone(261.63, 0.25));
+    await page.locator("[data-action=metronome]").click();
+    await expect(page.locator("#metro-panel")).toBeVisible();
+    await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
+    await page.locator("[data-action=metro-toggle]").click();
+    await expect(page.locator("[data-action=metro-toggle]")).toHaveText(
+      "停止节拍",
+    );
+    await expect(
+      page.locator('[data-action=metronome][data-playing="true"]'),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(() =>
+        window.pitchQA.streams.some((s) =>
+          s.getTracks().some((t) => t.readyState === "live"),
+        ),
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `test-results/pitch-metronome-${viewport.width}.png`,
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    for (const selector of [
+      ".pitch-stage-board",
+      "#metro-panel",
+      "[data-action=pause]",
+      "[data-action=finish]",
+    ]) {
+      const rect = await page.locator(selector).boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height + 1);
+    }
+
+    // Switching to score keeps BOTH pitch capture AND active metronome running.
     await page.locator("[data-score]").click();
+    await expect(page.locator("#score-dialog")).toBeVisible();
+    await page.locator(".score-options summary").click();
+    await expect(page.locator("#score-file")).toBeEnabled();
+    await page.locator("#score-file").setInputFiles({
+      name: "synthetic.musicxml",
+      mimeType: "application/xml",
+      buffer: Buffer.from(syntheticScore),
+    });
+    await expect(page.locator("#score-play")).toBeEnabled();
+    await page.locator(".score-options summary").click();
+    await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
+    await expect(
+      page.locator('[data-action=metronome][data-playing="true"]'),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `test-results/pitch-score-${viewport.width}.png`,
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    for (const selector of [
+      ".pitch-stage-board",
+      "#focus-tool-content",
+      "[data-action=pause]",
+      "[data-action=finish]",
+    ]) {
+      const rect = await page.locator(selector).boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height + 1);
+    }
+
+    // Closing and reopening pitch directly from the dock works while score stays open.
+    await page.locator("[data-action=pitch-toggle]").click();
+    await expect(page.locator(".pitch-stage")).toHaveCount(0);
+    await expect(page.locator("#score-dialog")).toBeVisible();
+    await page.locator("[data-action=pitch-toggle]").click();
+    await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
+    await expect(page.locator("#score-dialog")).toBeVisible();
+
+    // Switching to tuner releases prior pitch capture, starts tuner immediately, and omits privacy caption.
+    const priorStreamCount = await page.evaluate(
+      () => window.pitchQA.streams.length,
+    );
+    await page.locator("[data-tuner]").click();
+    await expect(
+      page.locator('#tuner-dialog[data-listening="true"]'),
+    ).toBeVisible();
+    await page.waitForFunction(
+      (count) =>
+        window.pitchQA.streams
+          .slice(0, count)
+          .every((s) => s.getTracks().every((t) => t.readyState === "ended")),
+      priorStreamCount,
+    );
+    await expect(page.locator(".tuner-privacy")).toHaveCount(0);
+    await expect(page.locator(".pitch-privacy-tag")).toHaveCount(0);
+    // Navigating away cancels tuner microphone capture cleanly.
+    await page.locator("#focus-back").click();
     await page.waitForFunction(() =>
       window.pitchQA.streams.every((s) =>
         s.getTracks().every((t) => t.readyState === "ended"),
@@ -172,6 +271,81 @@ for (const viewport of [
     );
     expect((await draft(page)).running).toBe(true);
     expect(errors).toEqual([]);
+  });
+}
+
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 1280, height: 720 },
+]) {
+  test(`tuner auto-starts in one click, fits MacBook ${viewport.width}x${viewport.height} without scrolling, and cancels on navigation`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await setupSyntheticAudio(page, "normal");
+    await page.goto("/#practice?view=lesson");
+
+    // 1. Standalone modal on Workspace: one click opens and starts capture immediately.
+    await page.locator("[data-tuner]").click();
+    await expect(
+      page.locator('#tuner-dialog[data-listening="true"]'),
+    ).toBeVisible();
+    await expect(page.locator("#tuner-stop")).toBeVisible();
+    await expect(page.locator(".tuner-privacy")).toHaveCount(0);
+    const modalRect = await page.locator("#tuner-stop").boundingBox();
+    expect(modalRect.y + modalRect.height).toBeLessThanOrEqual(
+      viewport.height,
+    );
+    expect(
+      await page.locator("#tuner-dialog").evaluate((el) => el.scrollTop),
+    ).toBe(0);
+    await page.screenshot({
+      path: `test-results/tuner-modal-${viewport.width}.png`,
+    });
+
+    // Closing modal releases capture.
+    await page.locator("#tuner-close").click();
+    await page.waitForFunction(() =>
+      window.pitchQA.streams.every((s) =>
+        s.getTracks().every((t) => t.readyState === "ended"),
+      ),
+    );
+
+    // 2. Focus mode: one click starts tuner and fits completely inside viewport without scrolling.
+    await page.locator("[data-start]:enabled").click();
+    await page.locator("[data-tuner]").click();
+    await expect(
+      page.locator('#tuner-dialog[data-listening="true"]'),
+    ).toBeVisible();
+    for (const selector of [
+      ".tuner-instrument",
+      "#tuner-readout",
+      "#tuner-stop",
+      "[data-action=pause]",
+      "[data-action=finish]",
+    ]) {
+      const rect = await page.locator(selector).boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height + 1);
+    }
+    expect(
+      await page
+        .locator(".focus-main")
+        .evaluate((el) => el.scrollHeight <= el.clientHeight + 1),
+    ).toBe(true);
+    await page.screenshot({
+      path: `test-results/tuner-focus-${viewport.width}.png`,
+    });
+
+    // Navigating to another route cancels capture immediately.
+    await page.locator("[data-action=practice-menu]").click();
+    await page.locator(".practice-menu").getByRole("link", { name: "课程目录" }).click();
+    await page.waitForFunction(
+      () =>
+        window.pitchQA.streams.every((s) =>
+          s.getTracks().every((t) => t.readyState === "ended"),
+        ) && window.pitchQA.contexts.every((c) => c.state === "closed"),
+    );
   });
 }
 
@@ -215,4 +389,79 @@ test("pitch stage releases capture on background and handles permission denial",
   await expect(deniedPage.locator("[data-action=pitch-retry]")).toBeVisible();
   expect((await draft(deniedPage)).running).toBe(true);
   await deniedCtx.close();
+});
+
+test("workspace standalone pitch playground and position-reference live linkage work", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await setupSyntheticAudio(page, "normal");
+  await page.goto("/#practice?view=lesson");
+
+  // 1. Open standalone pitch playground right from the home screen without starting practice.
+  await page.locator("[data-action=workspace-pitch]").click();
+  await expect(page.locator("#pitch-playground-dialog")).toBeVisible();
+  expect(await draft(page)).toBeNull();
+  await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
+
+  // Interval pill appears on consecutive distinct notes, and freeze/zen/guide/target controls work.
+  await page.evaluate(() => window.pitchQA.setTone(293.66, 0.25));
+  await expect(page.locator("[data-pitch-note]")).toHaveText("D4");
+  await expect(page.locator("[data-pitch-interval]")).toHaveText("↑ 大二度");
+
+  await page.getByRole("button", { name: "空弦" }).click();
+  await page.locator("[data-action=pitch-freeze]").click();
+  await expect(page.locator('[data-pitch-frozen="true"]')).toBeVisible();
+  await page.locator("[data-action=pitch-freeze]").click();
+
+  const canvasBox = await page.locator(".pitch-canvas").boundingBox();
+  await page.mouse.click(
+    canvasBox.x + canvasBox.width * 0.5,
+    canvasBox.y + canvasBox.height * 0.5,
+  );
+  await expect(page.locator("[data-action=pitch-unlock-target]")).toBeVisible();
+  await page.locator("[data-action=pitch-unlock-target]").click();
+  await expect(page.locator("[data-action=pitch-unlock-target]")).toHaveCount(
+    0,
+  );
+
+  await page.locator("[data-action=pitch-zen]").click();
+  await expect(page.locator(".pitch-hero")).toHaveCount(0);
+  await page.locator("[data-action=pitch-zen]").click();
+  await expect(page.locator(".pitch-hero")).toBeVisible();
+
+  await page.screenshot({
+    path: "test-results/pitch-playground-1280.png",
+  });
+
+  // Closing standalone playground releases capture cleanly.
+  await page.locator("[data-action=pitch-close]").click();
+  await expect(page.locator("#pitch-playground-dialog")).toHaveCount(0);
+  await page.waitForFunction(() =>
+    window.pitchQA.streams.every((s) =>
+      s.getTracks().every((t) => t.readyState === "ended"),
+    ),
+  );
+
+  // 2. Focus mode: position reference + live pitch lights up exact & octave frets.
+  await page.evaluate(() => window.pitchQA.setTone(261.63, 0.25));
+  await page.locator("[data-start]:enabled").click();
+  await page.locator("[data-position-reference]").click();
+  await page.locator("[data-action=pitch-toggle]").click();
+  await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
+  await expect(
+    page.locator('#position-dialog [data-fret-midi="60"][data-live-match="exact"]'),
+  ).toHaveCount(1);
+  await expect(
+    page.locator('#position-dialog [data-fret-midi="48"][data-live-match="octave"]'),
+  ).toHaveCount(1);
+
+  // Clicking a fretboard note plays reference sound without errors.
+  await page.locator('#position-dialog [data-fret-midi="60"]').click();
+  await page.screenshot({
+    path: "test-results/pitch-position-1280.png",
+  });
+  expect(errors).toEqual([]);
 });

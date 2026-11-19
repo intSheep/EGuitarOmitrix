@@ -100,7 +100,7 @@ else {
       ? (process.platform === 'win32'
         ? require('electron-updater').autoUpdater
         : process.platform === 'darwin'
-          ? createMacUpdater({ currentVersion: app.getVersion() })
+          ? createMacUpdater({ currentVersion: app.getVersion(), app })
           : null)
       : null;
     const updates = updaterInstance
@@ -158,6 +158,7 @@ else {
     ]));
     window.setAutoHideMenuBar(false);
     window.setMenuBarVisibility(true);
+    if (updates) void updates.check({ automatic: true });
   }).catch(error => { dialog.showErrorBox('EGuitarOmitrix', '应用无法启动：' + error.message); app.exit(1); });
   app.on('before-quit', event => {
     if (quitting) return;

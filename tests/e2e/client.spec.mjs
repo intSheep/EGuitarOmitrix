@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 for (const viewport of [{width:1280,height:720},{width:800,height:600},{width:390,height:700},{width:390,height:560}]) {
   test(`client keeps navigation and primary actions visible at ${viewport.width}x${viewport.height}`, async ({page}) => {
     await page.setViewportSize(viewport);
-    await page.addInitScript(() => { window.eguitarMinPracticeMs = 1000; window.eguitarDesktop = {checkUpdates: async () => { window.updateChecks = (window.updateChecks || 0) + 1; }}; });
+    await page.addInitScript(() => { window.eguitarMinPracticeMs = 1000; window.eguitarDesktop = {checkUpdates: async () => {}}; });
     const errors=[]; page.on('pageerror', e=>errors.push(e.message));
     await page.goto('/');
     await expect(page.locator('[data-start]')).toBeEnabled();
@@ -11,7 +11,10 @@ for (const viewport of [{width:1280,height:720},{width:800,height:600},{width:39
       await expect(locator).toBeVisible();
       const b=await locator.boundingBox(); expect(b.y).toBeGreaterThanOrEqual(0); expect(b.y+b.height).toBeLessThanOrEqual(viewport.height+1);
     };
-    await within(page.locator('#client-update'));
+    await within(page.locator('.app-version'));
+    const version = await page.evaluate(async () => (await (await fetch('./build-info.json')).json()).version);
+    await expect(page.locator('.app-version')).toHaveText('v' + version);
+    await expect(page.getByRole('button', { name: '检查更新' })).toHaveCount(0);
     await within(page.locator('[data-nav=history]'));
     if(viewport.width<=760) {
       await expect(page.locator('.lesson-detail')).toBeHidden();
@@ -26,8 +29,6 @@ for (const viewport of [{width:1280,height:720},{width:800,height:600},{width:39
     await page.locator('.client-lesson-content').evaluate(e => e.scrollTop=e.scrollHeight);
     await within(page.locator('[data-start]'));
     expect(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight)).toBe(true);
-    await page.locator('#client-update').click();
-    expect(await page.evaluate(()=>window.updateChecks)).toBe(1);
     await page.locator('.client-lesson-content').evaluate(e=>e.scrollTop=0);
     await page.screenshot({path:`test-results/workspace-${viewport.width}-${viewport.height}.png`});
     await page.locator('[data-start]').click();
@@ -46,12 +47,18 @@ for (const viewport of [{width:1280,height:720},{width:800,height:600},{width:39
 }
 test('Android back returns from detail without navigating out of the client', async ({page})=>{
   await page.setViewportSize({width:390,height:700});
-  await page.addInitScript(()=>{window.Capacitor={getPlatform:()=> 'android',Plugins:{AppUpdate:{check:async()=>{}}}};});
+  await page.addInitScript(()=>{window.Capacitor={getPlatform:()=> 'android',Plugins:{AppUpdate:{check:async options=>{(window.androidUpdateChecks ??= []).push(options.automatic);}}}};});
   await page.goto('/'); await page.locator('.exercise-select').first().click();
   await expect(page.locator('.client-back')).toBeVisible();
   expect(await page.evaluate(()=>eguitarClientBack())).toBe(true);
   await expect(page.locator('.exercise-list')).toBeVisible();
   expect(await page.evaluate(()=>eguitarClientBack())).toBe(false);
+  expect(await page.evaluate(()=>window.androidUpdateChecks)).toEqual([true]);
+  await expect(page.getByRole('button', { name: '检查更新' })).toHaveCount(0);
+  await page.locator('[data-nav=history]').click();
+  await page.locator('[data-action=manage]').click();
+  await page.getByRole('button', { name: '检查更新' }).click();
+  expect(await page.evaluate(()=>window.androidUpdateChecks)).toEqual([true, false]);
 });
 for(const width of [1280,390]) {
   test(`client catalog filters and history management remain reachable at ${width}px`, async ({page})=>{

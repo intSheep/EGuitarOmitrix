@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter, useLocation } from "react-router-dom";
 import { Workspace, Focus, Finish } from "./components/practice-pages";
@@ -12,6 +12,7 @@ import {
   checkUpdates,
   clientBack,
 } from "./platform/client";
+import { version } from "../package.json";
 import "./theme.css";
 
 const navItems: [string, string, string][] = [
@@ -24,10 +25,10 @@ function App() {
   const s = usePractice(),
     location = useLocation(),
     name = location.pathname.replace(/^\//, "") || "practice";
-  const [updating, setUpdating] = useState(false);
   useEffect(() => {
     void c.initialize();
     window.eguitarClientBack = clientBack;
+    if (isAndroid()) void checkUpdates({ automatic: true }).catch(() => {});
   }, []);
   useLayoutEffect(() => {
     document.body.classList.toggle("is-focusing", name === "focus");
@@ -93,11 +94,11 @@ function App() {
         </symbol>
       </svg>
       <header className="app-header">
-        <a className="brand" href="#practice" aria-label="帅帅练琴屋 首页">
+        <a className="brand" href="#practice">
           <img src="./assets/mark.svg" width="32" height="32" alt="" />
           <span className="brand-copy">
             <span>帅帅练琴屋</span>
-            <small className="brand-subtitle">7 周电吉他自学工作台</small>
+            {isClient() && <small className="app-version">v{version}</small>}
           </span>
         </a>
         <nav className="navigation" aria-label="主导航">
@@ -115,24 +116,6 @@ function App() {
             </a>
           ))}
         </nav>
-        {isClient() && (
-          <Button
-            id="client-update"
-            disabled={updating}
-            onClick={() => {
-              setUpdating(true);
-              void checkUpdates()
-                .catch((e) => c.notify(String(e.message)))
-                .finally(() => setUpdating(false));
-            }}
-          >
-            {updating
-              ? "正在检查…"
-              : window.eguitarDesktop?.updatesSupported === false
-                ? "下载与版本说明"
-                : "检查更新"}
-          </Button>
-        )}
       </header>
       <div className="workspace">
         {s.draft && !["practice", "focus", "finish"].includes(name) && (

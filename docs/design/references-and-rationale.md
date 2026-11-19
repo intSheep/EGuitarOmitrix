@@ -214,3 +214,13 @@ Retained in the React + TypeScript implementation (`codex/react-typescript-mac`)
   menu, and single pause/finish pair, and keeps all interactive controls within the
   bounded client viewport.
 
+
+## Installed-client update prompts — 2026-11-17
+
+Stitch project `6723020998384701419`, screen
+`b7bc27e942df482cb9f589b6a245288f`, supplied the update-flow exploration.
+Retained the understated version beneath the product name, the removal of the
+persistent update button, and separate download and restart confirmations.
+Rejected the example version numbers, fabricated release notes, MD5 copy,
+mock system controls, and navigation changes. The native client owns the
+dialogs and displays the installed build version in the existing workspace.

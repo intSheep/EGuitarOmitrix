@@ -2,7 +2,6 @@
 html[data-client], html[data-client] body { height: 100%; overflow: hidden; }
 html[data-client] body { display: flex; flex-direction: column; height: 100dvh; }
 html[data-client] .app-header { display: flex; flex: 0 0 64px; position: relative; padding: 0 24px; gap: 28px; }
-html[data-client] #client-update { margin-left: auto; white-space: nowrap; min-height: 40px; }
 html[data-client] .workspace { width: 100%; max-width: none; min-height: 0; flex: 1; padding: 0 24px 16px; overflow: hidden; }
 html[data-client] #main { height: 100%; min-height: 0; overflow: hidden; }
 html[data-client] #app { height: 100%; min-height: 0; overflow: auto; overscroll-behavior: contain; }
@@ -41,7 +40,6 @@ html[data-client] .storage-banner, html[data-client] .study-panel { flex-shrink:
 @media (max-width: 760px) {
   html[data-client] .app-header { flex-basis: 54px; padding: 0 14px; gap: 8px; }
   html[data-client] .brand { font-size: 15px; }
-  html[data-client] #client-update { font-size: 12px; padding: 6px 10px; }
   html[data-client] .navigation { position: fixed; left: 0; right: 0; bottom: 0; height: 62px; padding-bottom: env(safe-area-inset-bottom); background: white; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; z-index: 20; }
   html[data-client] .navigation a { flex-direction: column; justify-content: center; gap: 2px; font-size: 11px; }
   html[data-client] .navigation a[aria-current="page"]::after { bottom: auto; top: 0; }

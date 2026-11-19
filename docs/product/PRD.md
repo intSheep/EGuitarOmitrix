@@ -448,3 +448,11 @@ versions, goals, viewing evidence and backups remain compatible without a schema
 migration. ARM64 macOS is an unsigned self-use pilot; x64 builds do not establish
 Intel acceptance. Signing/notarization, stores, iOS and automatic planning remain
 out of this revision. Architecture and acceptance boundaries: ADR 0009.
+
+### Installed update interaction — 2026-11-17
+
+FR-024 refinement: show the running package version near the product name. Check
+on native app launch and prompt when a newer compatible stable release is
+available. Retain manual checks in a secondary location. Require explicit
+download and installation consent, preserve the draft barrier, and make macOS
+replacement errors visible and recoverable.

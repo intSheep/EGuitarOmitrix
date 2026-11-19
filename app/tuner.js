@@ -186,6 +186,7 @@ async function devices(token) {
 }
 
 async function start() {
+  if (typeof document !== 'undefined' && document.hidden) return;
   const deviceId = $('device').value;
   stop('正在开启麦克风…');
   const token = generation;
@@ -278,7 +279,7 @@ async function start() {
   }
 }
 
-export function stopTunerCapture() { stop('麦克风已停止。点击开始调音重新开启。'); }
+export function stopTunerCapture() { stop('麦克风已停止。点击重新开启。'); }
 
 export function closeTuner() {
   stop();
@@ -302,7 +303,7 @@ export function showTuner({ host = null, onClose = null } = {}) {
       <div class="tuner-instrument"><img src="./assets/tuner-electric-guitar.png" width="2172" height="724" alt="横向电吉他，琴头在左，两侧各三个调弦旋钮"><svg class="tuner-string-overlay" viewBox="0 0 2172 724" aria-hidden="true">${STRINGS.map((s, i) => `<g data-guitar-string="${s.string}"><path d="M${pegPositions[i][0]} ${pegPositions[i][1]} L350 ${272 + i * 19} L1762 ${282 + i * 23}"/><circle cx="${pegPositions[i][0]}" cy="${pegPositions[i][1]}" r="12"/></g>`).join('')}</svg></div>
       <ol class="tuner-string-status" aria-label="自动识别的目标弦（点击可锁定并播放标准音）">${STRINGS.map(s => `<li data-string-status="${s.string}" role="button" tabindex="0" aria-pressed="false" title="点击播放 ${s.string} 弦 (${s.note}) 标准参考音并锁定该弦"><span>${s.string} 弦</span><strong>${s.note}</strong></li>`).join('')}</ol>
       <div id="tuner-readout"><div class="tuner-note-group"><span id="tuner-target">拨动一根空弦</span><strong id="tuner-note">—</strong></div><div class="tuner-feedback"><div class="tuner-direction-row"><strong id="tuner-direction">等待声音</strong><span id="tuner-adjustment">开启后，逐根拨空弦即可（点击上方弦号可听参考音）</span></div><div class="tuner-deviation" aria-hidden="true"><span class="tuner-deviation-center"></span><i id="tuner-needle" style="visibility:hidden"></i></div><div class="tuner-deviation-labels" aria-hidden="true"><span>偏低 −50</span><span>0</span><span>+50 偏高</span></div><div class="tuner-values"><span id="tuner-frequency">— Hz</span><span id="tuner-cents">— 音分</span></div></div></div>
-      <div class="tuner-footer"><div class="tuner-input-group"><div class="tuner-input"><svg class="tuner-mic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3m-3 0h6"/></svg><label for="tuner-device" class="sr-only">输入设备</label><select id="tuner-device"><option value="">系统默认输入</option></select><meter id="tuner-level" aria-label="输入音量" min="0" max="1" value="0"></meter></div><p id="tuner-status" role="status">开启麦克风，开始调音。</p></div><span id="tuner-announcement" class="sr-only" aria-live="polite"></span><div class="tuner-actions"><button class="button primary" id="tuner-start">开始调音</button><button class="button primary" id="tuner-stop" disabled hidden>停止调音</button></div></div><p class="tuner-privacy">本机处理 · 不保存录音</p>`;
+      <div class="tuner-footer"><div class="tuner-input-group"><div class="tuner-input"><svg class="tuner-mic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3m-3 0h6"/></svg><label for="tuner-device" class="sr-only">输入设备</label><select id="tuner-device"><option value="">系统默认输入</option></select><meter id="tuner-level" aria-label="输入音量" min="0" max="1" value="0"></meter></div><p id="tuner-status" role="status">正在开启麦克风…</p></div><span id="tuner-announcement" class="sr-only" aria-live="polite"></span><div class="tuner-actions"><button class="button primary" id="tuner-start">重新开启</button><button class="button primary" id="tuner-stop" disabled hidden>停止调音</button></div></div>`;
     $('close').onclick = closeTuner;
     $('start').onclick = start;
     $('stop').onclick = () => stop();
@@ -343,7 +344,10 @@ export function showTuner({ host = null, onClose = null } = {}) {
   $('close').onclick = onClose || closeTuner;
   $('close').hidden = !!host;
   updateStringLockUI();
-  stop('开启麦克风，开始调音。');
   if (host) panel.show(); else panel.showModal();
-  devices(generation).catch(() => {});
+  if (document.hidden) {
+    stop('页面已离开，麦克风已停止。返回后可重新开启。');
+  } else {
+    void start();
+  }
 }

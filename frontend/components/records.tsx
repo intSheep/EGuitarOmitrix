@@ -1,4 +1,4 @@
-import { isClient } from "../platform/client";
+import { checkUpdates, isAndroid } from "../platform/client";
 import { EffortReview } from "./effort-review";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -197,19 +197,6 @@ export function DialogHost() {
           <a href="#practice">练习台</a>
           <a href="#catalog">课程目录</a>
           <a href="#history">练习回顾</a>
-          {isClient() && (
-            <Button
-              data-action="client-update"
-              onClick={() => {
-                c.setDialog(null);
-                document
-                  .querySelector<HTMLButtonElement>("#client-update")
-                  ?.click();
-              }}
-            >
-              检查更新
-            </Button>
-          )}
         </nav>
       ) : d.kind === "materials" ? (
         <Materials id={d.id} />
@@ -394,6 +381,17 @@ function Manage() {
           }}
         />
       </label>
+      {isAndroid() && (
+        <Button
+          data-action="client-update"
+          onClick={() => {
+            c.setDialog(null);
+            c.run(() => checkUpdates());
+          }}
+        >
+          检查更新
+        </Button>
+      )}
       <p role="alert">{error}</p>
       <div id="import-preview">
         {pending && (

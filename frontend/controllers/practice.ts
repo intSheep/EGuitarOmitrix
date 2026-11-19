@@ -72,6 +72,7 @@ export interface Snapshot {
   notice: string;
   saved: PracticeLog | null;
   metroPlaying: boolean;
+  metroBpm: number | null;
 }
 let state: Snapshot = {
   course: null,
@@ -90,6 +91,7 @@ let state: Snapshot = {
   notice: "",
   saved: null,
   metroPlaying: false,
+  metroBpm: null,
 };
 const listeners = new Set<() => void>();
 let db: IDBDatabase | null = null,
@@ -176,7 +178,7 @@ function sample() {
 function stopSound() {
   pauseScore();
   metro.stop();
-  patch({ metroPlaying: false });
+  patch({ metroPlaying: false, metroBpm: null });
 }
 export async function pause(reason = "已暂停") {
   if (state.draft && release)
@@ -298,6 +300,7 @@ export async function finish() {
       patch({ draft: null, saved: null });
       release?.();
       release = null;
+      stopPitchCapture();
       setTool(null);
       navigate(`practice?lesson=${entryId}`);
       notify("练习不足 1 分钟，本次未计入记录");
@@ -306,6 +309,7 @@ export async function finish() {
     sessionLog(draft());
     patch({ draft: { ...draft(), finishing: true } });
     await persist();
+    stopPitchCapture();
     setTool(null);
     navigate("finish");
   });
@@ -322,6 +326,7 @@ export async function discard() {
     patch({ draft: null, saved: null });
     release?.();
     release = null;
+    stopPitchCapture();
     setTool(null);
     navigate(`practice?lesson=${entryId}`);
     notify("已放弃本次练习");
@@ -363,9 +368,15 @@ export function setTool(tool: Tool) {
   if (state.tool === tool) return;
   closeScore();
   closeTuner();
-  stopPitchCapture();
-  metro.stop();
-  patch({ tool, metroPlaying: false });
+  // Tuner shares microphone and audio cue space; other tools can coexist with
+  // live pitch capture and an active metronome.
+  if (tool === "tuner") {
+    stopPitchCapture();
+    metro.stop();
+    patch({ tool, metroPlaying: false, metroBpm: null });
+    return;
+  }
+  patch({ tool });
 }
 export async function openTool(tool: Tool) {
   sample();
@@ -378,7 +389,7 @@ export async function toggleMetronome(bpm: number) {
   sample();
   if (metro.running) {
     metro.stop();
-    patch({ metroPlaying: false });
+    patch({ metroPlaying: false, metroBpm: null });
     return;
   }
   if (!draft().running) throw Error("请先继续练习");
@@ -390,14 +401,15 @@ export async function toggleMetronome(bpm: number) {
     throw Error("BPM 请输入 20–300 之间的整数");
   if (prescription.fixedBpm && bpm !== prescription.fixedBpm)
     throw Error("请保持老师要求的固定速度");
+  pauseScore();
   metro.bpm = bpm;
   await metro.start();
-  patch({ metroPlaying: true });
+  patch({ metroPlaying: true, metroBpm: bpm });
 }
 export function stopMetronome() {
   sample();
   metro.stop();
-  patch({ metroPlaying: false });
+  patch({ metroPlaying: false, metroBpm: null });
 }
 export async function connectStorage() {
   if (connection) return connection;
