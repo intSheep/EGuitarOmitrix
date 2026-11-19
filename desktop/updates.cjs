@@ -1,16 +1,20 @@
 // Main-process update authority. The renderer can request a check only; native dialogs control download/install.
 const { createHash } = require('node:crypto');
-const { mkdtemp, rm, stat, writeFile } = require('node:fs/promises');
+const { constants, createWriteStream } = require('node:fs');
+const { access, mkdtemp, readFile, rename, rm, stat } = require('node:fs/promises');
+const { Transform } = require('node:stream');
+const { pipeline } = require('node:stream/promises');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
 const { execFile } = require('node:child_process');
 
 const RELEASES_API = 'https://api.github.com/repos/intSheep/EGuitarOmitrix/releases/latest';
-const MAX_MAC_ZIP = 300 * 1024 * 1024;
+const MAX_MAC_ZIP = 512 * 1024 * 1024;
+const MAC_BUNDLE_ID = 'io.github.intsheep.eguitaromitrix';
 
 function runFile(cmd, args) {
   return new Promise((resolve, reject) => {
-    execFile(cmd, args, error => (error ? reject(error) : resolve()));
+    execFile(cmd, args, (error, stdout) => (error ? reject(error) : resolve(stdout)));
   });
 }
 
@@ -65,15 +69,45 @@ async function fetchReleaseJSON(url, fetchImpl = fetch) {
   return JSON.parse(text);
 }
 
-function createMacUpdater({ currentVersion, arch = process.arch, exePath = process.execPath, fetchImpl = fetch, installBundle } = {}) {
+async function replaceMacBundle(candidate, bundle, backup, move = rename) {
+  await move(bundle, backup);
+  try {
+    await move(candidate, bundle);
+  } catch (installError) {
+    try {
+      await move(backup, bundle);
+    } catch (rollbackError) {
+      throw Error('无法恢复旧版。旧应用保存在 ' + backup + '\n' + rollbackError.message, { cause: installError });
+    }
+    throw installError;
+  }
+}
+
+async function validateMacBundle(bundle, expectedVersion) {
+  const plist = path.join(bundle, 'Contents', 'Info.plist');
+  const property = async key => (await runFile('/usr/bin/plutil', ['-extract', key, 'raw', '-o', '-', plist])).trim();
+  const [identifier, version, executable, build] = await Promise.all([
+    property('CFBundleIdentifier'),
+    property('CFBundleShortVersionString'),
+    property('CFBundleExecutable'),
+    readFile(path.join(bundle, 'Contents', 'Resources', 'web', 'build-info.json'), 'utf8').then(JSON.parse),
+  ]);
+  if (identifier !== MAC_BUNDLE_ID || version !== expectedVersion || build.version !== expectedVersion ||
+      executable !== '帅帅练琴屋') throw Error('安装包身份或版本不匹配');
+  await access(path.join(bundle, 'Contents', 'MacOS', executable), constants.X_OK);
+  await access(path.join(bundle, 'Contents', 'Resources', 'app.asar'), constants.R_OK);
+}
+
+function createMacUpdater({ currentVersion, arch = process.arch, exePath = process.execPath, fetchImpl = fetch, installBundle, app } = {}) {
   const emitter = new (require('node:events').EventEmitter)();
   let latest = null;
   let downloadedZip = null;
   let stagingDir = null;
 
   const targetBundle = () => {
-    const idx = exePath.indexOf('.app/Contents/MacOS/');
-    return idx > 0 ? exePath.slice(0, idx + 4) : '/Applications/帅帅练琴屋.app';
+    const idx = exePath.lastIndexOf('.app/Contents/MacOS/');
+    if (idx <= 0) throw Error('无法定位当前安装的应用，请从下载页手动更新。');
+    return exePath.slice(0, idx + 4);
   };
 
   const cleanup = async () => {
@@ -116,46 +150,66 @@ function createMacUpdater({ currentVersion, arch = process.arch, exePath = proce
     if (!latest) throw Error('请先检查更新');
     stagingDir = await mkdtemp(path.join(tmpdir(), 'eguitar-mac-update-'));
     const zipFile = path.join(stagingDir, latest.zipName);
-    const res = await fetchReleaseStream(latest.url, fetchImpl);
-    const hash = createHash('sha256');
-    let total = 0;
-    const chunks = [];
-    for await (const chunk of res.body) {
-      const buf = Buffer.from(chunk);
-      total += buf.length;
-      if (total > latest.bytes || total > MAX_MAC_ZIP) throw Error('下载文件大小超出预期');
-      hash.update(buf);
-      chunks.push(buf);
-      emitter.emit('download-progress', { percent: (total * 100) / latest.bytes });
+    try {
+      const response = await fetchReleaseStream(latest.url, fetchImpl);
+      const hash = createHash('sha256');
+      let total = 0;
+      const verify = new Transform({
+        transform(chunk, _encoding, callback) {
+          total += chunk.length;
+          if (total > latest.bytes || total > MAX_MAC_ZIP) {
+            callback(Error('下载文件大小超出预期'));
+            return;
+          }
+          hash.update(chunk);
+          emitter.emit('download-progress', { percent: (total * 100) / latest.bytes });
+          callback(null, chunk);
+        },
+      });
+      await pipeline(response.body, verify, createWriteStream(zipFile, { flags: 'wx' }));
+      if (total !== latest.bytes || hash.digest('hex') !== latest.sha256) throw Error('更新包 SHA-256 校验失败');
+      downloadedZip = zipFile;
+    } catch (error) {
+      await cleanup();
+      throw error;
     }
-    const digest = hash.digest('hex');
-    if (total !== latest.bytes || digest !== latest.sha256) throw Error('更新包 SHA-256 校验失败');
-    await writeFile(zipFile, Buffer.concat(chunks));
-    downloadedZip = zipFile;
   };
 
-  emitter.quitAndInstall = () => {
+  emitter.discardDownload = cleanup;
+  emitter.quitAndInstall = async () => {
     const zipFile = downloadedZip, dir = stagingDir, bundle = targetBundle();
-    if (!zipFile || !dir) return;
+    if (!zipFile || !dir || !latest) throw Error('没有已验证的更新包，请重新下载。');
     if (installBundle) {
-      installBundle({ zipFile, stagingDir: dir, bundle });
+      await installBundle({ zipFile, stagingDir: dir, bundle });
       return;
     }
-    const unpacked = path.join(dir, 'unpacked');
-    const candidate = path.join(unpacked, '帅帅练琴屋.app');
-    (async () => {
-      await runFile('/usr/bin/ditto', ['-x', '-k', zipFile, unpacked]);
-      const info = await stat(path.join(candidate, 'Contents/MacOS/帅帅练琴屋'));
-      if (!info.isFile()) throw Error('解压后的应用包不完整');
-      await runFile('/usr/bin/xattr', ['-cr', candidate]).catch(() => {});
-      await rm(bundle, { recursive: true, force: true });
-      await runFile('/usr/bin/ditto', [candidate, bundle]);
-      await runFile('/usr/bin/xattr', ['-cr', bundle]).catch(() => {});
-      await rm(dir, { recursive: true, force: true }).catch(() => {});
-      const { app } = require('electron');
-      app.relaunch();
+    // Stage outside the live bundle on the same volume. Extraction and validation
+    // must finish before the installed application is moved.
+    if (!app) throw Error('无法重新打开应用，请从下载页手动更新。');
+    const installDir = await mkdtemp(path.join(path.dirname(bundle), '.eguitar-update-'));
+    const candidate = path.join(installDir, '帅帅练琴屋.app');
+    const backup = path.join(installDir, 'previous.app');
+    try {
+      await runFile('/usr/bin/ditto', ['-x', '-k', zipFile, installDir]);
+      await validateMacBundle(candidate, latest.version);
+      await replaceMacBundle(candidate, bundle, backup);
+      try {
+        app.relaunch({ execPath: exePath });
+      } catch (error) {
+        // Put the validated candidate aside to restore the original after a failed relaunch.
+        await replaceMacBundle(backup, bundle, candidate);
+        throw error;
+      }
+      await cleanup();
+      await rm(installDir, { recursive: true, force: true }).catch(() => {});
       app.exit(0);
-    })().catch(() => {});
+    } catch (error) {
+      // Keep the original bundle if a filesystem error also prevents rollback.
+      if (!await stat(backup).then(() => true, () => false)) {
+        await rm(installDir, { recursive: true, force: true }).catch(() => {});
+      }
+      throw error;
+    }
   };
 
   return emitter;
@@ -176,16 +230,25 @@ function createUpdateController({ updater, ask, prepare, installing, failed = ()
     if (busy && Number.isFinite(info.percent)) progress(Math.max(0, Math.min(1, info.percent / 100)));
   });
   return {
-    async check() {
+    async check({ automatic = false } = {}) {
       if (busy) return;
       busy = true;
       try {
-        progress(2);
+        if (!automatic) progress(2);
         available = null;
-        const result = await updater.checkForUpdates();
-        if (!result) throw Error('此安装方式暂不支持在线更新，请从下载页安装。');
+        let result;
+        try {
+          result = await updater.checkForUpdates();
+        } catch (error) {
+          if (automatic) return;
+          throw error;
+        }
+        if (!result) {
+          if (automatic) return;
+          throw Error('此安装方式暂不支持在线更新，请从下载页安装。');
+        }
         if (!available) {
-          await ask({ type: 'info', message: '当前已是最新版本', buttons: ['好的'] });
+          if (!automatic) await ask({ type: 'info', message: '当前已是最新版本', buttons: ['好的'] });
           return;
         }
         const consent = await ask({ type: 'question', message: '发现新版本 ' + available.version,
@@ -196,19 +259,24 @@ function createUpdateController({ updater, ask, prepare, installing, failed = ()
         await updater.downloadUpdate();
         progress(-1);
         const install = await ask({ type: 'question', message: '更新已下载并校验',
-          detail: '安装前将保存并暂停练习。建议先在练习回顾中导出备份。安装会退出应用。',
-          buttons: ['稍后', '保存并安装'], defaultId: 0, cancelId: 0 });
+          detail: '安装前将保存并暂停练习。安装完成后应用会重新打开。',
+          buttons: ['稍后', '保存并重启'], defaultId: 0, cancelId: 0 });
         if (install.response !== 1) return;
         if (await prepare() !== true) throw Error('未能确认练习已保存，请稍后重试。');
         installing();
-        updater.quitAndInstall(false, true);
+        progress(2);
+        await updater.quitAndInstall(false, true);
       } catch (error) {
         failed();
         await ask({ type: 'error', message: '更新未完成',
-          detail: '当前版本仍可使用。请检查网络或从下载页重试。\n' + error.message,
+          detail: '请重试，或从下载页手动安装。\n' + error.message,
           buttons: ['好的'] });
-      } finally { progress(-1); busy = false; }
+      } finally {
+        await updater.discardDownload?.();
+        progress(-1);
+        busy = false;
+      }
     },
   };
 }
-module.exports = { createUpdateController, createMacUpdater, isNewerVersion, allowedReleaseURL };
+module.exports = { createUpdateController, createMacUpdater, isNewerVersion, allowedReleaseURL, replaceMacBundle };

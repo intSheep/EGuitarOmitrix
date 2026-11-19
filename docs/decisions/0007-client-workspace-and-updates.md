@@ -63,3 +63,20 @@ Browser tests with synthetic desktop/Android bridges cover geometry and interact
 they do not prove native APK installation, Windows installer replacement, physical
 microphone behavior or data retention across a real device upgrade. Check native
 compilation and actual runtime separately, and record results in validation.md.
+
+## Update discovery and macOS replacement — 2026-11-17
+
+The owner replaces the persistent update button with a small installed version
+label in the workspace header. Each native client checks once at startup and
+prompts only for a newer compatible stable release. A current version or a
+startup check failure is silent. Manual checks remain in desktop Help and in
+Android's backup and management dialog. Download and installation each retain
+their explicit consent and draft-persistence barrier.
+
+macOS now streams the ZIP to disk with a bounded size and SHA-256 verification.
+After draft persistence, it extracts and validates the bundle on the install
+volume before moving the old application aside. A failed replacement restores
+the old bundle. A rejected relaunch request restores it as well. Installation
+errors reach the native dialog, and a rollback error reports where the previous
+bundle was retained. Application data directories and origins retain their
+existing identities.

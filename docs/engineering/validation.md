@@ -424,3 +424,19 @@ with synthetic audio and isolated profiles. They cover note changes, silence,
 permission denial, viewport fit, capture cleanup and manual timing across tool
 and lifecycle changes. Physical microphone and installed-device behavior were
 outside these local checks.
+
+### Installed update discovery and replacement — 2026-11-17
+
+On macOS, an interrupted in-place update left the installed bundle without its
+executable or Info.plist. The recovered 0.6.0 bundle opened at the existing
+application path and its manual update check reported the current version.
+
+The updater suite passed ten cases, including quiet startup checks, surfaced
+installation failures, actual ZIP extraction and replacement on macOS, and
+restoring the prior bundle after a simulated replacement or relaunch failure.
+Twenty-two Chromium tests passed, including installed-layout versions, Android
+bridge invocation, update draft persistence, and protected unfinished results.
+A local Apple silicon package passed resource inventory and an isolated packaged
+smoke with version display, offline score loading, and practice retained across
+restart. The replacement test simulates the relaunch call. A live upgrade from
+a public release and physical Windows and Android installers remain unverified.

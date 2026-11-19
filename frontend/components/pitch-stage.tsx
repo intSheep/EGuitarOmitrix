@@ -8,6 +8,7 @@ import {
   switchPitchDevice,
   type PitchFrame,
 } from "../audio/pitch-capture";
+import { playReferenceMidi } from "../audio/reference-tone";
 import type { ChromaticReading } from "../domain/tuner-model";
 import { Button } from "./ui/button";
 
@@ -15,6 +16,7 @@ const SPAN_SEMITONES = 22;
 const HISTORY_MS = 5600;
 const MAX_PARTICLES = 32;
 const MAX_RIPPLES = 5;
+const LABEL_ZONE_WIDTH = 56;
 const NATURAL_NOTES = new Set([0, 2, 4, 5, 7, 9, 11]);
 const NOTE_NAMES = [
   "C",
@@ -30,6 +32,49 @@ const NOTE_NAMES = [
   "A♯",
   "B",
 ] as const;
+
+const OPEN_STRING_LABELS = new Map<number, string>([
+  [40, "6弦 E2"],
+  [45, "5弦 A2"],
+  [50, "4弦 D3"],
+  [55, "3弦 G3"],
+  [59, "2弦 B3"],
+  [64, "1弦 E4"],
+]);
+
+const INTERVAL_NAMES = [
+  "同度",
+  "小二度",
+  "大二度",
+  "小三度",
+  "大三度",
+  "纯四度",
+  "增四度",
+  "纯五度",
+  "小六度",
+  "大六度",
+  "小七度",
+  "大七度",
+  "纯八度",
+] as const;
+
+type GuideMode = "chromatic" | "cmajor" | "strings";
+
+function formatIntervalLabel(fromMidi: number, toMidi: number): string | null {
+  const diff = toMidi - fromMidi;
+  const abs = Math.abs(diff);
+  if (abs === 0 || abs > 24) return null;
+  const arrow = diff > 0 ? "↑" : "↓";
+  if (abs <= 12) return `${arrow} ${INTERVAL_NAMES[abs]}`;
+  const inner = INTERVAL_NAMES[abs % 12];
+  return `${arrow} 八度+${inner}`;
+}
+
+function noteLabelForMidi(midi: number): string {
+  const idx = ((midi % 12) + 12) % 12;
+  const octave = Math.floor(midi / 12) - 1;
+  return `${NOTE_NAMES[idx]}${octave}`;
+}
 
 interface HistoryPoint {
   t: number;
@@ -104,14 +149,18 @@ function formatClock(seconds: number) {
 }
 
 export function PitchStage({
-  running,
-  reason,
-  elapsedMs,
+  running = false,
+  reason = "",
+  elapsedMs = 0,
+  embedded = false,
+  standalone = false,
   onClose,
 }: {
-  running: boolean;
-  reason: string;
-  elapsedMs: number;
+  running?: boolean;
+  reason?: string;
+  elapsedMs?: number;
+  embedded?: boolean;
+  standalone?: boolean;
   onClose: () => void;
 }) {
   const capture = useSyncExternalStore(
@@ -133,6 +182,14 @@ export function PitchStage({
     held: false,
     lastConfirmed: null,
   });
+  const [guideMode, setGuideMode] = useState<GuideMode>("chromatic");
+  const [lockedTargetMidi, setLockedTargetMidi] = useState<number | null>(null);
+  const [frozen, setFrozen] = useState(false);
+  const [zen, setZen] = useState(false);
+  const [intervalLabel, setIntervalLabel] = useState<string | null>(null);
+  const [hoverZone, setHoverZone] = useState<"tone" | "target" | "default">(
+    "default",
+  );
   const [announcement, setAnnouncement] = useState("");
   const lastAnnouncedRef = useRef<{ note: string; at: number }>({
     note: "",
@@ -149,9 +206,22 @@ export function PitchStage({
     smoothOrbMidi: number | null;
     smoothRms: number;
     lastNoteMidi: number | null;
+    lastDistinctMidi: { midi: number; at: number } | null;
     lastPulseAt: number;
     lastParticleAt: number;
     phase: number;
+    guideMode: GuideMode;
+    lockedTargetMidi: number | null;
+    frozen: boolean;
+    frozenAt: number;
+    flashMidi: number | null;
+    flashUntil: number;
+    layout: {
+      topPad: number;
+      drawableHeight: number;
+      pxPerSemitone: number;
+      displayCenterMidi: number;
+    } | null;
   }>({
     latestFrame: null,
     history: [],
@@ -162,15 +232,42 @@ export function PitchStage({
     smoothOrbMidi: null,
     smoothRms: 0,
     lastNoteMidi: null,
+    lastDistinctMidi: null,
     lastPulseAt: 0,
     lastParticleAt: 0,
     phase: 0,
+    guideMode: "chromatic",
+    lockedTargetMidi: null,
+    frozen: false,
+    frozenAt: 0,
+    flashMidi: null,
+    flashUntil: 0,
+    layout: null,
   });
+
+  useEffect(() => {
+    liveRef.current.guideMode = guideMode;
+  }, [guideMode]);
+  useEffect(() => {
+    liveRef.current.lockedTargetMidi = lockedTargetMidi;
+  }, [lockedTargetMidi]);
+  useEffect(() => {
+    liveRef.current.frozen = frozen;
+    if (frozen) {
+      liveRef.current.frozenAt = performance.now();
+    }
+  }, [frozen]);
 
   useEffect(() => {
     const state = liveRef.current;
     let lastUiKey = "";
     const unsubscribe = subscribePitchFrames((frame) => {
+      if (state.frozen) {
+        if (meterRef.current) {
+          meterRef.current.value = Math.min(1, frame.rms * 7);
+        }
+        return;
+      }
       state.latestFrame = frame;
       if (meterRef.current) {
         meterRef.current.value = Math.min(1, frame.rms * 7);
@@ -190,6 +287,25 @@ export function PitchStage({
 
       if (frame.reading) {
         const { midiFloat, midi } = frame.reading;
+        const nowMs = Date.now();
+        if (
+          state.lastDistinctMidi &&
+          state.lastDistinctMidi.midi !== midi &&
+          nowMs - state.lastDistinctMidi.at <= 6000
+        ) {
+          setIntervalLabel(
+            formatIntervalLabel(state.lastDistinctMidi.midi, midi),
+          );
+        } else if (
+          !state.lastDistinctMidi ||
+          nowMs - state.lastDistinctMidi.at > 6000
+        ) {
+          setIntervalLabel(null);
+        }
+        if (!frame.held) {
+          state.lastDistinctMidi = { midi, at: nowMs };
+        }
+
         if (Math.abs(midiFloat - state.targetCenterMidi) > 4.5) {
           state.targetCenterMidi = clamp(
             midiFloat - Math.sign(midiFloat - state.targetCenterMidi) * 4.5,
@@ -198,7 +314,6 @@ export function PitchStage({
           );
         }
         const rgb = pitchRgb(frame.reading.cents);
-        const nowMs = Date.now();
         if (
           state.lastNoteMidi !== midi ||
           nowMs - state.lastPulseAt >= 520
@@ -248,7 +363,6 @@ export function PitchStage({
 
     return () => {
       unsubscribe();
-      stopPitchCapture();
     };
   }, []);
 
@@ -285,18 +399,23 @@ export function PitchStage({
     let rafId = 0;
     let lastTime = performance.now();
 
-    const draw = (now: number) => {
-      const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
-      lastTime = now;
-      const reducedMotion = Boolean(motionQuery?.matches);
+    const draw = (rafNow: number) => {
       const state = liveRef.current;
+      const now = state.frozen ? state.frozenAt : rafNow;
+      const dt = state.frozen
+        ? 0
+        : Math.min(0.05, Math.max(0.001, (rafNow - lastTime) / 1000));
+      lastTime = rafNow;
+      const reducedMotion = Boolean(motionQuery?.matches);
       const frame = state.latestFrame;
       const reading = frame?.reading ?? null;
       const rms = frame?.rms ?? 0;
 
       // Keep recent 5.6 seconds of trail.
-      while (state.history.length > 0 && now - state.history[0].t > HISTORY_MS) {
-        state.history.shift();
+      if (!state.frozen) {
+        while (state.history.length > 0 && now - state.history[0].t > HISTORY_MS) {
+          state.history.shift();
+        }
       }
 
       if (reducedMotion) {
@@ -305,7 +424,7 @@ export function PitchStage({
         state.smoothRms = rms;
         state.ripples = [];
         state.particles = [];
-      } else {
+      } else if (!state.frozen) {
         const centerEase = 1 - Math.exp(-dt * 4.2);
         state.displayCenterMidi = lerp(
           state.displayCenterMidi,
@@ -335,12 +454,23 @@ export function PitchStage({
       }
 
       const compact = width < 640;
+      const tight = compact && height < 230;
+      const spanSemitones = tight ? 12 : SPAN_SEMITONES;
       const playheadX = compact ? width * 0.78 : Math.max(220, width - 275);
-      const topPad = compact ? 104 : 26;
-      const bottomPad = compact ? 28 : 40;
-      const drawableHeight = Math.max(120, height - topPad - bottomPad);
-      const pxPerSemitone = drawableHeight / SPAN_SEMITONES;
+      const topPad = compact ? (tight ? 96 : 104) : 26;
+      const bottomPad = compact ? (tight ? 12 : 28) : 40;
+      const drawableHeight = Math.max(
+        tight ? 48 : 120,
+        height - topPad - bottomPad,
+      );
+      const pxPerSemitone = drawableHeight / spanSemitones;
       const pxPerSec = Math.max(75, playheadX / 4.4);
+      state.layout = {
+        topPad,
+        drawableHeight,
+        pxPerSemitone,
+        displayCenterMidi: state.displayCenterMidi,
+      };
 
       const midiToY = (midi: number) =>
         topPad +
@@ -370,7 +500,7 @@ export function PitchStage({
         ctx.fillRect(0, 0, width, height);
       }
 
-      // 3. Subtle harmonic bars along the bottom edge (kept clear of privacy caption)
+      // 3. Subtle harmonic bars along the bottom edge
       if (!reducedMotion) {
         const bars = compact ? 14 : 26;
         const barStart = compact ? Math.max(168, width * 0.44) : 44;
@@ -400,10 +530,13 @@ export function PitchStage({
         }
       }
 
-      // 4. Semitone lanes and active lane highlight
-      const minMidi = Math.floor(state.displayCenterMidi - SPAN_SEMITONES / 2) - 1;
-      const maxMidi = Math.ceil(state.displayCenterMidi + SPAN_SEMITONES / 2) + 1;
+      // 4. Semitone lanes, guide mode highlights, reference flash, and target lock
+      const minMidi = Math.floor(state.displayCenterMidi - spanSemitones / 2) - 1;
+      const maxMidi = Math.ceil(state.displayCenterMidi + spanSemitones / 2) + 1;
       const activeMidi = reading?.midi ?? null;
+      const mode = state.guideMode;
+      const lockedMidi = state.lockedTargetMidi;
+      const flashActive = state.flashMidi !== null && rafNow < state.flashUntil;
 
       ctx.font = "700 11px system-ui, -apple-system, sans-serif";
       ctx.textBaseline = "middle";
@@ -415,42 +548,72 @@ export function PitchStage({
         const pitchIdx = ((m % 12) + 12) % 12;
         const isNatural = NATURAL_NOTES.has(pitchIdx);
         const isC = pitchIdx === 0;
+        const openLabel = OPEN_STRING_LABELS.get(m);
+        const isOpenString = openLabel !== undefined;
         const isActive = activeMidi === m;
+        const isLocked = lockedMidi === m;
+        const isFlashing = flashActive && state.flashMidi === m;
 
-        if (isActive) {
+        if (isFlashing) {
+          ctx.fillStyle = "rgb(63 92 240 / 0.14)";
+          ctx.fillRect(0, y - pxPerSemitone * 0.48, width, pxPerSemitone * 0.96);
+        } else if (isActive) {
           const rgb = pitchRgb(reading?.cents ?? 0);
           ctx.fillStyle = rgbCss(rgb, 0.075);
           ctx.fillRect(0, y - pxPerSemitone * 0.46, width, pxPerSemitone * 0.92);
+        } else if (isLocked) {
+          const hitLocked =
+            reading !== null &&
+            Math.abs(reading.midiFloat - m) <= 0.15;
+          ctx.fillStyle = hitLocked
+            ? "rgb(22 163 74 / 0.09)"
+            : "rgb(63 92 240 / 0.05)";
+          ctx.fillRect(0, y - pxPerSemitone * 0.44, width, pxPerSemitone * 0.88);
+        } else if (mode === "cmajor" && isC) {
+          ctx.fillStyle = "rgb(63 92 240 / 0.035)";
+          ctx.fillRect(0, y - pxPerSemitone * 0.44, width, pxPerSemitone * 0.88);
         }
 
         ctx.beginPath();
-        ctx.strokeStyle = isActive
-          ? "rgb(63 92 240 / 0.42)"
-          : isC
-            ? "#d3dcf6"
-            : isNatural
-              ? "#eaedf7"
-              : "#f3f5fb";
-        ctx.lineWidth = isActive || isC ? 1.5 : 1;
-        if (!isNatural && !isActive) {
+        const highlightOpen = mode === "strings" && isOpenString;
+        const highlightMajor = mode === "cmajor" && isNatural;
+        ctx.strokeStyle = isLocked
+          ? "rgb(63 92 240 / 0.72)"
+          : isActive
+            ? "rgb(63 92 240 / 0.42)"
+            : highlightOpen
+              ? "rgb(63 92 240 / 0.48)"
+              : isC
+                ? "#cbd5f6"
+                : highlightMajor
+                  ? "#dce3f7"
+                  : isNatural
+                    ? "#eaedf7"
+                    : "#f3f5fb";
+        ctx.lineWidth =
+          isLocked || isActive || highlightOpen || isC ? 1.5 : 1;
+        if (isLocked) {
+          ctx.setLineDash([7, 5]);
+        } else if (!isNatural && !isActive && !highlightOpen) {
           ctx.setLineDash([4, 6]);
         } else {
           ctx.setLineDash([]);
         }
-        ctx.moveTo(46, y);
+        ctx.moveTo(48, y);
         ctx.lineTo(width - 12, y);
         ctx.stroke();
         ctx.setLineDash([]);
 
-        if (isNatural || isActive) {
-          const octave = Math.floor(m / 12) - 1;
-          const label = `${NOTE_NAMES[pitchIdx]}${octave}`;
-          ctx.fillStyle = isActive
-            ? "#3f5cf0"
-            : isC
-              ? "#64748b"
-              : "#94a3b8";
-          ctx.fillText(label, 12, y);
+        if (isNatural || isActive || isLocked || isFlashing || highlightOpen) {
+          const baseLabel = `${NOTE_NAMES[pitchIdx]}${Math.floor(m / 12) - 1}`;
+          const label = highlightOpen && !compact ? openLabel : baseLabel;
+          ctx.fillStyle =
+            isLocked || isActive || isFlashing || highlightOpen
+              ? "#3f5cf0"
+              : isC
+                ? "#475569"
+                : "#94a3b8";
+          ctx.fillText(label, 10, y);
         }
       }
 
@@ -621,6 +784,41 @@ export function PitchStage({
     };
   }, []);
 
+  const midiFromClientY = (clientY: number): number | null => {
+    const board = boardRef.current;
+    const layout = liveRef.current.layout;
+    if (!board || !layout) return null;
+    const rect = board.getBoundingClientRect();
+    const y = clientY - rect.top;
+    const raw =
+      layout.displayCenterMidi -
+      (y - (layout.topPad + layout.drawableHeight / 2)) / layout.pxPerSemitone;
+    return clamp(Math.round(raw), 28, 88);
+  };
+
+  const handleBoardClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const board = boardRef.current;
+    if (!board) return;
+    const rect = board.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const midi = midiFromClientY(e.clientY);
+    if (midi === null) return;
+    if (x <= LABEL_ZONE_WIDTH) {
+      playReferenceMidi(midi);
+      liveRef.current.flashMidi = midi;
+      liveRef.current.flashUntil = performance.now() + 850;
+      return;
+    }
+    setLockedTargetMidi((prev) => (prev === midi ? null : midi));
+  };
+
+  const handleBoardMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const board = boardRef.current;
+    if (!board) return;
+    const x = e.clientX - board.getBoundingClientRect().left;
+    setHoverZone(x <= LABEL_ZONE_WIDTH ? "tone" : "target");
+  };
+
   const active = readout.reading;
   const roundedCents = active ? Math.round(active.cents) : null;
   const thumbOffset = active ? clamp(active.cents, -50, 50) : 0;
@@ -630,20 +828,26 @@ export function PitchStage({
       : `${roundedCents > 0 ? "+" : ""}${roundedCents} 音分`;
 
   return (
-    <div className="pitch-stage" data-pitch-status={capture.status}>
+    <div
+      className={`pitch-stage ${embedded ? "is-embedded" : ""} ${standalone ? "is-standalone" : ""} ${zen ? "is-zen" : ""}`.trim()}
+      data-pitch-status={capture.status}
+      data-pitch-frozen={frozen ? "true" : undefined}
+    >
       <div className="pitch-stage-top">
-        <div className="pitch-timer-chip">
-          <span
-            className={`pitch-timer-dot ${running ? "is-running" : ""}`}
-            aria-hidden="true"
-          />
-          <span id="timer-state" role="status">
-            {running ? "练习中" : reason || "已暂停"}
-          </span>
-          <strong id="timer-value" role="timer" aria-label="练习时间">
-            {formatClock(elapsedMs / 1000)}
-          </strong>
-        </div>
+        {!embedded && !standalone && (
+          <div className="pitch-timer-chip">
+            <span
+              className={`pitch-timer-dot ${running ? "is-running" : ""}`}
+              aria-hidden="true"
+            />
+            <span id="timer-state" role="status">
+              {running ? "练习中" : reason || "已暂停"}
+            </span>
+            <strong id="timer-value" role="timer" aria-label="练习时间">
+              {formatClock(elapsedMs / 1000)}
+            </strong>
+          </div>
+        )}
 
         <div className="pitch-stage-controls">
           <div className="pitch-input-wrap">
@@ -673,10 +877,47 @@ export function PitchStage({
               defaultValue={0}
             />
           </div>
+          <div className="pitch-guide-tabs" role="group" aria-label="音高参考线">
+            {(
+              [
+                ["chromatic", "半音"],
+                ["cmajor", "C大调"],
+                ["strings", "空弦"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                className="pitch-guide-tab"
+                aria-pressed={guideMode === key}
+                onClick={() => setGuideMode(key)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <span className="pitch-stage-status" role="status">
             {capture.message}
           </span>
           <div className="pitch-stage-actions">
+            {capture.status === "listening" && (
+              <Button
+                className="compact"
+                data-action="pitch-freeze"
+                aria-pressed={frozen}
+                onClick={() => setFrozen((v) => !v)}
+              >
+                {frozen ? "继续" : "定格"}
+              </Button>
+            )}
+            <Button
+              className="compact"
+              data-action="pitch-zen"
+              aria-pressed={zen}
+              onClick={() => setZen((v) => !v)}
+            >
+              {zen ? "显示读数" : "纯画布"}
+            </Button>
             {(capture.status === "error" || capture.status === "idle") && (
               <Button
                 variant="primary"
@@ -695,61 +936,86 @@ export function PitchStage({
                 onClose();
               }}
             >
-              {capture.status === "requesting" ? "取消" : "关闭音高"}
+              {capture.status === "requesting" ? "取消" : "关闭"}
             </Button>
           </div>
         </div>
       </div>
 
       <div className="pitch-stage-board" ref={boardRef}>
-        <canvas ref={canvasRef} className="pitch-canvas" aria-hidden="true" />
+        <canvas
+          ref={canvasRef}
+          className="pitch-canvas"
+          data-hover-zone={hoverZone}
+          title="点击左侧音名听基准音 · 点击画布锁定目标音线"
+          onClick={handleBoardClick}
+          onPointerMove={handleBoardMove}
+          onPointerLeave={() => setHoverZone("default")}
+        />
 
-        <div
-          className={`pitch-hero ${active ? "has-reading" : ""}`}
-          data-held={String(readout.held)}
-        >
-          <span className="pitch-hero-caption">
-            {active ? "当前音高" : "等待声音"}
-          </span>
-          <div className="pitch-hero-note" data-pitch-note>
-            {active ? (
-              <>
-                {active.noteName}
-                <sub>{active.octave}</sub>
-              </>
-            ) : (
-              "—"
-            )}
-          </div>
-          <div className="pitch-hero-meta">
-            {active?.solfege && (
-              <span className="pitch-solfege-pill">唱名 {active.solfege}</span>
-            )}
-            <span className="pitch-hz" data-pitch-hz>
-              {active ? `${active.frequency.toFixed(1)} Hz` : "— Hz"}
+        {lockedTargetMidi !== null && (
+          <button
+            type="button"
+            className="pitch-target-chip"
+            data-action="pitch-unlock-target"
+            onClick={() => setLockedTargetMidi(null)}
+          >
+            目标 {noteLabelForMidi(lockedTargetMidi)} ×
+          </button>
+        )}
+
+        {!zen && (
+          <div
+            className={`pitch-hero ${active ? "has-reading" : ""}`}
+            data-held={String(readout.held)}
+          >
+            <span className="pitch-hero-caption">
+              {frozen ? "已定格" : active ? "当前音高" : "等待声音"}
             </span>
-          </div>
-          <div className="pitch-cents-track" aria-hidden="true">
-            <span className="pitch-cents-center" />
-            <i
-              className="pitch-cents-thumb"
-              style={{
-                opacity: active ? 1 : 0,
-                transform: `translateX(${thumbOffset * 0.72}px)`,
-              }}
-            />
-          </div>
-          <div className="pitch-cents-readout" data-pitch-cents>
-            {centsLabel}
-          </div>
-          {!active && readout.lastConfirmed && (
-            <div className="pitch-last-note" data-pitch-last>
-              上一个音：{readout.lastConfirmed.note}
+            <div className="pitch-hero-note" data-pitch-note>
+              {active ? (
+                <>
+                  {active.noteName}
+                  <sub>{active.octave}</sub>
+                </>
+              ) : (
+                "—"
+              )}
             </div>
-          )}
-        </div>
+            <div className="pitch-hero-meta">
+              {active?.solfege && (
+                <span className="pitch-solfege-pill">唱名 {active.solfege}</span>
+              )}
+              {intervalLabel && (
+                <span className="pitch-interval-pill" data-pitch-interval>
+                  {intervalLabel}
+                </span>
+              )}
+              <span className="pitch-hz" data-pitch-hz>
+                {active ? `${active.frequency.toFixed(1)} Hz` : "— Hz"}
+              </span>
+            </div>
+            <div className="pitch-cents-track" aria-hidden="true">
+              <span className="pitch-cents-center" />
+              <i
+                className="pitch-cents-thumb"
+                style={{
+                  opacity: active ? 1 : 0,
+                  transform: `translateX(${thumbOffset * 0.72}px)`,
+                }}
+              />
+            </div>
+            <div className="pitch-cents-readout" data-pitch-cents>
+              {centsLabel}
+            </div>
+            {!active && readout.lastConfirmed && (
+              <div className="pitch-last-note" data-pitch-last>
+                上一个音：{readout.lastConfirmed.note}
+              </div>
+            )}
+          </div>
+        )}
 
-        <span className="pitch-privacy-tag">本机实时识别 · 不保存录音</span>
         <span className="sr-only" aria-live="polite">
           {announcement}
         </span>

@@ -17,7 +17,7 @@ declare global {
     Capacitor?: {
       getPlatform: () => string;
       Plugins: {
-        AppUpdate: { check: () => Promise<unknown> };
+        AppUpdate: { check: (options: { automatic: boolean }) => Promise<unknown> };
         ExportFile: {
           save: (args: {
             name: string;

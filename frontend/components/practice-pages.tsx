@@ -20,7 +20,12 @@ import {
 } from "../../app/position-reference.js";
 import { Materials } from "./records";
 import { PitchStage } from "./pitch-stage";
-import { startPitchCapture, stopPitchCapture } from "../audio/pitch-capture";
+import {
+  startPitchCapture,
+  stopPitchCapture,
+  subscribePitchFrames,
+} from "../audio/pitch-capture";
+import { playReferenceMidi } from "../audio/reference-tone";
 
 const toolIcons: Record<Exclude<c.Tool, null>, ReactNode> = {
   tuner: (
@@ -75,6 +80,8 @@ const dialTicks = Array.from({ length: 60 }, (_, i) => {
 export function Workspace() {
   const s = usePractice();
   useLocation();
+  const [pitchPlaygroundOpen, setPitchPlaygroundOpen] = useState(false);
+  useEffect(() => () => stopPitchCapture(), []);
   let e = c.selected();
   const params = c.route().params,
     requested = Number(params.get("stage"));
@@ -92,14 +99,35 @@ export function Workspace() {
   );
   const target = s.draft?.entryId || e.id;
   const currentStage = STAGES.find((x) => x.id === stage)!;
+  const showPlayground = pitchPlaygroundOpen && s.tool !== "tuner";
   return (
     <>
       <div className="page-heading">
         <h1>练习台</h1>
-        <Button data-tuner onClick={() => c.run(() => c.openTool("tuner"))}>
-          {toolIcons.tuner}
-          <span>调音器</span>
-        </Button>
+        <div className="workspace-quick-tools">
+          <Button
+            data-action="workspace-pitch"
+            onClick={() => {
+              if (s.tool) c.setTool(null);
+              setPitchPlaygroundOpen(true);
+              void startPitchCapture();
+            }}
+          >
+            {pitchToolIcon}
+            <span>实时音高</span>
+          </Button>
+          <Button
+            data-tuner
+            onClick={() => {
+              setPitchPlaygroundOpen(false);
+              stopPitchCapture();
+              c.run(() => c.openTool("tuner"));
+            }}
+          >
+            {toolIcons.tuner}
+            <span>调音器</span>
+          </Button>
+        </div>
       </div>
       {s.saved && (
         <div className="saved-feedback" role="status">
@@ -251,9 +279,49 @@ export function Workspace() {
         </aside>
       </div>
       {s.tool === "tuner" && <ToolSurface tool="tuner" id={e.id} standalone />}
+      {showPlayground && (
+        <PitchPlaygroundDialog
+          onClose={() => {
+            stopPitchCapture();
+            setPitchPlaygroundOpen(false);
+          }}
+        />
+      )}
     </>
   );
 }
+function PitchPlaygroundDialog({ onClose }: { onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (!dialog.open) dialog.showModal();
+    const handleClose = () => onCloseRef.current();
+    dialog.addEventListener("close", handleClose);
+    return () => {
+      dialog.removeEventListener("close", handleClose);
+      if (dialog.open) dialog.close();
+    };
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      id="pitch-playground-dialog"
+      className="pitch-modal-dialog"
+      aria-label="实时音高"
+    >
+      <PitchStage standalone onClose={onClose} />
+    </dialog>
+  );
+}
+const pitchToolIcon = (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+    <path d="M4 12h2l2-5 3 10 3-8 2 5 2-2h2" />
+  </svg>
+);
+
 const tools: [Exclude<c.Tool, null>, string][] = [
   ["tuner", "调音器"],
   ["position", "把位速查"],
@@ -265,6 +333,7 @@ export function Focus() {
   const s = usePractice(),
     d = s.draft;
   const [pitchOpen, setPitchOpen] = useState(false);
+  useEffect(() => () => stopPitchCapture(), []);
   if (!d)
     return (
       <>
@@ -274,10 +343,12 @@ export function Focus() {
     );
   const e = c.lesson(d.entryId),
     p = teacherPrescription(c.assignment(e.id));
-  const showPitchStage = pitchOpen && !s.tool;
+  const showPitchStage = pitchOpen && s.tool !== "tuner";
+  const splitPitch = showPitchStage && !!s.tool;
   return (
     <section
-      className={`focus-page ${s.tool ? "has-focus-tool" : ""} ${showPitchStage ? "has-pitch-stage" : ""}`}
+      className={`focus-page ${s.tool ? "has-focus-tool" : ""} ${showPitchStage ? "has-pitch-stage" : ""} ${splitPitch ? "has-pitch-split" : ""}`.trim()}
+      data-active-tool={s.tool || undefined}
     >
       <div className="focus-top">
         <div className="focus-top-left">
@@ -314,7 +385,11 @@ export function Focus() {
             <Button
               key={key}
               className="focus-tool"
+              aria-label={label}
               aria-pressed={s.tool === key}
+              data-playing={
+                key === "metronome" && s.metroPlaying ? "true" : undefined
+              }
               {...(key === "score"
                 ? { "data-score": e.id }
                 : key === "materials"
@@ -325,81 +400,112 @@ export function Focus() {
                       ? { "data-tuner": "" }
                       : { "data-action": "metronome" })}
               onClick={() => {
-                setPitchOpen(false);
-                stopPitchCapture();
+                if (key === "tuner") {
+                  setPitchOpen(false);
+                  stopPitchCapture();
+                }
                 c.run(() => c.openTool(key));
               }}
             >
               {toolIcons[key]}
               <span>{label}</span>
+              {key === "metronome" && s.metroPlaying && (
+                <span className="tool-live-badge" aria-hidden="true">
+                  {s.metroBpm ? `${s.metroBpm}` : "●"}
+                </span>
+              )}
             </Button>
           ))}
+        <Button
+          className="focus-tool focus-tool-pitch"
+          data-action="pitch-toggle"
+          aria-pressed={showPitchStage}
+          onClick={() => {
+            if (showPitchStage) {
+              setPitchOpen(false);
+              stopPitchCapture();
+            } else {
+              if (s.tool === "tuner") c.setTool(null);
+              setPitchOpen(true);
+              void startPitchCapture();
+            }
+          }}
+        >
+          {pitchToolIcon}
+          <span>实时音高</span>
+        </Button>
       </div>
       <div className="focus-main">
-        <div
-          id="focus-clock"
-          className={d.running ? "clock-running" : ""}
-          data-pitch-stage={showPitchStage ? "true" : undefined}
-          hidden={!!s.tool}
-        >
-          {showPitchStage ? (
+        {!showPitchStage && (
+          <div
+            id="focus-clock"
+            className={d.running ? "clock-running" : ""}
+            hidden={!!s.tool}
+          >
+            <div className="timer-orbit">
+              <div className="ambient-orbit" />
+              <svg
+                className="timer-dial"
+                viewBox="0 0 280 280"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="140"
+                  cy="140"
+                  r="134"
+                  fill="none"
+                  stroke="#e2e8f0"
+                  strokeWidth="2"
+                />
+                {dialTicks}
+              </svg>
+              <div className="timer-content">
+                <p id="timer-state" role="status">
+                  {d.running ? "练习中" : d.reason || "已暂停"}
+                </p>
+                <strong id="timer-value" role="timer" aria-label="练习时间">
+                  {clock(d.elapsedMs / 1000)}
+                </strong>
+                <span>练习时间</span>
+              </div>
+            </div>
+            <div className="pitch-launch-row">
+              <Button
+                className="pitch-launch-btn"
+                data-action="pitch-open"
+                onClick={() => {
+                  setPitchOpen(true);
+                  void startPitchCapture();
+                }}
+              >
+                {pitchToolIcon}
+                <span>开启实时音高</span>
+              </Button>
+            </div>
+            <div id="focus-requirements">
+              <Requirements id={e.id} />
+            </div>
+          </div>
+        )}
+        {s.tool && <ToolSurface tool={s.tool} id={e.id} />}
+        {showPitchStage && (
+          <div
+            id={!s.tool ? "focus-clock" : undefined}
+            className={`${!s.tool && d.running ? "clock-running" : ""} ${splitPitch ? "pitch-pane" : ""}`.trim()}
+            data-pitch-stage="true"
+          >
             <PitchStage
               running={d.running}
               reason={d.reason}
               elapsedMs={d.elapsedMs}
-              onClose={() => setPitchOpen(false)}
+              embedded={splitPitch}
+              onClose={() => {
+                stopPitchCapture();
+                setPitchOpen(false);
+              }}
             />
-          ) : (
-            <>
-              <div className="timer-orbit">
-                <div className="ambient-orbit" />
-                <svg
-                  className="timer-dial"
-                  viewBox="0 0 280 280"
-                  aria-hidden="true"
-                >
-                  <circle
-                    cx="140"
-                    cy="140"
-                    r="134"
-                    fill="none"
-                    stroke="#e2e8f0"
-                    strokeWidth="2"
-                  />
-                  {dialTicks}
-                </svg>
-                <div className="timer-content">
-                  <p id="timer-state" role="status">
-                    {d.running ? "练习中" : d.reason || "已暂停"}
-                  </p>
-                  <strong id="timer-value" role="timer" aria-label="练习时间">
-                    {clock(d.elapsedMs / 1000)}
-                  </strong>
-                  <span>练习时间</span>
-                </div>
-              </div>
-              <div className="pitch-launch-row">
-                <Button
-                  className="pitch-launch-btn"
-                  data-action="pitch-open"
-                  onClick={() => {
-                    setPitchOpen(true);
-                    void startPitchCapture();
-                  }}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
-                    <path d="M4 12h2l2-5 3 10 3-8 2 5 2-2h2" />
-                  </svg>
-                  <span>开启实时音高（模唱）</span>
-                </Button>
-              </div>
-              <div id="focus-requirements">
-                <Requirements id={e.id} />
-              </div>
-            </>
-          )}
-        </div>
-        {s.tool && <ToolSurface tool={s.tool} id={e.id} />}
+          </div>
+        )}
       </div>
       <div className="focus-actions">
         {s.tool && (
@@ -454,10 +560,22 @@ function ToolSurface({
     };
     document.addEventListener("keydown", escape);
     if (tool === "score")
-      c.run(() => showScore(id, shortTitle(c.lesson(id)), { host, onClose }));
+      c.run(() =>
+        showScore(id, shortTitle(c.lesson(id)), {
+          host,
+          onClose,
+          onPlayStart: () => c.stopMetronome(),
+        }),
+      );
     if (tool === "tuner")
       showTuner({ host: standalone ? null : host, onClose });
-    if (tool === "position") showPositionReference({ host, onClose });
+    if (tool === "position")
+      showPositionReference({
+        host,
+        onClose,
+        subscribePitchFrames,
+        playReferenceMidi,
+      });
     const dialog = standalone ? document.querySelector("#tuner-dialog") : null;
     dialog?.addEventListener("close", onClose);
     host.tabIndex = -1;
@@ -490,7 +608,9 @@ function MetronomePanel({ id }: { id: string }) {
       c.assignment(id)?.version || "",
       c.assignment(id),
     );
-  const [bpm, setBpm] = useState(g.bpm || p.startBpm || 60);
+  const [bpm, setBpm] = useState(
+    s.metroPlaying && s.metroBpm ? s.metroBpm : g.bpm || p.startBpm || 60,
+  );
   return (
     <section id="metro-panel">
       <h2>节拍器</h2>

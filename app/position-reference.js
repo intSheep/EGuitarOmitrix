@@ -12,20 +12,40 @@ const degrees = ['1','','2','','3','4','','5','','6','','7'];
 const inlayFrets = new Set([3, 5, 7, 9, 12, 15]);
 export function positionNotes(index) {
   return POSITIONS[index].flatMap((frets,s) => frets.map(fret => {
-    const pitch = (tuning[s] + fret) % 12;
-    return { string:s+1, fret, name:names[pitch], degree:degrees[pitch], root:pitch===0 };
+    const midi = tuning[s] + fret;
+    const pitch = midi % 12;
+    return { string:s+1, fret, midi, name:names[pitch], degree:degrees[pitch], root:pitch===0 };
   }));
 }
-let panel, selected = 0, noteNames = false;
+let panel, selected = 0, noteNames = false, unsubscribePitch = null;
+function applyLivePitchMatch(reading) {
+  if (!panel) return;
+  const targetMidi = reading?.midi ?? null;
+  const targetPitch = targetMidi !== null ? ((targetMidi % 12) + 12) % 12 : null;
+  panel.querySelectorAll('[data-fret-midi]').forEach(el => {
+    const midi = Number(el.dataset.fretMidi);
+    const pitch = Number(el.dataset.fretPitch);
+    if (targetMidi !== null && midi === targetMidi) {
+      el.dataset.liveMatch = 'exact';
+    } else if (targetPitch !== null && pitch === targetPitch) {
+      el.dataset.liveMatch = 'octave';
+    } else {
+      delete el.dataset.liveMatch;
+    }
+  });
+}
 export function closePositionReference() {
+  unsubscribePitch?.();
+  unsubscribePitch = null;
+  applyLivePitchMatch(null);
   if (panel?.open) panel.close();
   if (panel) {
     panel.classList.remove('in-practice');
     document.body.append(panel);
   }
 }
-/** @param {{host?: HTMLElement | null, onClose?: (() => void) | null}} [options] */
-export function showPositionReference({ host = null, onClose = null } = {}) {
+/** @param {{host?: HTMLElement | null, onClose?: (() => void) | null, subscribePitchFrames?: ((cb: (frame: any) => void) => () => void) | null, playReferenceMidi?: ((midi: number) => void) | null}} [options] */
+export function showPositionReference({ host = null, onClose = null, subscribePitchFrames = null, playReferenceMidi = null } = {}) {
   if (!panel) {
     panel = document.createElement('dialog');
     panel.id = 'position-dialog';
@@ -35,6 +55,7 @@ export function showPositionReference({ host = null, onClose = null } = {}) {
   (host || document.body).append(panel);
   panel.classList.toggle('in-practice', !!host);
   panel.setAttribute('role', host ? 'region' : 'dialog');
+  let lastReading = null;
   function render() {
     const notes = positionNotes(selected);
     const min = Math.min(...notes.map(n=>n.fret)), max = Math.max(...notes.map(n=>n.fret));
@@ -47,13 +68,28 @@ export function showPositionReference({ host = null, onClose = null } = {}) {
       ${Array.from({length:count},(_,i)=>{const f=min+i,cx=120+(i+.5)*step,mark=inlayFrets.has(f);return `<g><rect x="${cx-26}" y="10" width="52" height="24" rx="8" fill="${mark?'#eef2ff':'#f4f6fa'}" stroke="${mark?'#c7d2fe':'#e2e6ef'}" stroke-width="1.5"/><text x="${cx}" y="27" text-anchor="middle" font-size="13" font-weight="800" fill="${mark?'#3f5cf0':'#475569'}">${f} 品</text>${mark?(f===12?`<circle cx="${cx}" cy="126" r="7.5" fill="#eef2ff" stroke="#cbd5e1" stroke-width="1.5"/><circle cx="${cx}" cy="206" r="7.5" fill="#eef2ff" stroke="#cbd5e1" stroke-width="1.5"/>`:`<circle cx="${cx}" cy="166" r="8.5" fill="#eef2ff" stroke="#cbd5e1" stroke-width="1.5"/>`):''}</g>`;}).join('')}
       ${Array.from({length:count+1},(_,i)=>`<line x1="${120+i*step}" y1="49" x2="${120+i*step}" y2="283" stroke="${i===0?'#94a3b8':'#cbd5e1'}" stroke-width="${i===0?3.5:2}"/>`).join('')}
       ${tuning.map((_,s)=>{const y=70+s*38;return `<g><rect x="18" y="${y-13}" width="72" height="26" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/><text x="54" y="${y+5}" text-anchor="middle" font-size="13" font-weight="800" fill="#171717" class="string-label">${s+1} 弦</text><line x1="109" y1="${y}" x2="651" y2="${y}" stroke="#64748b" stroke-width="${1.3+s*.4}"/></g>`;}).join('')}
-      ${notes.map(n=>{const x=120+(n.fret-min+.5)*step,y=70+(n.string-1)*38;return `<g>${n.root?`<rect x="${x-16}" y="${y-13}" width="32" height="30" rx="9" fill="#2338a8"/><rect x="${x-16}" y="${y-16}" width="32" height="30" rx="9" fill="#3f5cf0" stroke="#ffffff" stroke-width="2"/>`:`<circle cx="${x}" cy="${y+3}" r="15" fill="#0f172a"/><circle cx="${x}" cy="${y}" r="15" fill="#181c26" stroke="#ffffff" stroke-width="2"/>`}<text x="${x}" y="${y+5}" fill="white" font-size="13.5" font-weight="800" text-anchor="middle">${noteNames?n.name:n.degree}</text></g>`}).join('')}</svg>
-      <div class="position-legend"><span><i></i>主音 C · 1</span><span>标准调弦 E A D G B E</span></div>`;
+      ${notes.map(n=>{const x=120+(n.fret-min+.5)*step,y=70+(n.string-1)*38;return `<g class="position-note" data-fret-midi="${n.midi}" data-fret-pitch="${n.midi%12}" role="button" tabindex="0" aria-label="${n.string}弦${n.fret}品 ${n.name}"><circle class="position-note-halo" cx="${x}" cy="${y}" r="21" fill="none" stroke="#3f5cf0" stroke-width="3"/><rect class="position-note-octave-halo" x="${x-21}" y="${y-21}" width="42" height="42" rx="13" fill="none" stroke="#93c5fd" stroke-width="2.5"/>${n.root?`<rect x="${x-16}" y="${y-13}" width="32" height="30" rx="9" fill="#2338a8"/><rect x="${x-16}" y="${y-16}" width="32" height="30" rx="9" fill="#3f5cf0" stroke="#ffffff" stroke-width="2"/>`:`<circle cx="${x}" cy="${y+3}" r="15" fill="#0f172a"/><circle cx="${x}" cy="${y}" r="15" fill="#181c26" stroke="#ffffff" stroke-width="2"/>`}<text x="${x}" y="${y+5}" fill="white" font-size="13.5" font-weight="800" text-anchor="middle">${noteNames?n.name:n.degree}</text></g>`}).join('')}</svg>
+      <div class="position-legend"><span><i></i>主音 C · 1</span><span>点击音点可听基准音 · 配合实时音高可亮灯</span></div>`;
     panel.querySelector('[data-close]').onclick=onClose || (()=>panel.close());
     panel.querySelector('[data-close]').hidden = !!host;
     panel.querySelectorAll('[data-position]').forEach(b=>b.onclick=()=>{selected=Number(b.dataset.position);render();panel.querySelector(`[data-position="${selected}"]`).focus()});
     panel.querySelector('[data-label]').onclick=()=>{noteNames=!noteNames;render();panel.querySelector('[data-label]').focus()};
+    panel.querySelectorAll('[data-fret-midi]').forEach(el => {
+      const strike = () => {
+        playReferenceMidi?.(Number(el.dataset.fretMidi));
+        el.dataset.struck = 'true';
+        setTimeout(() => { if (el.isConnected) delete el.dataset.struck; }, 420);
+      };
+      el.onclick = strike;
+      el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); strike(); } };
+    });
+    applyLivePitchMatch(lastReading);
   }
+  unsubscribePitch?.();
+  unsubscribePitch = subscribePitchFrames ? subscribePitchFrames(frame => {
+    lastReading = frame.reading;
+    applyLivePitchMatch(lastReading);
+  }) : null;
   render();
   if (!panel.open) { if (host) panel.show(); else panel.showModal(); }
 }

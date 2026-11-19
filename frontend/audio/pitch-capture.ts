@@ -45,7 +45,7 @@ const frameListeners = new Set<(frame: PitchFrame) => void>();
 
 let snapshot: PitchCaptureSnapshot = {
   status: "idle",
-  message: "开启麦克风，实时显示弹奏与哼唱音高。",
+  message: "开启麦克风，实时显示琴声与人声音高。",
   devices: [],
   selectedDeviceId: "",
 };
@@ -295,7 +295,7 @@ export async function startPitchCapture(
 
     emitStatus({
       status: "listening",
-      message: "正在聆听 · 弹一个音，再跟着哼",
+      message: "正在聆听 · 拨弦或哼唱即可看到音高轨迹",
     });
     void refreshPitchDevices(token);
 
@@ -318,13 +318,13 @@ export async function startPitchCapture(
           timestamp: now,
         });
         if (step.reading) {
-          emitStatus({ message: "正在显示实时音高 · 停琴后继续哼即可比对" });
+          emitStatus({ message: "正在追踪音高 · 点击左侧音名可听基准音" });
         } else {
           emitStatus({
             message:
               raw.rms < 0.0022
-                ? "正在聆听 · 弹一个音，再跟着哼"
-                : "正在捕捉音高 · 尽量保持单音稳定",
+                ? "正在聆听 · 拨弦或哼唱即可看到音高轨迹"
+                : "正在捕捉音高 · 保持单音更稳定",
           });
         }
       }
