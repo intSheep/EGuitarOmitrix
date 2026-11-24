@@ -440,3 +440,65 @@ A local Apple silicon package passed resource inventory and an isolated packaged
 smoke with version display, offline score loading, and practice retained across
 restart. The replacement test simulates the relaunch call. A live upgrade from
 a public release and physical Windows and Android installers remain unverified.
+
+### Persistent metronome, prominent timer return, and two-tier workspace IA — 2026-11-23
+
+Refactored practice navigation and tool hosting around a two-tier information
+architecture separating primary Focus views (`主视图`: `计时`, `乐谱`, `实时识音`,
+`谱+识音`) from non-destructive utilities (`小工具`: inline `节拍器` bar, companion
+`把位图`, non-modal Focus / modal Workspace `调音器`, and `课程资料` modal):
+
+- **Metronome persistence and boundaries**: WebAudio metronome scheduling continues
+  across primary Focus views, live BPM adjustments (`setBpm`), in-app route switches
+  (via `#global-metro-bar` outside Focus), and background/visibility transitions.
+  Standalone metronome usage without a running session draft records no `tempoUsage`,
+  practice session, or proficiency evidence. Automatic metronome stop triggers remain
+  scoped to explicit pause/finish/discard, `调音器` entry, `#score-play` audio start,
+  external material launch, and page close.
+- **Prominent timer recovery**: Non-timer Focus views surface the `#focus-back`
+  (`← 返回计时`) button, the `计时` primary view button with live elapsed badge, and a
+  clickable bottom `.passive-clock-btn` bar; off-Focus routes keep `#session-access`
+  (`返回计时`) visible when a session is running.
+- **Non-destructive score and multi-tool flows**: `ScoreHost` stays mounted across
+  `乐谱` and `谱+识音` and while toggling `节拍器`, `把位图`, `调音器`, or
+  `课程资料`; `谱+识音` + `节拍器` + `把位图` work simultaneously without stopping
+  the manual session clock or losing loaded local scores.
+
+**Verified checks after final code edits**:
+- `npm run typecheck` (`tsc --noEmit`): passed (0 errors).
+- `npm run lint` (`eslint frontend`): passed (0 errors).
+- `npm run test:ui` (`vitest run`): passed 6/6 UI component and controller tests.
+- `npm run build` + `node scripts/verify-distribution.mjs dist`: passed sanitized
+  lightweight distribution build and asset verification (31 bundled assets).
+- `npm run test:web` (Playwright against system Google Chrome): 37 passed, 1 skipped
+  (`Lightweight CI excludes private course resources`) across `1440×900`, `1280×720`,
+  `800×600`, `390×700`, and `390×560` viewports, plus screenshot inspection of desktop
+  and narrow mobile layouts.
+- `npm test` (`node --test tests/*.test.mjs`): 76/77 passed; `tests/audio-score.test.mjs`
+  failed with `spawnSync ffmpeg ENOENT` because `ffmpeg` is not installed locally.
+
+**Limits**:
+- Earlier desktop validation before the final narrow-viewport CSS fix observed
+  `npm run test:desktop` (`scripts/verify-desktop.mjs:48`) blocked at `desktop/main.cjs`'s
+  intentional `win.isFocused()` microphone security guard when launched from a
+  non-foreground macOS background shell (not bypassed), while a read-only Electron
+  shell smoke confirmed zero `pageerror`s, standalone metronome playback, cross-route
+  `#global-metro-bar`, Focus `乐谱` + `把位图`, and `#focus-back`.
+- Physical microphone/speaker audio quality, native OS focus transitions in interactive
+  desktop sessions, and physical Windows/Android devices remain outside local automated
+  checks.
+
+
+### Guitar Pro 8 course score playback repair — 2026-11-24
+
+Compared all 96 original and repaired GP files. The notation and timing
+sections match, and reimport preserves pitches, rhythm, tablature and staff
+views, MIDI program and sync points. All 19 embedded backing files and every
+non-GP course asset are byte-identical. The candidate pack verified all 343
+course assets, and the local build verified all 374 distributed assets.
+
+Four bundled-resource Chromium scenarios passed. P033, P026 and the P072
+backing track produced nonzero audio samples in Chromium, and the app
+downloaded the exact repaired GP bytes for each. Guitar Pro 8 listening
+acceptance remains open. The installed app and public pack are pending release
+of the candidate version.

@@ -224,3 +224,14 @@ persistent update button, and separate download and restart confirmations.
 Rejected the example version numbers, fabricated release notes, MD5 copy,
 mock system controls, and navigation changes. The native client owns the
 dialogs and displays the installed build version in the existing workspace.
+
+## Two-tier primary views vs. utility tools — 2026-11-23
+
+To prevent tool switches from interrupting practice audio or hiding the session
+clock, Focus separates a solid royal-blue segmented primary-view switcher (`计时` /
+`乐谱` / `实时识音` / `谱+识音`) from lighter outlined companion utility toggles
+(`节拍器` / `把位图` / `调音器` / `课程资料`), with a matching quick-utility strip
+on `练习台`. Renaming the pitch canvas to `实时识音` clarifies that it visualizes
+played or hummed notes in real time rather than only vocal matching, and `把位图`
+explicitly frames the five-position C-major fretboard chart as a lightweight
+companion reference rather than a primary view.

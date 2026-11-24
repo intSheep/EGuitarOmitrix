@@ -1,3 +1,5 @@
+import { attachLightDismiss } from '../frontend/platform/dialog-utils.ts';
+
 // Standard-tuning C-major reference; not a prescribed lesson sequence.
 export const POSITIONS = [
   [[3,5],[3,5],[2,4,5],[2,3,5],[2,3,5],[3,5]],
@@ -17,7 +19,7 @@ export function positionNotes(index) {
     return { string:s+1, fret, midi, name:names[pitch], degree:degrees[pitch], root:pitch===0 };
   }));
 }
-let panel, selected = 0, noteNames = false, unsubscribePitch = null;
+let panel, selected = 0, noteNames = false, unsubscribePitch = null, activeOnClose = null, detachLightDismiss = null;
 function applyLivePitchMatch(reading) {
   if (!panel) return;
   const targetMidi = reading?.midi ?? null;
@@ -35,12 +37,17 @@ function applyLivePitchMatch(reading) {
   });
 }
 export function closePositionReference() {
+  activeOnClose = null;
+  detachLightDismiss?.();
+  detachLightDismiss = null;
   unsubscribePitch?.();
   unsubscribePitch = null;
   applyLivePitchMatch(null);
   if (panel?.open) panel.close();
   if (panel) {
     panel.classList.remove('in-practice');
+    panel.removeAttribute('closedby');
+    panel.removeAttribute('role');
     document.body.append(panel);
   }
 }
@@ -51,16 +58,35 @@ export function showPositionReference({ host = null, onClose = null, subscribePi
     panel.id = 'position-dialog';
     panel.setAttribute('aria-labelledby','position-title');
     document.body.append(panel);
+    panel.addEventListener('close', () => {
+      detachLightDismiss?.();
+      detachLightDismiss = null;
+      unsubscribePitch?.();
+      unsubscribePitch = null;
+      applyLivePitchMatch(null);
+      const cb = activeOnClose;
+      activeOnClose = null;
+      cb?.();
+    });
   }
+  activeOnClose = onClose;
   (host || document.body).append(panel);
   panel.classList.toggle('in-practice', !!host);
-  panel.setAttribute('role', host ? 'region' : 'dialog');
+  detachLightDismiss?.();
+  detachLightDismiss = null;
+  if (host) {
+    panel.removeAttribute('closedby');
+    panel.setAttribute('role', 'region');
+  } else {
+    panel.removeAttribute('role');
+    detachLightDismiss = attachLightDismiss(panel);
+  }
   let lastReading = null;
   function render() {
     const notes = positionNotes(selected);
     const min = Math.min(...notes.map(n=>n.fret)), max = Math.max(...notes.map(n=>n.fret));
     const width = 680, count = max - min + 1, step = 520 / count;
-    panel.innerHTML = `<header class="position-heading"><h2 id="position-title">C 调把位速查</h2><button class="button secondary" data-close>关闭</button></header>
+    panel.innerHTML = `<header class="position-heading"><h2 id="position-title">C 调把位图</h2><button class="button secondary" data-close>关闭</button></header>
       <div class="position-choices" role="group" aria-label="选择把位">${POSITIONS.map((_,i)=>`<button class="button secondary" data-position="${i}" aria-pressed="${i===selected}">${i+1} 把位</button>`).join('')}</div>
       <div class="position-meta"><strong>第 ${selected+1} 把位 · ${min}–${max} 品</strong><button class="button secondary" data-label aria-pressed="${noteNames}">${noteNames?'显示唱名':'显示音名'}</button></div>
       <svg viewBox="0 0 ${width} 310" role="img" aria-labelledby="fretboard-title fretboard-desc"><title id="fretboard-title">C 调第 ${selected+1} 把位，${min} 到 ${max} 品</title><desc id="fretboard-desc">从上到下为第一到第六弦。${notes.map(n=>`${n.string}弦${n.fret}品${n.name}`).join('，')}。蓝色方块为主音 C。</desc>
@@ -69,9 +95,16 @@ export function showPositionReference({ host = null, onClose = null, subscribePi
       ${Array.from({length:count+1},(_,i)=>`<line x1="${120+i*step}" y1="49" x2="${120+i*step}" y2="283" stroke="${i===0?'#94a3b8':'#cbd5e1'}" stroke-width="${i===0?3.5:2}"/>`).join('')}
       ${tuning.map((_,s)=>{const y=70+s*38;return `<g><rect x="18" y="${y-13}" width="72" height="26" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/><text x="54" y="${y+5}" text-anchor="middle" font-size="13" font-weight="800" fill="#171717" class="string-label">${s+1} 弦</text><line x1="109" y1="${y}" x2="651" y2="${y}" stroke="#64748b" stroke-width="${1.3+s*.4}"/></g>`;}).join('')}
       ${notes.map(n=>{const x=120+(n.fret-min+.5)*step,y=70+(n.string-1)*38;return `<g class="position-note" data-fret-midi="${n.midi}" data-fret-pitch="${n.midi%12}" role="button" tabindex="0" aria-label="${n.string}弦${n.fret}品 ${n.name}"><circle class="position-note-halo" cx="${x}" cy="${y}" r="21" fill="none" stroke="#3f5cf0" stroke-width="3"/><rect class="position-note-octave-halo" x="${x-21}" y="${y-21}" width="42" height="42" rx="13" fill="none" stroke="#93c5fd" stroke-width="2.5"/>${n.root?`<rect x="${x-16}" y="${y-13}" width="32" height="30" rx="9" fill="#2338a8"/><rect x="${x-16}" y="${y-16}" width="32" height="30" rx="9" fill="#3f5cf0" stroke="#ffffff" stroke-width="2"/>`:`<circle cx="${x}" cy="${y+3}" r="15" fill="#0f172a"/><circle cx="${x}" cy="${y}" r="15" fill="#181c26" stroke="#ffffff" stroke-width="2"/>`}<text x="${x}" y="${y+5}" fill="white" font-size="13.5" font-weight="800" text-anchor="middle">${noteNames?n.name:n.degree}</text></g>`}).join('')}</svg>
-      <div class="position-legend"><span><i></i>主音 C · 1</span><span>点击音点可听基准音 · 配合实时音高可亮灯</span></div>`;
-    panel.querySelector('[data-close]').onclick=onClose || (()=>panel.close());
-    panel.querySelector('[data-close]').hidden = !!host;
+      <div class="position-legend"><span><i></i>主音 C · 1</span><span>点击音点可听基准音 · 配合实时识音可亮灯</span></div>`;
+    panel.querySelector('[data-close]').onclick = () => {
+      if (panel.open) panel.close();
+      else {
+        const cb = activeOnClose;
+        activeOnClose = null;
+        cb?.();
+      }
+    };
+    panel.querySelector('[data-close]').hidden = false;
     panel.querySelectorAll('[data-position]').forEach(b=>b.onclick=()=>{selected=Number(b.dataset.position);render();panel.querySelector(`[data-position="${selected}"]`).focus()});
     panel.querySelector('[data-label]').onclick=()=>{noteNames=!noteNames;render();panel.querySelector('[data-label]').focus()};
     panel.querySelectorAll('[data-fret-midi]').forEach(el => {

@@ -106,8 +106,9 @@ for (const viewport of [
       });
     }
 
-    await page.locator("[data-action=pitch-open]").click();
-    await page.locator('#focus-clock[data-pitch-stage="true"]').waitFor();
+    await page.locator("[data-action=pitch-toggle]").click();
+    await page.locator('[data-pitch-stage="true"]').waitFor();
+    await expect(page.locator("#focus-back")).toBeVisible();
 
     // Initial guitar tone C4 (261.63 Hz)
     await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
@@ -202,9 +203,10 @@ for (const viewport of [
       expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height + 1);
     }
 
-    // Switching to score keeps BOTH pitch capture AND active metronome running.
-    await page.locator("[data-score]").click();
+    // Switching to 谱+识音 keeps BOTH pitch capture AND active metronome running simultaneously.
+    await page.locator("[data-action=split-view]").click();
     await expect(page.locator("#score-dialog")).toBeVisible();
+    await expect(page.locator('[data-pitch-stage="true"]')).toBeVisible();
     await page.locator(".score-options summary").click();
     await expect(page.locator("#score-file")).toBeEnabled();
     await page.locator("#score-file").setInputFiles({
@@ -229,6 +231,7 @@ for (const viewport of [
     for (const selector of [
       ".pitch-stage-board",
       "#focus-tool-content",
+      "#metro-panel",
       "[data-action=pause]",
       "[data-action=finish]",
     ]) {
@@ -237,15 +240,25 @@ for (const viewport of [
       expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height + 1);
     }
 
-    // Closing and reopening pitch directly from the dock works while score stays open.
-    await page.locator("[data-action=pitch-toggle]").click();
+    // Closing pitch from split view stays on score; re-opening 谱+识音 restores both alongside metronome.
+    await page.locator("[data-action=pitch-close]").click();
     await expect(page.locator(".pitch-stage")).toHaveCount(0);
     await expect(page.locator("#score-dialog")).toBeVisible();
-    await page.locator("[data-action=pitch-toggle]").click();
+    await page.locator("[data-action=split-view]").click();
     await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
     await expect(page.locator("#score-dialog")).toBeVisible();
+    await expect(page.locator("#focus-back")).toBeVisible();
 
-    // Switching to tuner releases prior pitch capture, starts tuner immediately, and omits privacy caption.
+    // Returning to timer from split view cleans up pitch capture while keeping metronome running.
+    await page.locator("#focus-back").click();
+    await expect(page.locator("#focus-clock")).toBeVisible();
+    await expect(
+      page.locator('[data-action=metronome][data-playing="true"]'),
+    ).toBeVisible();
+    await page.locator("[data-action=pitch-toggle]").click();
+    await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
+
+    // Switching to tuner releases prior pitch capture, stops metronome, starts tuner immediately, and omits privacy caption.
     const priorStreamCount = await page.evaluate(
       () => window.pitchQA.streams.length,
     );
@@ -356,7 +369,7 @@ test("pitch stage releases capture on background and handles permission denial",
   await setupSyntheticAudio(page, "normal");
   await page.goto("/#practice?view=lesson");
   await page.locator("[data-start]:enabled").click();
-  await page.locator("[data-action=pitch-open]").click();
+  await page.locator("[data-action=pitch-toggle]").click();
   await expect(page.locator("[data-pitch-note]")).toHaveText("C4");
 
   await page.evaluate(() => {
@@ -382,7 +395,7 @@ test("pitch stage releases capture on background and handles permission denial",
   await setupSyntheticAudio(deniedPage, "denied");
   await deniedPage.goto("/#practice?view=lesson");
   await deniedPage.locator("[data-start]:enabled").click();
-  await deniedPage.locator("[data-action=pitch-open]").click();
+  await deniedPage.locator("[data-action=pitch-toggle]").click();
   await expect(deniedPage.locator(".pitch-stage-status")).toContainText(
     "未获得麦克风权限",
   );

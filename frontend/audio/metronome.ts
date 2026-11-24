@@ -17,6 +17,13 @@ export class Metronome {
     this.volume = 0.4;
     this.nodes = new Set();
   }
+  setBpm(bpm: number) {
+    this.bpm = bpm;
+    if (this.running && this.audio) {
+      const maxNext = this.audio.currentTime + 60 / bpm + 0.05;
+      if (this.next > maxNext) this.next = maxNext;
+    }
+  }
   async start() {
     this.stop();
     const Audio = window.AudioContext || window.webkitAudioContext;
@@ -85,5 +92,6 @@ export class Metronome {
       this.audio.close().catch(() => {});
       this.audio = null;
     }
+    this.onBeat(-1);
   }
 }

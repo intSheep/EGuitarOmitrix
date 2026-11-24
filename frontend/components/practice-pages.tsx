@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import * as c from "../controllers/practice";
 import { usePractice, clock, Requirements } from "./common";
@@ -18,7 +18,7 @@ import {
   showPositionReference,
   closePositionReference,
 } from "../../app/position-reference.js";
-import { Materials } from "./records";
+import { attachLightDismiss } from "../platform/dialog-utils";
 import { PitchStage } from "./pitch-stage";
 import {
   startPitchCapture,
@@ -27,17 +27,11 @@ import {
 } from "../audio/pitch-capture";
 import { playReferenceMidi } from "../audio/reference-tone";
 
-const toolIcons: Record<Exclude<c.Tool, null>, ReactNode> = {
-  tuner: (
+const viewIcons = {
+  timer: (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
-      <path d="M9 3v8a3 3 0 0 0 6 0V3M12 14v7M7 3v7m10-7v7" />
-    </svg>
-  ),
-  position: (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
-      <rect x="4" y="3" width="16" height="18" rx="2" />
-      <path d="M9 3v18m6-18v18M4 9h16M4 15h16" />
-      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
     </svg>
   ),
   score: (
@@ -47,9 +41,35 @@ const toolIcons: Record<Exclude<c.Tool, null>, ReactNode> = {
       <ellipse cx="17" cy="15" rx="3" ry="2" />
     </svg>
   ),
+  pitch: (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="M4 12h2l2-5 3 10 3-8 2 5 2-2h2" />
+    </svg>
+  ),
+  split: (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M12 4v16M6 10h3m-3 4h3m6-2h3" />
+    </svg>
+  ),
+};
+
+const utilityIcons = {
   metronome: (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
       <path d="M9 3h6l5 18H4L9 3ZM12 16l5-10M8 17h8" />
+    </svg>
+  ),
+  position: (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <path d="M9 3v18m6-18v18M4 9h16M4 15h16" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+    </svg>
+  ),
+  tuner: (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="M9 3v8a3 3 0 0 0 6 0V3M12 14v7M7 3v7m10-7v7" />
     </svg>
   ),
   materials: (
@@ -81,7 +101,14 @@ export function Workspace() {
   const s = usePractice();
   useLocation();
   const [pitchPlaygroundOpen, setPitchPlaygroundOpen] = useState(false);
-  useEffect(() => () => stopPitchCapture(), []);
+  const pitchOpenRef = useRef(false);
+  pitchOpenRef.current = pitchPlaygroundOpen;
+  useEffect(
+    () => () => {
+      if (pitchOpenRef.current) stopPitchCapture();
+    },
+    [],
+  );
   let e = c.selected();
   const params = c.route().params,
     requested = Number(params.get("stage"));
@@ -99,36 +126,98 @@ export function Workspace() {
   );
   const target = s.draft?.entryId || e.id;
   const currentStage = STAGES.find((x) => x.id === stage)!;
-  const showPlayground = pitchPlaygroundOpen && s.tool !== "tuner";
+  const showPlayground =
+    pitchPlaygroundOpen && !s.tunerOpen && !s.positionOpen;
+  const runningPrescription = s.draft?.running
+    ? teacherPrescription(c.assignment(s.draft.entryId))
+    : null;
+  const toolbarProps = { focusgroup: "toolbar wrap" } as Record<
+    string,
+    string
+  >;
   return (
     <>
       <div className="page-heading">
         <h1>练习台</h1>
-        <div className="workspace-quick-tools">
+        <div
+          className="workspace-quick-tools"
+          role="toolbar"
+          aria-label="快捷工具"
+          {...toolbarProps}
+        >
           <Button
             data-action="workspace-pitch"
             onClick={() => {
-              if (s.tool) c.setTool(null);
+              if (s.tunerOpen) c.closeTunerOverlay();
+              if (s.positionOpen) c.setPositionOpen(false);
               setPitchPlaygroundOpen(true);
               void startPitchCapture();
             }}
           >
-            {pitchToolIcon}
-            <span>实时音高</span>
+            {viewIcons.pitch}
+            <span>实时识音</span>
           </Button>
-          <Button
-            data-tuner
-            onClick={() => {
-              setPitchPlaygroundOpen(false);
-              stopPitchCapture();
-              c.run(() => c.openTool("tuner"));
-            }}
+          <span
+            className="toolbar-divider"
+            role="separator"
+            aria-orientation="vertical"
+          />
+          <div
+            className="workspace-utility-group"
+            role="group"
+            aria-label="小工具"
           >
-            {toolIcons.tuner}
-            <span>调音器</span>
-          </Button>
+            {!runningPrescription?.noMetronome && (
+              <Button
+                data-action="metronome"
+                aria-pressed={s.metroOpen}
+                data-playing={s.metroPlaying ? "true" : undefined}
+                onClick={() => c.toggleMetroOpen()}
+              >
+                {utilityIcons.metronome}
+                <span>节拍器</span>
+                {s.metroPlaying && (
+                  <span className="tool-live-badge" aria-hidden="true">
+                    {s.metroBpm ?? "●"}
+                  </span>
+                )}
+              </Button>
+            )}
+            <Button
+              data-position-reference=""
+              aria-pressed={s.positionOpen}
+              onClick={() => {
+                setPitchPlaygroundOpen(false);
+                stopPitchCapture();
+                if (s.tunerOpen) c.closeTunerOverlay();
+                c.togglePosition();
+              }}
+            >
+              {utilityIcons.position}
+              <span>把位图</span>
+            </Button>
+            <Button
+              data-tuner=""
+              aria-pressed={s.tunerOpen}
+              onClick={() => {
+                setPitchPlaygroundOpen(false);
+                stopPitchCapture();
+                if (s.positionOpen) c.setPositionOpen(false);
+                if (s.tunerOpen) c.closeTunerOverlay();
+                else c.openTuner();
+              }}
+            >
+              {utilityIcons.tuner}
+              <span>调音器</span>
+            </Button>
+          </div>
         </div>
       </div>
+      {s.metroOpen && !runningPrescription?.noMetronome && (
+        <MetronomeBar
+          id={s.draft?.running ? s.draft.entryId : undefined}
+        />
+      )}
       {s.saved && (
         <div className="saved-feedback" role="status">
           已保存 · {clock(s.saved.minutes * 60)}{" "}
@@ -272,13 +361,14 @@ export function Workspace() {
               data-material={e.id}
               onClick={() => c.setDialog({ kind: "materials", id: e.id })}
             >
-              {toolIcons.materials}
+              {utilityIcons.materials}
               <span>课程资料</span>
             </Button>
           </div>
         </aside>
       </div>
-      {s.tool === "tuner" && <ToolSurface tool="tuner" id={e.id} standalone />}
+      {s.tunerOpen && <TunerHost standalone />}
+      {s.positionOpen && <PositionHost standalone />}
       {showPlayground && (
         <PitchPlaygroundDialog
           onClose={() => {
@@ -297,10 +387,12 @@ function PitchPlaygroundDialog({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
+    const detach = attachLightDismiss(dialog);
     if (!dialog.open) dialog.showModal();
     const handleClose = () => onCloseRef.current();
     dialog.addEventListener("close", handleClose);
     return () => {
+      detach();
       dialog.removeEventListener("close", handleClose);
       if (dialog.open) dialog.close();
     };
@@ -310,30 +402,42 @@ function PitchPlaygroundDialog({ onClose }: { onClose: () => void }) {
       ref={ref}
       id="pitch-playground-dialog"
       className="pitch-modal-dialog"
-      aria-label="实时音高"
+      aria-label="实时识音"
     >
       <PitchStage standalone onClose={onClose} />
     </dialog>
   );
 }
-const pitchToolIcon = (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
-    <path d="M4 12h2l2-5 3 10 3-8 2 5 2-2h2" />
-  </svg>
-);
 
-const tools: [Exclude<c.Tool, null>, string][] = [
-  ["tuner", "调音器"],
-  ["position", "把位速查"],
-  ["score", "乐谱"],
-  ["metronome", "节拍器"],
-  ["materials", "课程资料"],
-];
 export function Focus() {
   const s = usePractice(),
     d = s.draft;
-  const [pitchOpen, setPitchOpen] = useState(false);
-  useEffect(() => () => stopPitchCapture(), []);
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || document.querySelector("dialog:modal")) {
+        return;
+      }
+      const snap = c.getSnapshot();
+      if (snap.tunerOpen) {
+        event.preventDefault();
+        c.closeTunerOverlay();
+      } else if (snap.positionOpen) {
+        event.preventDefault();
+        c.setPositionOpen(false);
+      } else if (snap.metroOpen) {
+        event.preventDefault();
+        c.setMetroOpen(false);
+      } else if (snap.focusView !== "timer") {
+        event.preventDefault();
+        c.returnToTimer();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      stopPitchCapture();
+    };
+  }, []);
   if (!d)
     return (
       <>
@@ -343,13 +447,32 @@ export function Focus() {
     );
   const e = c.lesson(d.entryId),
     p = teacherPrescription(c.assignment(e.id));
-  const showPitchStage = pitchOpen && s.tool !== "tuner";
-  const splitPitch = showPitchStage && !!s.tool;
+  const showScorePane =
+    s.focusView === "score" || s.focusView === "score-pitch";
+  const showPitchPane =
+    s.focusView === "pitch" || s.focusView === "score-pitch";
+  const showClockPane = s.focusView === "timer";
+  const awayFromTimer =
+    s.focusView !== "timer" || s.tunerOpen || s.positionOpen;
+  const toolbarProps = { focusgroup: "toolbar wrap" } as Record<
+    string,
+    string
+  >;
+  const pageClasses = [
+    "focus-page",
+    `focus-view-${s.focusView}`,
+    s.focusView !== "timer" ? "has-focus-tool" : "",
+    showPitchPane ? "has-pitch-stage" : "",
+    s.focusView === "score-pitch" ? "has-pitch-split" : "",
+    s.metroOpen && !p.noMetronome ? "has-metronome-bar" : "",
+    s.positionOpen ? "has-position-drawer" : "",
+    s.tunerOpen ? "has-tuner-overlay" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <section
-      className={`focus-page ${s.tool ? "has-focus-tool" : ""} ${showPitchStage ? "has-pitch-stage" : ""} ${splitPitch ? "has-pitch-split" : ""}`.trim()}
-      data-active-tool={s.tool || undefined}
-    >
+    <section className={pageClasses} data-focus-view={s.focusView}>
       <div className="focus-top">
         <div className="focus-top-left">
           <div className="focus-course">
@@ -360,8 +483,8 @@ export function Focus() {
           </div>
         </div>
         <div className="focus-top-actions">
-          {s.tool && (
-            <Button id="focus-back" onClick={() => c.setTool(null)}>
+          {awayFromTimer && (
+            <Button id="focus-back" onClick={() => c.returnToTimer()}>
               ← 返回计时
             </Button>
           )}
@@ -378,69 +501,134 @@ export function Focus() {
           </Button>
         </div>
       </div>
-      <div className="tool-dock" aria-label="练习工具">
-        {tools
-          .filter(([key]) => key !== "metronome" || !p.noMetronome)
-          .map(([key, label]) => (
+
+      <div
+        className="focus-toolbar"
+        role="toolbar"
+        aria-label="练习工作区"
+        {...toolbarProps}
+      >
+        <div
+          className="focus-primary-views"
+          role="group"
+          aria-label="主视图"
+        >
+          <Button
+            className="focus-view-btn"
+            data-view="timer"
+            aria-pressed={s.focusView === "timer" && !s.tunerOpen}
+            onClick={() => c.returnToTimer()}
+          >
+            {viewIcons.timer}
+            <span>计时</span>
+            {(s.focusView !== "timer" || s.tunerOpen) && (
+              <span
+                className="view-timer-badge"
+                data-running={d.running ? "true" : "false"}
+              >
+                {clock(d.elapsedMs / 1000)}
+              </span>
+            )}
+          </Button>
+          <Button
+            className="focus-view-btn"
+            data-score={e.id}
+            data-view="score"
+            aria-pressed={s.focusView === "score" && !s.tunerOpen}
+            onClick={() => c.setFocusView("score")}
+          >
+            {viewIcons.score}
+            <span>乐谱</span>
+          </Button>
+          <Button
+            className="focus-view-btn"
+            data-action="pitch-toggle"
+            data-view="pitch"
+            aria-pressed={s.focusView === "pitch" && !s.tunerOpen}
+            onClick={() => c.setFocusView("pitch")}
+          >
+            {viewIcons.pitch}
+            <span>实时识音</span>
+          </Button>
+          <Button
+            className="focus-view-btn"
+            data-action="split-view"
+            data-view="score-pitch"
+            aria-pressed={s.focusView === "score-pitch" && !s.tunerOpen}
+            title="边看谱边看实时识音"
+            onClick={() => c.setFocusView("score-pitch")}
+          >
+            {viewIcons.split}
+            <span>谱+识音</span>
+          </Button>
+        </div>
+
+        <span
+          className="toolbar-divider"
+          role="separator"
+          aria-orientation="vertical"
+        />
+
+        <div
+          className="focus-utility-tools"
+          role="group"
+          aria-label="小工具"
+        >
+          {!p.noMetronome && (
             <Button
-              key={key}
               className="focus-tool"
-              aria-label={label}
-              aria-pressed={s.tool === key}
-              data-playing={
-                key === "metronome" && s.metroPlaying ? "true" : undefined
-              }
-              {...(key === "score"
-                ? { "data-score": e.id }
-                : key === "materials"
-                  ? { "data-material": e.id }
-                  : key === "position"
-                    ? { "data-position-reference": "" }
-                    : key === "tuner"
-                      ? { "data-tuner": "" }
-                      : { "data-action": "metronome" })}
-              onClick={() => {
-                if (key === "tuner") {
-                  setPitchOpen(false);
-                  stopPitchCapture();
-                }
-                c.run(() => c.openTool(key));
-              }}
+              data-action="metronome"
+              aria-pressed={s.metroOpen}
+              data-playing={s.metroPlaying ? "true" : undefined}
+              onClick={() => c.toggleMetroOpen()}
             >
-              {toolIcons[key]}
-              <span>{label}</span>
-              {key === "metronome" && s.metroPlaying && (
+              {utilityIcons.metronome}
+              <span>节拍器</span>
+              {s.metroPlaying && (
                 <span className="tool-live-badge" aria-hidden="true">
-                  {s.metroBpm ? `${s.metroBpm}` : "●"}
+                  {s.metroBpm ?? "●"}
                 </span>
               )}
             </Button>
-          ))}
-        <Button
-          className="focus-tool focus-tool-pitch"
-          data-action="pitch-toggle"
-          aria-pressed={showPitchStage}
-          onClick={() => {
-            if (showPitchStage) {
-              setPitchOpen(false);
-              stopPitchCapture();
-            } else {
-              if (s.tool === "tuner") c.setTool(null);
-              setPitchOpen(true);
-              void startPitchCapture();
+          )}
+          <Button
+            className="focus-tool"
+            data-position-reference=""
+            aria-pressed={s.positionOpen}
+            onClick={() => c.togglePosition()}
+          >
+            {utilityIcons.position}
+            <span>把位图</span>
+          </Button>
+          <Button
+            className="focus-tool"
+            data-tuner=""
+            aria-pressed={s.tunerOpen}
+            onClick={() =>
+              s.tunerOpen ? c.closeTunerOverlay() : c.openTuner()
             }
-          }}
-        >
-          {pitchToolIcon}
-          <span>实时音高</span>
-        </Button>
+          >
+            {utilityIcons.tuner}
+            <span>调音器</span>
+          </Button>
+          <Button
+            className="focus-tool"
+            data-material={e.id}
+            onClick={() => c.setDialog({ kind: "materials", id: e.id })}
+          >
+            {utilityIcons.materials}
+            <span>课程资料</span>
+          </Button>
+        </div>
       </div>
+
+      {s.metroOpen && !p.noMetronome && <MetronomeBar id={e.id} />}
+
       <div className="focus-main">
-        {!showPitchStage && (
+        {showClockPane && (
           <div
             id="focus-clock"
             className={d.running ? "clock-running" : ""}
-            hidden={!!s.tool}
           >
             <div className="timer-orbit">
               <div className="ambient-orbit" />
@@ -469,52 +657,54 @@ export function Focus() {
                 <span>练习时间</span>
               </div>
             </div>
-            <div className="pitch-launch-row">
-              <Button
-                className="pitch-launch-btn"
-                data-action="pitch-open"
-                onClick={() => {
-                  setPitchOpen(true);
-                  void startPitchCapture();
-                }}
-              >
-                {pitchToolIcon}
-                <span>开启实时音高</span>
-              </Button>
-            </div>
             <div id="focus-requirements">
               <Requirements id={e.id} />
             </div>
           </div>
         )}
-        {s.tool && <ToolSurface tool={s.tool} id={e.id} />}
-        {showPitchStage && (
-          <div
-            id={!s.tool ? "focus-clock" : undefined}
-            className={`${!s.tool && d.running ? "clock-running" : ""} ${splitPitch ? "pitch-pane" : ""}`.trim()}
-            data-pitch-stage="true"
-          >
+        {showScorePane && <ScoreHost id={e.id} />}
+        {showPitchPane && (
+          <div className="pitch-pane" data-pitch-stage="true">
             <PitchStage
-              running={d.running}
-              reason={d.reason}
-              elapsedMs={d.elapsedMs}
-              embedded={splitPitch}
-              onClose={() => {
-                stopPitchCapture();
-                setPitchOpen(false);
-              }}
+              embedded={s.focusView === "score-pitch"}
+              onClose={() =>
+                c.setFocusView(
+                  s.focusView === "score-pitch" ? "score" : "timer",
+                )
+              }
             />
           </div>
         )}
+        {s.positionOpen && (
+          <div className="position-companion-pane">
+            <PositionHost />
+          </div>
+        )}
+        {s.tunerOpen && (
+          <div className="focus-tuner-overlay">
+            <TunerHost />
+          </div>
+        )}
       </div>
+
       <div className="focus-actions">
-        {s.tool && (
-          <span className="passive-clock">
+        {awayFromTimer && (
+          <button
+            type="button"
+            className="passive-clock passive-clock-btn"
+            onClick={() => c.returnToTimer()}
+            title="返回计时主视图"
+          >
+            <span
+              className={`passive-clock-dot ${d.running ? "is-running" : ""}`}
+              aria-hidden="true"
+            />
             <span data-session-time role="timer">
               {clock(d.elapsedMs / 1000)}
             </span>{" "}
             · {d.running ? "练习中" : "已暂停"}
-          </span>
+            <span className="passive-clock-return">返回计时</span>
+          </button>
         )}
         <Button
           data-action="pause"
@@ -537,110 +727,219 @@ export function Focus() {
     </section>
   );
 }
-function ToolSurface({
-  tool,
-  id,
-  standalone = false,
-}: {
-  tool: c.Tool;
-  id: string;
-  standalone?: boolean;
-}) {
+function ScoreHost({ id }: { id: string }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const host = ref.current;
     if (!host) return;
+    c.run(() =>
+      showScore(id, shortTitle(c.lesson(id)), {
+        host,
+        onClose: () =>
+          c.setFocusView(
+            c.getSnapshot().focusView === "score-pitch" ? "pitch" : "timer",
+          ),
+        onPlayStart: () => c.stopMetronome(),
+      }),
+    );
+    return () => {
+      closeScore();
+    };
+  }, [id]);
+  return <div id="focus-tool-content" data-tool="score" ref={ref} />;
+}
+function PositionHost({ standalone = false }: { standalone?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const host = ref.current;
+    if (!standalone && !host) return;
     const trigger = document.activeElement as HTMLElement | null;
-    const onClose = () => c.setTool(null);
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !document.querySelector("dialog:modal")) {
-        event.preventDefault();
-        onClose();
+    showPositionReference({
+      host: standalone ? null : host,
+      onClose: () => c.setPositionOpen(false),
+      subscribePitchFrames,
+      playReferenceMidi,
+    });
+    if (!standalone && host) {
+      host.tabIndex = -1;
+      host.focus({ preventScroll: true });
+    }
+    return () => {
+      closePositionReference();
+      if (
+        !standalone &&
+        host &&
+        trigger?.isConnected &&
+        (!document.activeElement ||
+          document.activeElement === document.body ||
+          host.contains(document.activeElement))
+      ) {
+        trigger.focus({ preventScroll: true });
       }
     };
-    document.addEventListener("keydown", escape);
-    if (tool === "score")
-      c.run(() =>
-        showScore(id, shortTitle(c.lesson(id)), {
-          host,
-          onClose,
-          onPlayStart: () => c.stopMetronome(),
-        }),
-      );
-    if (tool === "tuner")
-      showTuner({ host: standalone ? null : host, onClose });
-    if (tool === "position")
-      showPositionReference({
-        host,
-        onClose,
-        subscribePitchFrames,
-        playReferenceMidi,
-      });
-    const dialog = standalone ? document.querySelector("#tuner-dialog") : null;
-    dialog?.addEventListener("close", onClose);
-    host.tabIndex = -1;
-    if (!standalone) host.focus({ preventScroll: true });
-    return () => {
-      document.removeEventListener("keydown", escape);
-      dialog?.removeEventListener("close", onClose);
-      if (tool === "score") closeScore();
-      if (tool === "tuner") closeTuner();
-      if (tool === "position") closePositionReference();
-      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
-    };
-  }, [tool, id, standalone]);
-  return (
-    <div id="focus-tool-content" data-tool={tool} ref={ref}>
-      {tool === "metronome" ? (
-        <MetronomePanel id={id} />
-      ) : tool === "materials" ? (
-        <Materials id={id} />
-      ) : null}
-    </div>
-  );
+  }, [standalone]);
+  if (standalone) return null;
+  return <div className="position-host" data-tool="position" ref={ref} />;
 }
-function MetronomePanel({ id }: { id: string }) {
-  const s = usePractice(),
-    p = teacherPrescription(c.assignment(id)),
-    g = resumeGuidance(
-      s.logs,
-      id,
-      c.assignment(id)?.version || "",
-      c.assignment(id),
-    );
-  const [bpm, setBpm] = useState(
-    s.metroPlaying && s.metroBpm ? s.metroBpm : g.bpm || p.startBpm || 60,
-  );
+function TunerHost({ standalone = false }: { standalone?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const host = ref.current;
+    if (!standalone && !host) return;
+    const trigger = document.activeElement as HTMLElement | null;
+    showTuner({
+      host: standalone ? null : host,
+      onClose: () => c.closeTunerOverlay(),
+    });
+    if (!standalone && host) {
+      host.tabIndex = -1;
+      host.focus({ preventScroll: true });
+    }
+    return () => {
+      closeTuner();
+      if (
+        !standalone &&
+        host &&
+        trigger?.isConnected &&
+        (!document.activeElement ||
+          document.activeElement === document.body ||
+          host.contains(document.activeElement))
+      ) {
+        trigger.focus({ preventScroll: true });
+      }
+    };
+  }, [standalone]);
+  if (standalone) return null;
+  return <div className="tuner-host" data-tool="tuner" ref={ref} />;
+}
+function MetronomeBar({ id }: { id?: string }) {
+  const s = usePractice();
+  const p = id ? teacherPrescription(c.assignment(id)) : null;
+  const fixed = !!p?.fixedBpm;
+  const activeBpm =
+    s.metroPlaying && s.metroBpm ? s.metroBpm : s.metroTargetBpm;
+  const [draftText, setDraftText] = useState(String(activeBpm));
+
+  useEffect(() => {
+    setDraftText(String(activeBpm));
+  }, [activeBpm]);
+
+  const stepBpm = (delta: number) => {
+    const next = Math.max(20, Math.min(300, activeBpm + delta));
+    setDraftText(String(next));
+    c.run(() => c.setMetronomeBpm(next));
+  };
+
   return (
-    <section id="metro-panel">
-      <h2>节拍器</h2>
-      <p>{p.tempo}</p>
-      <label>
-        BPM
-        <input
-          id="bpm"
-          type="number"
-          min="20"
-          max="300"
-          value={bpm}
-          disabled={!!p.fixedBpm}
-          onChange={(e) => {
-            c.stopMetronome();
-            setBpm(Number(e.target.value));
-          }}
-        />
-      </label>
-      <div className="beats">
+    <section id="metro-panel" className="metro-bar" aria-label="节拍器">
+      <div className="metro-bar-info">
+        <h2>节拍器</h2>
+        <span className="metro-bar-hint">
+          {p ? p.tempo : "自由节拍 · 切页不中断"}
+        </span>
+      </div>
+      <div className="metro-bpm-control">
+        <Button
+          className="compact metro-step-btn"
+          aria-label="减 5 BPM"
+          disabled={fixed || activeBpm <= 20}
+          onClick={() => stepBpm(-5)}
+        >
+          -5
+        </Button>
+        <Button
+          className="compact metro-step-btn"
+          aria-label="减 1 BPM"
+          disabled={fixed || activeBpm <= 20}
+          onClick={() => stepBpm(-1)}
+        >
+          -1
+        </Button>
+        <label className="metro-bpm-field">
+          <span>BPM</span>
+          <input
+            id="bpm"
+            type="number"
+            min="20"
+            max="300"
+            value={draftText}
+            disabled={fixed}
+            onChange={(e) => {
+              const raw = e.target.value;
+              setDraftText(raw);
+              const parsed = Number(raw);
+              if (
+                raw.trim() !== "" &&
+                Number.isInteger(parsed) &&
+                parsed >= 20 &&
+                parsed <= 300
+              ) {
+                c.run(() => c.setMetronomeBpm(parsed));
+              }
+            }}
+            onBlur={() => {
+              const parsed = Number(draftText);
+              if (
+                draftText.trim() !== "" &&
+                Number.isInteger(parsed) &&
+                parsed >= 20 &&
+                parsed <= 300
+              ) {
+                if (parsed !== activeBpm) {
+                  c.run(() => c.setMetronomeBpm(parsed));
+                }
+              } else {
+                setDraftText(String(activeBpm));
+              }
+            }}
+          />
+        </label>
+        <Button
+          className="compact metro-step-btn"
+          aria-label="加 1 BPM"
+          disabled={fixed || activeBpm >= 300}
+          onClick={() => stepBpm(1)}
+        >
+          +1
+        </Button>
+        <Button
+          className="compact metro-step-btn"
+          aria-label="加 5 BPM"
+          disabled={fixed || activeBpm >= 300}
+          onClick={() => stepBpm(5)}
+        >
+          +5
+        </Button>
+      </div>
+      <div className="beats" aria-hidden="true">
         {[0, 1, 2, 3].map((i) => (
           <i className="beat-dot" key={i} />
         ))}
       </div>
-      <Button
-        data-action="metro-toggle"
-        onClick={() => c.run(() => c.toggleMetronome(bpm))}
-      >
-        {s.metroPlaying ? "停止节拍" : "播放节拍"}
-      </Button>
+      <div className="metro-bar-actions">
+        <Button
+          variant={s.metroPlaying ? "secondary" : "primary"}
+          className="compact"
+          data-action="metro-toggle"
+          onClick={() => {
+            const parsed = Number(draftText);
+            const target =
+              draftText.trim() !== "" && Number.isFinite(parsed)
+                ? parsed
+                : activeBpm;
+            c.run(() => c.toggleMetronome(target));
+          }}
+        >
+          {s.metroPlaying ? "停止节拍" : "播放节拍"}
+        </Button>
+        <Button
+          className="compact"
+          data-action="metro-collapse"
+          onClick={() => c.setMetroOpen(false)}
+        >
+          收起
+        </Button>
+      </div>
     </section>
   );
 }

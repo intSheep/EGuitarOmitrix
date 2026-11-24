@@ -5,6 +5,7 @@ import { Workspace, Focus, Finish } from "./components/practice-pages";
 import { Catalog, History, DialogHost, WatchPanel } from "./components/records";
 import { usePractice, clock } from "./components/common";
 import { Button } from "./components/ui/button";
+import { shortTitle } from "./domain/course";
 import * as c from "./controllers/practice";
 import {
   isClient,
@@ -118,12 +119,66 @@ function App() {
         </nav>
       </header>
       <div className="workspace">
-        {s.draft && !["practice", "focus", "finish"].includes(name) && (
-          <div id="session-access">
-            <span>当前练习 · {clock(s.draft.elapsedMs / 1000)}</span>
-            <a href={s.draft.finishing ? "#finish" : "#focus"}>返回练习</a>
+        {s.draft && name !== "focus" && name !== "finish" && (
+          <div
+            id="session-access"
+            className={name === "practice" ? "practice-list-only" : undefined}
+          >
+            <div className="session-access-copy">
+              <span
+                className={`session-access-dot ${s.draft.running ? "is-running" : ""}`}
+                aria-hidden="true"
+              />
+              <span>
+                {s.draft.running ? "计时进行中" : "练习已暂停"}
+                {s.course ? ` · ${shortTitle(c.lesson(s.draft.entryId))}` : ""}
+                {" · "}
+                <strong data-session-time>
+                  {clock(s.draft.elapsedMs / 1000)}
+                </strong>
+              </span>
+            </div>
+            <a
+              className="button primary compact"
+              href={s.draft.finishing ? "#finish" : "#focus"}
+            >
+              {s.draft.finishing ? "确认练习" : "返回计时"}
+            </a>
           </div>
         )}
+        {s.metroPlaying &&
+          name !== "focus" &&
+          !(name === "practice" && s.metroOpen) && (
+            <div id="global-metro-bar" role="status">
+              <div className="global-metro-copy">
+                <span
+                  className="global-metro-dot"
+                  data-metro-beat-pulse=""
+                  aria-hidden="true"
+                />
+                <span>
+                  节拍器播放中 · {s.metroBpm ?? s.metroTargetBpm} BPM
+                </span>
+              </div>
+              <div className="global-metro-actions">
+                {name === "practice" && (
+                  <Button
+                    className="compact"
+                    onClick={() => c.setMetroOpen(true)}
+                  >
+                    调整
+                  </Button>
+                )}
+                <Button
+                  className="compact"
+                  data-action="global-metro-stop"
+                  onClick={() => c.stopMetronome()}
+                >
+                  停止节拍
+                </Button>
+              </div>
+            </div>
+          )}
         <main id="main" tabIndex={-1}>
           <div id="app" aria-busy={!s.course}>
             {s.fatal ? (
