@@ -140,25 +140,11 @@ function rgbCss([r, g, b]: [number, number, number], alpha = 1) {
   return alpha >= 1 ? `rgb(${r} ${g} ${b})` : `rgb(${r} ${g} ${b} / ${alpha})`;
 }
 
-function formatClock(seconds: number) {
-  return `${Math.floor(seconds / 60)
-    .toString()
-    .padStart(2, "0")}:${Math.floor(seconds % 60)
-    .toString()
-    .padStart(2, "0")}`;
-}
-
 export function PitchStage({
-  running = false,
-  reason = "",
-  elapsedMs = 0,
   embedded = false,
   standalone = false,
   onClose,
 }: {
-  running?: boolean;
-  reason?: string;
-  elapsedMs?: number;
   embedded?: boolean;
   standalone?: boolean;
   onClose: () => void;
@@ -834,21 +820,6 @@ export function PitchStage({
       data-pitch-frozen={frozen ? "true" : undefined}
     >
       <div className="pitch-stage-top">
-        {!embedded && !standalone && (
-          <div className="pitch-timer-chip">
-            <span
-              className={`pitch-timer-dot ${running ? "is-running" : ""}`}
-              aria-hidden="true"
-            />
-            <span id="timer-state" role="status">
-              {running ? "练习中" : reason || "已暂停"}
-            </span>
-            <strong id="timer-value" role="timer" aria-label="练习时间">
-              {formatClock(elapsedMs / 1000)}
-            </strong>
-          </div>
-        )}
-
         <div className="pitch-stage-controls">
           <div className="pitch-input-wrap">
             <label htmlFor={deviceSelectId} className="sr-only">

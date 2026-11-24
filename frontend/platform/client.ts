@@ -11,8 +11,16 @@ export function clientBack() {
     c.setDialog(null);
     return true;
   }
-  if (s.tool) {
-    c.setTool(null);
+  if (s.tunerOpen) {
+    c.closeTunerOverlay();
+    return true;
+  }
+  if (s.positionOpen) {
+    c.setPositionOpen(false);
+    return true;
+  }
+  if (name === "focus" && s.focusView !== "timer") {
+    c.returnToTimer();
     return true;
   }
   if (name === "finish") return true;

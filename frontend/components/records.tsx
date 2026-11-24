@@ -3,6 +3,7 @@ import { EffortReview } from "./effort-review";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import * as c from "../controllers/practice";
+import { attachLightDismiss } from "../platform/dialog-utils";
 import { usePractice, clock } from "./common";
 import { Button } from "./ui/button";
 import {
@@ -160,8 +161,18 @@ export function DialogHost() {
     const dialog = ref.current;
     if (!dialog || !s.dialog) return;
     const previous = document.activeElement as HTMLElement | null;
+    const kind = s.dialog.kind;
+    const detach =
+      kind === "menu" || kind === "materials" || kind === "manage"
+        ? attachLightDismiss(dialog)
+        : null;
+    if (kind === "goals" || kind === "result") {
+      dialog.setAttribute("closedby", "closerequest");
+    }
     dialog.showModal();
     return () => {
+      detach?.();
+      dialog.removeAttribute("closedby");
       dialog.close();
       if (previous?.isConnected) previous.focus();
     };
@@ -184,6 +195,9 @@ export function DialogHost() {
                 : "课程资料"
       }
       onCancel={() => c.setDialog(null)}
+      onClose={() => {
+        if (c.getSnapshot().dialog) c.setDialog(null);
+      }}
     >
       <Button
         className="dialog-close"

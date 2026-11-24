@@ -1,7 +1,8 @@
 import { STRINGS, detectPitch, tuningReading, TunerTracker, microphoneErrorMessage } from '../frontend/domain/tuner-model.ts';
+import { attachLightDismiss } from '../frontend/platform/dialog-utils.ts';
 
 let panel, stream, audio, toneAudio, source, analyser, loop, generation = 0;
-let samples, lastAnnouncement = '', ignoreInputUntil = 0;
+let samples, lastAnnouncement = '', ignoreInputUntil = 0, activeOnClose = null, detachLightDismiss = null;
 let soundEnabled = true;
 try { soundEnabled = localStorage.getItem('eguitar-tuner-sound') !== 'false'; } catch {}
 const tracker = new TunerTracker({ holdMs: 3000 });
@@ -282,10 +283,15 @@ async function start() {
 export function stopTunerCapture() { stop('麦克风已停止。点击重新开启。'); }
 
 export function closeTuner() {
+  activeOnClose = null;
+  detachLightDismiss?.();
+  detachLightDismiss = null;
   stop();
   if (panel?.open) panel.close();
   if (panel) {
     panel.classList.remove('in-practice');
+    panel.removeAttribute('closedby');
+    panel.removeAttribute('role');
     document.body.append(panel);
   }
 }
@@ -304,7 +310,6 @@ export function showTuner({ host = null, onClose = null } = {}) {
       <ol class="tuner-string-status" aria-label="自动识别的目标弦（点击可锁定并播放标准音）">${STRINGS.map(s => `<li data-string-status="${s.string}" role="button" tabindex="0" aria-pressed="false" title="点击播放 ${s.string} 弦 (${s.note}) 标准参考音并锁定该弦"><span>${s.string} 弦</span><strong>${s.note}</strong></li>`).join('')}</ol>
       <div id="tuner-readout"><div class="tuner-note-group"><span id="tuner-target">拨动一根空弦</span><strong id="tuner-note">—</strong></div><div class="tuner-feedback"><div class="tuner-direction-row"><strong id="tuner-direction">等待声音</strong><span id="tuner-adjustment">开启后，逐根拨空弦即可（点击上方弦号可听参考音）</span></div><div class="tuner-deviation" aria-hidden="true"><span class="tuner-deviation-center"></span><i id="tuner-needle" style="visibility:hidden"></i></div><div class="tuner-deviation-labels" aria-hidden="true"><span>偏低 −50</span><span>0</span><span>+50 偏高</span></div><div class="tuner-values"><span id="tuner-frequency">— Hz</span><span id="tuner-cents">— 音分</span></div></div></div>
       <div class="tuner-footer"><div class="tuner-input-group"><div class="tuner-input"><svg class="tuner-mic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3m-3 0h6"/></svg><label for="tuner-device" class="sr-only">输入设备</label><select id="tuner-device"><option value="">系统默认输入</option></select><meter id="tuner-level" aria-label="输入音量" min="0" max="1" value="0"></meter></div><p id="tuner-status" role="status">正在开启麦克风…</p></div><span id="tuner-announcement" class="sr-only" aria-live="polite"></span><div class="tuner-actions"><button class="button primary" id="tuner-start">重新开启</button><button class="button primary" id="tuner-stop" disabled hidden>停止调音</button></div></div>`;
-    $('close').onclick = closeTuner;
     $('start').onclick = start;
     $('stop').onclick = () => stop();
     $('device').onchange = () => { if (stream) start(); };
@@ -333,16 +338,41 @@ export function showTuner({ host = null, onClose = null } = {}) {
       item.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleString(); } };
     });
     panel.addEventListener('cancel', () => stop());
-    panel.addEventListener('close', () => { if (!panel.open) stop(); });
+    panel.addEventListener('close', () => {
+      detachLightDismiss?.();
+      detachLightDismiss = null;
+      if (!panel.open) {
+        stop();
+        const cb = activeOnClose;
+        activeOnClose = null;
+        cb?.();
+      }
+    });
     document.addEventListener('visibilitychange', () => { if (document.hidden && panel.open) stop('页面已离开，麦克风已停止。返回后可重新开启。'); });
     window.addEventListener('pagehide', closeTuner);
     navigator.mediaDevices?.addEventListener('devicechange', () => { if (panel.open) devices(generation).catch(() => {}); });
   }
+  activeOnClose = onClose;
   (host || document.body).append(panel);
   panel.classList.toggle('in-practice', !!host);
-  panel.setAttribute('role', host ? 'region' : 'dialog');
-  $('close').onclick = onClose || closeTuner;
-  $('close').hidden = !!host;
+  detachLightDismiss?.();
+  detachLightDismiss = null;
+  if (host) {
+    panel.removeAttribute('closedby');
+    panel.setAttribute('role', 'region');
+  } else {
+    panel.removeAttribute('role');
+    detachLightDismiss = attachLightDismiss(panel);
+  }
+  $('close').onclick = () => {
+    if (panel.open) panel.close();
+    else {
+      const cb = activeOnClose;
+      activeOnClose = null;
+      cb?.();
+    }
+  };
+  $('close').hidden = false;
   updateStringLockUI();
   if (host) panel.show(); else panel.showModal();
   if (document.hidden) {

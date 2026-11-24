@@ -43,13 +43,19 @@ import {
   type Backup,
 } from "../domain/types";
 import { Metronome } from "../audio/metronome";
-import { stopPitchCapture } from "../audio/pitch-capture";
+import {
+  getPitchCaptureSnapshot,
+  startPitchCapture,
+  stopPitchCapture,
+} from "../audio/pitch-capture";
+import { teacherPrescription } from "../domain/prescription";
+import { resumeGuidance } from "../domain/guidance";
 import { pauseScore, closeScore } from "../../app/score-viewer.js";
 import { closeTuner, stopTunerCapture } from "../../app/tuner.js";
+import { closePositionReference } from "../../app/position-reference.js";
 import { saveFile } from "../platform/file-export";
 
-export type Tool =
-  "score" | "tuner" | "position" | "materials" | "metronome" | null;
+export type FocusMainView = "timer" | "score" | "pitch" | "score-pitch";
 export type Dialog =
   | { kind: "goals" | "materials"; id: string }
   | { kind: "manage" | "menu" }
@@ -67,12 +73,16 @@ export interface Snapshot {
   fatal: string;
   ready: boolean;
   busy: boolean;
-  tool: Tool;
+  focusView: FocusMainView;
+  metroOpen: boolean;
+  metroPlaying: boolean;
+  metroBpm: number | null;
+  metroTargetBpm: number;
+  positionOpen: boolean;
+  tunerOpen: boolean;
   dialog: Dialog;
   notice: string;
   saved: PracticeLog | null;
-  metroPlaying: boolean;
-  metroBpm: number | null;
 }
 let state: Snapshot = {
   course: null,
@@ -86,12 +96,16 @@ let state: Snapshot = {
   fatal: "",
   ready: false,
   busy: false,
-  tool: null,
+  focusView: "timer",
+  metroOpen: false,
+  metroPlaying: false,
+  metroBpm: null,
+  metroTargetBpm: 60,
+  positionOpen: false,
+  tunerOpen: false,
   dialog: null,
   notice: "",
   saved: null,
-  metroPlaying: false,
-  metroBpm: null,
 };
 const listeners = new Set<() => void>();
 let db: IDBDatabase | null = null,
@@ -103,11 +117,16 @@ let db: IDBDatabase | null = null,
   watchAway = false;
 let reviewQueue: Promise<void> = Promise.resolve();
 let timer: ReturnType<typeof setInterval> | undefined;
-const metro = new Metronome((beat: number) =>
+const metro = new Metronome((beat: number) => {
+  document.querySelectorAll(".beats").forEach((group) => {
+    group
+      .querySelectorAll(".beat-dot")
+      .forEach((el, i) => el.classList.toggle("lit", i === beat));
+  });
   document
-    .querySelectorAll(".beat-dot")
-    .forEach((el, i) => el.classList.toggle("lit", i === beat)),
-);
+    .querySelectorAll("[data-metro-beat-pulse]")
+    .forEach((el) => el.classList.toggle("is-beat-accent", beat === 0));
+});
 export const getSnapshot = () => state;
 export const subscribe = (listener: () => void) => {
   listeners.add(listener);
@@ -175,7 +194,7 @@ function sample() {
       ),
     });
 }
-function stopSound() {
+function stopAllSound() {
   pauseScore();
   metro.stop();
   patch({ metroPlaying: false, metroBpm: null });
@@ -191,7 +210,7 @@ export async function pause(reason = "已暂停") {
         metro.running ? metro.bpm : null,
       ),
     });
-  stopSound();
+  stopAllSound();
   if (state.draft && release) await persist();
 }
 async function acquire() {
@@ -260,6 +279,16 @@ async function exclusive(action: () => Promise<void>) {
     patch({ busy: false });
   }
 }
+function defaultLessonBpm(id: string): number {
+  const a = assignment(id);
+  const p = teacherPrescription(a);
+  if (p.fixedBpm) return p.fixedBpm;
+  if (state.assignments && a) {
+    const g = resumeGuidance(state.logs, id, a.version, a);
+    if (g.bpm) return g.bpm;
+  }
+  return p.startBpm || state.metroTargetBpm || 60;
+}
 export async function start(id: string, resume = false) {
   await exclusive(async () => {
     if (state.watchDraft)
@@ -269,6 +298,22 @@ export async function start(id: string, resume = false) {
       navigate("finish");
       return;
     }
+    const activeId = draft().entryId;
+    const prescription = teacherPrescription(assignment(activeId));
+    let nextTargetBpm = state.metroTargetBpm;
+    if (prescription.noMetronome) {
+      if (metro.running) {
+        metro.stop();
+        notify("本课不使用节拍器，已自动停止");
+      }
+    } else if (prescription.fixedBpm) {
+      if (metro.running && metro.bpm !== prescription.fixedBpm) {
+        metro.setBpm(prescription.fixedBpm);
+      }
+      nextTargetBpm = prescription.fixedBpm;
+    } else if (!metro.running) {
+      nextTargetBpm = defaultLessonBpm(activeId);
+    }
     patch({
       draft: resumeSession(
         { ...draft(), finishing: false },
@@ -276,6 +321,10 @@ export async function start(id: string, resume = false) {
         performance.now(),
       ),
       saved: null,
+      metroTargetBpm: nextTargetBpm,
+      ...(metro.running
+        ? { metroPlaying: true, metroBpm: metro.bpm }
+        : { metroPlaying: false, metroBpm: null }),
     });
     try {
       await persist();
@@ -283,7 +332,7 @@ export async function start(id: string, resume = false) {
       patch({ draft: recoverSession(draft()) });
       throw e;
     }
-    navigate("focus");
+    if (route().name !== "focus") navigate("focus");
   });
 }
 export const MIN_PRACTICE_MS = 60_000;
@@ -297,20 +346,37 @@ export async function finish() {
     if (draft().elapsedMs < minMs) {
       const entryId = draft().entryId;
       await writeDraft(database(), null);
-      patch({ draft: null, saved: null });
       release?.();
       release = null;
       stopPitchCapture();
-      setTool(null);
+      closeTuner();
+      closePositionReference();
+      closeScore();
+      patch({
+        draft: null,
+        saved: null,
+        focusView: "timer",
+        tunerOpen: false,
+        positionOpen: false,
+        metroOpen: false,
+      });
       navigate(`practice?lesson=${entryId}`);
       notify("练习不足 1 分钟，本次未计入记录");
       return;
     }
     sessionLog(draft());
-    patch({ draft: { ...draft(), finishing: true } });
-    await persist();
     stopPitchCapture();
-    setTool(null);
+    closeTuner();
+    closePositionReference();
+    closeScore();
+    patch({
+      draft: { ...draft(), finishing: true },
+      focusView: "timer",
+      tunerOpen: false,
+      positionOpen: false,
+      metroOpen: false,
+    });
+    await persist();
     navigate("finish");
   });
 }
@@ -323,11 +389,20 @@ export async function discard() {
     await queue;
     const entryId = draft().entryId;
     await writeDraft(database(), null);
-    patch({ draft: null, saved: null });
     release?.();
     release = null;
     stopPitchCapture();
-    setTool(null);
+    closeTuner();
+    closePositionReference();
+    closeScore();
+    patch({
+      draft: null,
+      saved: null,
+      focusView: "timer",
+      tunerOpen: false,
+      positionOpen: false,
+      metroOpen: false,
+    });
     navigate(`practice?lesson=${entryId}`);
     notify("已放弃本次练习");
   });
@@ -357,6 +432,10 @@ export async function saveResult(bpm: number | null, outcome: Outcome | null) {
       draft: null,
       saved: log,
       logs: [log, ...state.logs.filter((x) => x.id !== log.id)],
+      focusView: "timer",
+      tunerOpen: false,
+      positionOpen: false,
+      metroOpen: false,
     });
     release?.();
     release = null;
@@ -364,47 +443,96 @@ export async function saveResult(bpm: number | null, outcome: Outcome | null) {
     notify("已保存");
   });
 }
-export function setTool(tool: Tool) {
-  if (state.tool === tool) return;
-  closeScore();
-  closeTuner();
-  // Tuner shares microphone and audio cue space; other tools can coexist with
-  // live pitch capture and an active metronome.
-  if (tool === "tuner") {
-    stopPitchCapture();
-    metro.stop();
-    patch({ tool, metroPlaying: false, metroBpm: null });
-    return;
-  }
-  patch({ tool });
-}
-export async function openTool(tool: Tool) {
+export function setFocusView(view: FocusMainView) {
   sample();
-  setTool(tool);
+  if (state.tunerOpen) closeTuner();
+  patch({ focusView: view, tunerOpen: false });
+  if (view === "pitch" || view === "score-pitch") {
+    const status = getPitchCaptureSnapshot().status;
+    if (status === "idle" || status === "error") {
+      void startPitchCapture();
+    }
+  } else {
+    stopPitchCapture();
+  }
+}
+export function returnToTimer() {
+  sample();
+  closeTuner();
+  closePositionReference();
+  stopPitchCapture();
+  patch({ focusView: "timer", tunerOpen: false, positionOpen: false });
+}
+export function setMetroOpen(open: boolean) {
+  patch({ metroOpen: open });
+}
+export function toggleMetroOpen() {
+  setMetroOpen(!state.metroOpen);
+}
+export function setPositionOpen(open: boolean) {
+  sample();
+  if (!open) closePositionReference();
+  patch({ positionOpen: open });
+}
+export function togglePosition() {
+  setPositionOpen(!state.positionOpen);
+}
+export function openTuner() {
+  sample();
+  stopPitchCapture();
+  stopMetronome();
+  pauseScore();
+  const nextFocusView: FocusMainView =
+    state.focusView === "score-pitch"
+      ? "score"
+      : state.focusView === "pitch"
+        ? "timer"
+        : state.focusView;
+  patch({ tunerOpen: true, focusView: nextFocusView });
+}
+export function closeTunerOverlay() {
+  closeTuner();
+  patch({ tunerOpen: false });
 }
 export function setDialog(dialog: Dialog) {
   patch({ dialog });
 }
-export async function toggleMetronome(bpm: number) {
+function activeLessonPrescription() {
+  if (!state.draft) return null;
+  if (!state.draft.running && route().name !== "focus") return null;
+  return teacherPrescription(assignment(state.draft.entryId));
+}
+export function setMetronomeBpm(bpm: number) {
+  sample();
+  if (!Number.isInteger(bpm) || bpm < 20 || bpm > 300)
+    throw Error("BPM 请输入 20–300 之间的整数");
+  const prescription = activeLessonPrescription();
+  if (prescription?.fixedBpm && bpm !== prescription.fixedBpm)
+    throw Error("请保持老师要求的固定速度");
+  metro.setBpm(bpm);
+  patch({
+    metroTargetBpm: bpm,
+    ...(metro.running ? { metroBpm: bpm } : {}),
+  });
+}
+export async function toggleMetronome(bpm?: number) {
   sample();
   if (metro.running) {
     metro.stop();
     patch({ metroPlaying: false, metroBpm: null });
     return;
   }
-  if (!draft().running) throw Error("请先继续练习");
-  const prescription = (
-    await import("../domain/prescription")
-  ).teacherPrescription(assignment(draft().entryId));
-  if (prescription.noMetronome) throw Error("本课不使用节拍器");
-  if (!Number.isInteger(bpm) || bpm < 20 || bpm > 300)
+  const target = bpm ?? state.metroTargetBpm;
+  const prescription = activeLessonPrescription();
+  if (prescription?.noMetronome) throw Error("本课不使用节拍器");
+  if (!Number.isInteger(target) || target < 20 || target > 300)
     throw Error("BPM 请输入 20–300 之间的整数");
-  if (prescription.fixedBpm && bpm !== prescription.fixedBpm)
+  if (prescription?.fixedBpm && target !== prescription.fixedBpm)
     throw Error("请保持老师要求的固定速度");
   pauseScore();
-  metro.bpm = bpm;
+  metro.setBpm(target);
   await metro.start();
-  patch({ metroPlaying: true, metroBpm: bpm });
+  patch({ metroPlaying: true, metroBpm: target, metroTargetBpm: target });
 }
 export function stopMetronome() {
   sample();
@@ -439,6 +567,9 @@ export async function connectStorage() {
         watchDraft: study.draft,
         storageError: "",
         ready: true,
+        ...(saved && !metro.running
+          ? { metroTargetBpm: defaultLessonBpm(saved.entryId) }
+          : {}),
       });
     } catch (e) {
       next?.close();
@@ -465,6 +596,9 @@ export async function refresh() {
     goals,
     watches: study.records,
     watchDraft: study.draft,
+    ...(saved && !metro.running
+      ? { metroTargetBpm: defaultLessonBpm(saved.entryId) }
+      : {}),
   });
 }
 export async function endWatch(interrupted = false) {
@@ -499,7 +633,7 @@ export async function launchMaterial(id: string, from?: number) {
   watchBusy = true;
   try {
     sample();
-    stopSound();
+    stopAllSound();
     stopTunerCapture();
     stopPitchCapture();
     if (state.draft?.running) {
@@ -623,7 +757,7 @@ export async function prepareForBackground() {
   sample();
   stopTunerCapture();
   stopPitchCapture("页面已离开，麦克风已停止。返回后可重新开启。");
-  stopSound();
+  pauseScore();
   // A finish transaction owns the draft until commit; a late background write
   // must not recreate the active draft after finishDraft deletes it.
   if (state.draft && release && !state.busy) await persist();
@@ -673,21 +807,35 @@ export async function initialize() {
       return;
     }
     sample();
-    if (!state.draft.running) stopSound();
+    if (!state.draft.running) stopAllSound();
     void persist().catch((e) => {
       patch({ draft: recoverSession(draft()) });
-      stopSound();
+      stopAllSound();
       notify(message(e));
     });
   }, 1000);
-  window.addEventListener("hashchange", () =>
-    run(async () => {
-      setTool(null);
+  let lastRouteName = route().name;
+  window.addEventListener("hashchange", () => {
+    const nextRouteName = route().name;
+    if (nextRouteName !== lastRouteName) {
+      lastRouteName = nextRouteName;
       setDialog(null);
-      await prepareForBackground();
+      closeTuner();
+      closePositionReference();
+      stopPitchCapture("页面已离开，麦克风已停止。返回后可重新开启。");
+      closeScore();
+      patch({
+        tunerOpen: false,
+        positionOpen: false,
+        ...(nextRouteName !== "focus" ? { focusView: "timer" } : {}),
+      });
+    }
+    run(async () => {
+      sample();
+      if (state.draft && release && !state.busy) await persist();
       await endWatch();
-    }),
-  );
+    });
+  });
   document.addEventListener("visibilitychange", () =>
     run(async () => {
       if (document.hidden) {
@@ -708,6 +856,7 @@ export async function initialize() {
     }),
   );
   window.addEventListener("pagehide", () => {
+    stopAllSound();
     run(prepareForBackground);
   });
   window.eguitarPauseForBackground = prepareForBackground;
@@ -717,6 +866,7 @@ export async function initialize() {
 export function disposeController() {
   clearInterval(timer);
   closeTuner();
+  closePositionReference();
   stopPitchCapture();
   closeScore();
   metro.stop();

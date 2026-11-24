@@ -456,3 +456,22 @@ on native app launch and prompt when a newer compatible stable release is
 available. Retain manual checks in a secondary location. Require explicit
 download and installation consent, preserve the draft barrier, and make macOS
 replacement errors visible and recoverable.
+
+### Two-tier practice views, persistent metronome, and return-to-timer — 2026-11-23
+
+Owner-authorized refinement across Focus and Workspace:
+- Separate primary practice views (`计时`, `乐谱`, `实时识音`, `谱+识音`) from
+  non-destructive companion utilities (`节拍器`, `把位图`, `调音器`, `课程资料`).
+- Rename live pitch monitoring to `实时识音` (available standalone from `练习台`,
+  alone in Focus, or side-by-side with `乐谱`) and the C-major reference to `把位图`.
+- Keep the built-in metronome running across in-app route switches, primary-view
+  switches, live BPM edits, and page/window backgrounding, and permit standalone
+  metronome playback on `练习台` without starting a practice session (`tempoUsage`
+  still records only while a timed session draft is actively running). Stop the
+  metronome automatically only when opening `调音器`, starting score audio playback,
+  pausing/finishing/discarding practice, launching external material, or closing.
+- Keep loaded scores mounted when opening/closing `节拍器`, `把位图`, `调音器`,
+  or `课程资料` or switching `乐谱` ↔ `谱+识音`.
+- Keep return-to-timer unmistakable via `← 返回计时`, the `计时` primary view tab
+  with live clock badge, the clickable bottom timer status pill, and the `#session-access`
+  banner across other routes.
