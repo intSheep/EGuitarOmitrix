@@ -500,5 +500,5 @@ course assets, and the local build verified all 374 distributed assets.
 Four bundled-resource Chromium scenarios passed. P033, P026 and the P072
 backing track produced nonzero audio samples in Chromium, and the app
 downloaded the exact repaired GP bytes for each. Guitar Pro 8 listening
-acceptance remains open. The installed app and public pack are pending release
-of the candidate version.
+acceptance remains open. The repository lock identifies the repaired public
+course pack for Pages and future native builds.

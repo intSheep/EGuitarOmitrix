@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "version": "2026.10.20.1",
-  "sha256": "464773e061dd96a1a6141b3ff1d9f4c636081dd73a5300e64c718c09ee645906",
-  "manifestSha256": "2f66bd262681e83f642977b3edc6b6518134f7e3ef5dac3a040a1b0ad45f7576",
+  "version": "2026.11.24.1",
+  "sha256": "a796413c3b7d2fb4a8822d9f32d9705a18a9328c97c19d6b7266e3675b385a6e",
+  "manifestSha256": "a759b54eb318c4c60e0eccb2cadbbd03c47e7bc0c33dbb5030749fe858064403",
   "itemCount": 114,
   "fileCount": 343,
-  "uncompressedBytes": 183238515,
-  "releaseTag": "course-resources-2026.10.20.1",
-  "asset": "course-resources-2026.10.20.1.zip"
+  "uncompressedBytes": 182378998,
+  "releaseTag": "course-resources-2026.11.24.1",
+  "asset": "course-resources-2026.11.24.1.zip"
 }
