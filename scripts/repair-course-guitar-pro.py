@@ -18,7 +18,10 @@ CLEAN_GUITAR_RSE = """<RSE>
 <SoundbankPatch>Strat-Guitar</SoundbankPatch>
 <ElementsSettings/>
 <Pickups><OverloudPosition>0</OverloudPosition><Volumes>1 1</Volumes><Tones>1 1</Tones></Pickups>
-<EffectChain/>
+<EffectChain>
+<Effect id="A01_ComboTop30"><Parameters>0.61 0.59 0.38 0.511667 0.21 0.29 0 0</Parameters></Effect>
+<Effect id="E30_EqGEq"><Parameters>0.494949 0.232323 0.373737 0.494949 0.373737 0.494949 0.494949 0.777778</Parameters></Effect>
+</EffectChain>
 </RSE>"""
 
 
@@ -61,6 +64,9 @@ def repair_gpif(data):
         if any(property_node(one(note, "Properties"), "String") is not None
                for note in doc.getElementsByTagName("Note")):
             raise ValueError("Missing tuning on notes with explicit strings")
+        # Guitar Pro's string playback emits unpitched attacks when fret data
+        # is absent. The electric RSE preset can play these pitches directly.
+        track.removeChild(one(track, "UseOneChannelPerString"))
         tuning = parseString(f"""<Property name="Tuning">
 <Pitches>{STANDARD_TUNING}</Pitches><Label>Guitar Standard Tuning</Label>
 <LabelVisible>true</LabelVisible><Flat/><Instrument>Guitar</Instrument></Property>""")

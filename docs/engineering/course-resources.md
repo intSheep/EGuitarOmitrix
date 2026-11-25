@@ -38,10 +38,12 @@ Validation rejects unexpected fields/file paths, unreferenced entries, symlinks,
 FR-019. The original pack contains 28 guitar tracks without a tuning declaration,
 including P033. The other 68 declare standard six-string pitches but label the
 tuning as bass. All 96 select a MIDI-only sound. The migration writes a standard
-guitar tuning and a clean electric Guitar Pro RSE sound into a new versioned
-pack. It retains the existing MIDI program for the app player, all score views
-and notation, and the embedded audio and sync points. Pitch-only passages retain
-their pitch representation.
+guitar tuning and a clean electric Guitar Pro RSE sound with its factory amp and
+EQ into a new versioned pack. It retains the existing MIDI program for the app
+player, all score views and notation, and the embedded audio and sync points.
+Pitch-only passages retain their pitch representation and select pitched RSE
+playback so Guitar Pro does not render notes without frets as unpitched attacks.
+Tablature keeps string playback and the existing string and fret positions.
 
 ```sh
 git show a2fee8cf1b2fae68935f9c91adf39f9d037f237e:config/course-resources.lock.json \
@@ -49,15 +51,16 @@ git show a2fee8cf1b2fae68935f9c91adf39f9d037f237e:config/course-resources.lock.j
 python3 scripts/repair-course-guitar-pro.py \
   --archive private/course-resources-2026.10.20.1.zip \
   --source-lock private/course-resources-2026.10.20.1.lock.json \
-  --version 2026.11.24.1 \
-  --output private/course-resources-2026.11.24.1.zip \
-  --lock private/course-resources-2026.11.24.1.lock.json
-export EGUITAR_COURSE_PACK=private/course-resources-2026.11.24.1.zip
+  --version 2026.11.25.2 \
+  --output private/course-resources-2026.11.25.2.zip \
+  --lock private/course-resources-2026.11.25.2.lock.json
+export EGUITAR_COURSE_PACK=private/course-resources-2026.11.25.2.zip
 npm run build
 node scripts/verify-distribution.mjs dist
 ```
 
-The repository lock pins `2026.11.24.1` for Pages and new native builds.
+Publish the new immutable archive before merging a change to the repository
+lock used by Pages and native builds.
 
 ## GitHub delivery
 

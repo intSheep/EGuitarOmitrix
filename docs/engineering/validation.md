@@ -502,3 +502,22 @@ backing track produced nonzero audio samples in Chromium, and the app
 downloaded the exact repaired GP bytes for each. Guitar Pro 8 listening
 acceptance remains open. The repository lock identifies the repaired public
 course pack for Pages and future native builds.
+
+### Guitar Pro 8 low output on P034 — 2026-11-25
+
+The installed v0.7.1 handoff copied the correct bundled P034-ex1 bytes.
+Guitar Pro 8 showed standard tuning and enabled RSE, but a WAV export peaked at
+−39.5 dBFS. Restoring the clean electric preset's factory amp and EQ produced
+−16.3 dBFS in a second native export of the same 38.4 seconds, with export
+normalization disabled. The new course pack changes only the effect chain in
+all 96 GP files for this comparison. The higher output still did not reproduce
+the expected pitches, so this intermediate pack was not published.
+
+### Guitar Pro 8 pitched electric playback — 2026-11-25
+
+Native WAV exports showed that string playback on P034-ex1 produced unpitched
+attacks for notes without fret data. Removing the string-playback marker alone
+from the clean electric preset produced the expected C4, D4 and E4 in the
+first measure. Guitar Pro 8 recognized the same correction on P033 and kept
+string playback enabled on P026. The candidate disables the marker for the 28
+pitch-only scores. Notation, tempo, backing audio and source assets are preserved.
