@@ -33,6 +33,32 @@ On Windows use `python` and set `$env:EGUITAR_COURSE_PACK` in PowerShell before 
 
 Validation rejects unexpected fields/file paths, unreferenced entries, symlinks, duplicate ZIP entries, traversal, missing files, checksum changes and oversized expansion. Extraction validates the complete payload before writing into a fresh staging directory. The build never uses the owner's `app/local-scores` implicitly. Learner records remain in the existing separate local profile; packaging changes no storage schema, origin or backup semantics.
 
+## Guitar Pro 8 playback repair
+
+FR-019. The original pack contains 28 guitar tracks without a tuning declaration,
+including P033. The other 68 declare standard six-string pitches but label the
+tuning as bass. All 96 select a MIDI-only sound. The migration writes a standard
+guitar tuning and a clean electric Guitar Pro RSE sound into a new versioned
+pack. It retains the existing MIDI program for the app player, all score views
+and notation, and the embedded audio and sync points. Pitch-only passages retain
+their pitch representation.
+
+```sh
+git show a2fee8cf1b2fae68935f9c91adf39f9d037f237e:config/course-resources.lock.json \
+  > private/course-resources-2026.10.20.1.lock.json
+python3 scripts/repair-course-guitar-pro.py \
+  --archive private/course-resources-2026.10.20.1.zip \
+  --source-lock private/course-resources-2026.10.20.1.lock.json \
+  --version 2026.11.24.1 \
+  --output private/course-resources-2026.11.24.1.zip \
+  --lock private/course-resources-2026.11.24.1.lock.json
+export EGUITAR_COURSE_PACK=private/course-resources-2026.11.24.1.zip
+npm run build
+node scripts/verify-distribution.mjs dist
+```
+
+The repository lock pins `2026.11.24.1` for Pages and new native builds.
+
 ## GitHub delivery
 
 1. Confirm the repository is private. Upload the verified pack as a versioned **prerelease asset** at the lock's `releaseTag`; do not mark it latest. Attach only the allowlisted archive and a checksum. A published private prerelease is readable by repository readers; a draft is reserved for maintainers and is unsuitable for tester downloads.
